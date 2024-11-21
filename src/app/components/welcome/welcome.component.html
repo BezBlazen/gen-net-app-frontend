@@ -1,0 +1,10 @@
+<mat-toolbar class="root-menu">
+  <mat-toolbar-row>
+    @if (account?.data?.role != null) {
+      <button mat-flat-button (click)="gotoApp()">Open Project</button>
+    } @else {
+      <button mat-flat-button (click)="newSession()">New Project</button>
+    }
+  </mat-toolbar-row>
+</mat-toolbar>
+<p>Welcome</p>

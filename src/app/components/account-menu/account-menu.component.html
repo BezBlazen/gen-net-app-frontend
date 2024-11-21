@@ -1,0 +1,29 @@
+<!-- <button mat-menu-item (click)="getAccount()">A</button>
+<button mat-menu-item (click)="newSession()">NS</button>
+<button mat-menu-item (click)="logout()">Out</button> -->
+
+@if ((account?.isLoading)) {
+    <button mat-button>Login</button>
+} @else if ((account?.data?.role == accountRoleEnum.User || account?.data?.role == accountRoleEnum.Admin)) {
+    <button mat-button [matMenuTriggerFor]="menu">{{account!.data!.username}}</button>
+    <mat-menu #menu="matMenu">
+        <button mat-menu-item>Profile</button>
+        <button mat-menu-item (click)="signOut()">Logout</button>
+    </mat-menu>    
+} @else {
+    <button mat-button (click)="openDialog()">Login</button>
+}
+<!-- 
+@if (account. !== undefined && auth.state == authStateEnum.LoggedIn) {
+    <button mat-button [matMenuTriggerFor]="menu">{{auth.username}}</button>
+    <mat-menu #menu="matMenu">
+        <button mat-menu-item>Profile</button>
+        <button mat-menu-item>Logout</button>
+    </mat-menu>    
+} @else if (auth !== undefined && auth.state == authStateEnum.NotLoggenIn) {
+    <button mat-button (click)="openDialog()">Login</button>
+} @else if (auth !== undefined) {
+    <button mat-button>Login {{auth.state}}</button>
+} @else {
+    <button mat-button disabled>Login</button>
+} -->

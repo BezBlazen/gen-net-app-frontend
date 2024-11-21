@@ -1,0 +1,13 @@
+<!-- <mat-nav-list>
+  @for (link of list; track link) {
+    <a mat-list-item href="..." [activated]="link.isActive">{{ link }}</a>
+  }
+</mat-nav-list> -->
+
+
+<mat-nav-list class="root-menu">
+  <a mat-list-item routerLink="./projects">Projects</a>
+  <a mat-list-item routerLink="./persons">Persons</a>
+</mat-nav-list>
+
+<router-outlet></router-outlet>

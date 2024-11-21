@@ -1,0 +1,28 @@
+<form [formGroup]="signForm" (ngSubmit)="onSubmit()">
+    <mat-button-toggle-group hideSingleSelectionIndicator class="signKing" [value]="signKind" (change)="onChange($event)" (ngSubmit)="onSubmit()">
+        <mat-button-toggle [value]="enumSignKind.Login">Login</mat-button-toggle>
+        <mat-button-toggle [value]="enumSignKind.Registration">Registration</mat-button-toggle>
+    </mat-button-toggle-group>
+    <mat-dialog-content>
+        <mat-form-field>
+            <mat-label>Login</mat-label>
+            <input matInput formControlName="username"/>
+        </mat-form-field>
+        <br>
+        <mat-form-field>
+            <mat-label>Password</mat-label>
+            <input matInput type="password" formControlName="password"/>
+        </mat-form-field>
+        @if (signKind === enumSignKind.Registration) {
+            <br>
+            <mat-form-field>
+                <mat-label>Confirm Password</mat-label>
+                <input matInput type="password" formControlName="confirm_password"/>
+            </mat-form-field>
+        }
+    </mat-dialog-content>
+    <mat-dialog-actions>
+        <button mat-button mat-dialog-close type="submit" [disabled]="!signForm.valid">{{signKind===enumSignKind.Login ? 'Login' : 'Registration'}}</button>
+        <button mat-button mat-dialog-close>Cancel</button>
+    </mat-dialog-actions>
+</form>
