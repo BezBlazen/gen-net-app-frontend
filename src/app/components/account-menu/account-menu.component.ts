@@ -4,8 +4,9 @@ import { MatMenuModule } from '@angular/material/menu';
 import { Account, AccountRole } from '../../models/account.model';
 import { DataService } from '../../services/data.service';
 import { MatButtonModule } from '@angular/material/button';
-import { SignDialogComponent } from '../sign-dialog/sign-dialog.component';
 import { ApiDataWrapper } from '../../services/api-data-wrapper';
+import { SignComponent } from '../sign/sign.component';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-account-menu',
@@ -19,23 +20,23 @@ export class AccountMenuComponent {
   accountRoleEnum = AccountRole
   account:ApiDataWrapper<Account> | null = null;
 
-  constructor(private dataService: DataService) {
-    this.dataService.account$.subscribe(account => this.account = account);
+  constructor(private authService: AuthService) {
+    this.authService.account$.subscribe(account => this.account = account);
   }
 
   openDialog() {
-    this.dialog.open(SignDialogComponent);
+    const dialogRef = this.dialog.open(SignComponent, { disableClose: true });
   }
   signOut() {
-    this.dataService.postSignOut();
+    this.authService.postSignOut();
   }  
   getAccount() {
-    this.dataService.getAccount();
+    this.authService.getAccount();
   }    
   newSession() {
-    this.dataService.postNewSession();
+    this.authService.postNewSession();
   }  
   logout() {
-    this.dataService.postSignOut();
+    this.authService.postSignOut();
   }  
 }

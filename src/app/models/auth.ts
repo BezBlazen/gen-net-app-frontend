@@ -1,7 +1,8 @@
 export enum AuthState {
     Unknown,
-    Session,
-    User
+    SignInInProgress,
+    SignUpInProgress,
+    SignOutInProgress
 }
 
 export interface Auth {

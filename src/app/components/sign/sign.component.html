@@ -1,0 +1,46 @@
+<mat-tab-group animationDuration="500ms" [(selectedIndex)]="selectedIndex">
+    <mat-tab label="Login">
+        <form [formGroup]="signInForm">
+            <mat-dialog-content>
+                <mat-form-field>
+                    <mat-label>Username</mat-label>
+                    <input matInput formControlName="username"/>
+                </mat-form-field>
+                <br>
+                <mat-form-field>
+                    <mat-label>Password</mat-label>
+                    <input matInput type="password" formControlName="password"/>
+                </mat-form-field>
+            </mat-dialog-content>
+            <mat-dialog-actions>
+                <button mat-button (click)="onSignIn()">Login</button>
+                <button mat-button (click)="onClose()">Cancel</button>
+            </mat-dialog-actions>
+        </form>
+    </mat-tab>
+    <mat-tab label="Registration">
+        <form [formGroup]="signUpForm">
+            <mat-dialog-content>
+                <mat-form-field>
+                    <mat-label>Username</mat-label>
+                    <input matInput formControlName="username"/>
+                </mat-form-field>
+                <br>
+                <mat-form-field>
+                    <mat-label>Password</mat-label>
+                    <input matInput type="password" formControlName="password"/>
+                </mat-form-field>
+                <br>
+                <mat-form-field>
+                    <mat-label>Confirm Password</mat-label>
+                    <input matInput type="password" formControlName="confirmPassword"/>
+                </mat-form-field>
+            </mat-dialog-content>
+            <mat-dialog-actions>
+                <button mat-button (click)="onSignUp()">Registration</button>
+                <button mat-button (click)="onClose()">Cancel</button>
+            </mat-dialog-actions>
+        </form>        
+    </mat-tab>
+</mat-tab-group>
+
