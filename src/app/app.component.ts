@@ -20,6 +20,6 @@ export class AppComponent {
   account: ApiDataWrapper<Account> | null = null;
 
   constructor(private authService: AuthService, private router: Router) {
-    this.authService.account$.subscribe(account => {this.account = account; console.log('AppComponent account ' + account?.isLoading)});
+    this.authService.account$.subscribe(account => {this.account = account;});
   }  
 }

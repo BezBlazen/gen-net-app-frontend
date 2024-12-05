@@ -1,10 +1,9 @@
 import { Injectable } from '@angular/core';
-import { Account, AccountRole } from '../models/account.model';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { BehaviorSubject, catchError, delay, map, Observable, Observer, of, ReplaySubject, startWith, Subject, tap, throwError } from 'rxjs';
+import { Account } from '../models/account.model';
+import { HttpClient } from '@angular/common/http';
+import { BehaviorSubject, catchError, map, Observable, of, Subject } from 'rxjs';
 import { ApiDataWrapper } from './api-data-wrapper';
 import { Router } from '@angular/router';
-import { AuthState } from '../models/auth';
 
 @Injectable({
   providedIn: 'root'
@@ -35,8 +34,8 @@ export class AuthService {
     this.httpClient
       .get<Account>(this.baseUrl + '/auth/account', {withCredentials: true})
       .pipe(
-        map((account) => ({data: account, error: undefined, isLoading: false})),
-        catchError((err) => of({error: err instanceof Error ? err.message : 'Data loading failed', isLoading: false })),
+        map((account) => ({data: account, error: undefined})),
+        catchError((err) => of({error: err instanceof Error ? err.message : 'Data loading failed' })),
       )
       .subscribe((account) => {
         this._account.next(account);
@@ -50,8 +49,8 @@ export class AuthService {
     this.httpClient
       .post<Account>(this.baseUrl + '/auth/sign_in', {username: username, password: password}, {withCredentials: true,})
       .pipe(
-        map((account) => ({data: account, error: undefined, isLoading: false})),
-        catchError((err) => of({error: err instanceof Error ? err.message : 'Data loading failed', isLoading: false }))
+        map((account) => ({data: account, error: undefined})),
+        catchError((err) => of({error: err instanceof Error ? err.message : 'Data loading failed' }))
       ).subscribe((account) => {
         this._account.next(account);
         this._accountSubject.next(account);
@@ -65,8 +64,8 @@ export class AuthService {
     this.httpClient
       .post<Account>(this.baseUrl + '/auth/sign_up', {username: username, password: password}, {withCredentials: true,})
       .pipe(
-        map((account) => ({data: account, error: undefined, isLoading: false})),
-        catchError((err) => of({error: err instanceof Error ? err.message : 'Data loading failed', isLoading: false }))
+        map((account) => ({data: account, error: undefined})),
+        catchError((err) => of({error: err instanceof Error ? err.message : 'Data loading failed' }))
       ).subscribe((account) => {
         this._accountSubject.next(account);
         this._authInProgress.next(false);
@@ -78,8 +77,8 @@ export class AuthService {
     this.httpClient
       .post<Account>(this.baseUrl + '/auth/sign_out', null, {withCredentials: true,})
       .pipe(
-        map((account) => ({data: account, error: undefined, isLoading: false})),
-        catchError((err) => of({error: err instanceof Error ? err.message : 'Data loading failed', isLoading: false }))
+        map((account) => ({data: account, error: undefined})),
+        catchError((err) => of({error: err instanceof Error ? err.message : 'Data loading failed' }))
       ).subscribe((account) => {
         this._account.next(null);
         this.router.navigate(["/"]);
@@ -90,8 +89,8 @@ export class AuthService {
     this.httpClient
       .post<Account>(this.baseUrl + '/auth/new_session', null, {withCredentials: true,})
       .pipe(
-        map((account) => ({data: account, error: undefined, isLoading: false})),
-        catchError((err) => of({error: err instanceof Error ? err.message : 'Data loading failed', isLoading: false }))
+        map((account) => ({data: account, error: undefined})),
+        catchError((err) => of({error: err instanceof Error ? err.message : 'Data loading failed' }))
       ).subscribe((account) => {
         this._account.next(account)
         this._accountSubject.next(account);
