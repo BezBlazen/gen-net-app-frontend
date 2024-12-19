@@ -8,25 +8,29 @@ import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { Project } from '../../models/project.model';
 import { MatSort } from '@angular/material/sort';
 import { MatPaginator } from '@angular/material/paginator';
+import { MatDividerModule } from '@angular/material/divider';
 
 @Component({
   selector: 'app-projects',
   standalone: true,
-  imports: [MatToolbarModule, MatIconModule, MatButtonModule, ProjectComponent, MatTableModule],
+  imports: [MatToolbarModule, MatIconModule, MatButtonModule, ProjectComponent, MatTableModule, MatDividerModule],
   templateUrl: './projects.component.html',
   styleUrl: './projects.component.scss'
 })
 export class ProjectsComponent {
   dataSource = new MatTableDataSource();
-  // @ViewChild(MatPaginator) paginator: MatPaginator;
-  // @ViewChild(MatSort) sort: MatSort;
 
   displayedColumns: string[] = ['id', 'title'];
   constructor(private dataService: DataService) {
     this.dataService.getProjects().subscribe(projects => {
       if (projects?.data != undefined)
         this.dataSource.data = projects?.data;
-      console.log(projects);
     });
   }
+  postProject() {
+    const  project : Project = { id: -1, title: 'Test'};
+    this.dataService.postProject(project).subscribe((project) => {
+      this.dataService.getProjects();
+    });
+  }  
 }

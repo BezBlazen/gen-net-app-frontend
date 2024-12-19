@@ -1,2 +1,44 @@
-:host { flex-grow: 1; display: flex; flex-direction: row;}
-.root-menu { height: 100%; width: auto; }
+:host { 
+    height: 100%; 
+    mat-sidenav-container { 
+        height: 100%; 
+        width: auto; 
+    }
+}
+// .list-item-projects2 {
+//     height: auto !important;
+// //     .mat-mdc-form-field-subscript-wrapper {
+// //         display: none !important;
+// //     }
+// }
+// ::ng-deep .no-line .mdc-line-ripple {
+//     display: none;
+// }
+// ::ng-deep .no-line .mdc-text-field {
+//     padding: 0%;
+// }
+.list-item-projects {
+    display: flex;
+    .projects-link {
+        padding-right: 60px;
+        .projects-label {
+            font-size: 12px;
+            line-height: 16px;
+            font-weight: 300;
+            margin: 0px;
+        }
+        .project-title {
+            margin: 0px;
+        }
+    }
+    .project-selector {
+        position: absolute;
+        right: 0px;
+    }
+}
+::ng-deep .mat-mdc-icon-button .mat-mdc-button-persistent-ripple {
+    border-radius: var(--mat-list-active-indicator-shape, var(--mat-app-corner-full)) !important;
+}
+::ng-deep .mat-mdc-icon-button .mat-mdc-button-ripple {
+    border-radius: var(--mat-list-active-indicator-shape, var(--mat-app-corner-full)) !important;
+}

@@ -1,16 +1,17 @@
 import { Component } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { DataService } from '../../services/data.service';
 import { ApiDataWrapper } from '../../services/api-data-wrapper';
 import { Account, AccountRole } from '../../models/account.model';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatListModule } from '@angular/material/list';
 
 @Component({
   selector: 'app-welcome',
   standalone: true,
-  imports: [MatToolbarModule, MatButtonModule],
+  imports: [MatToolbarModule, MatButtonModule, MatSidenavModule, MatListModule],
   templateUrl: './welcome.component.html',
   styleUrl: './welcome.component.scss'
 })

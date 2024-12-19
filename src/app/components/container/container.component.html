@@ -1,13 +1,53 @@
-<!-- <mat-nav-list>
-  @for (link of list; track link) {
-    <a mat-list-item href="..." [activated]="link.isActive">{{ link }}</a>
-  }
-</mat-nav-list> -->
+<mat-sidenav-container autosize>
+  <mat-sidenav mode="side" opened>
+    <mat-nav-list>
 
+      @if (project == undefined) {
+        <a mat-list-item  (click)="postProject()">New Project</a>
+      } @else {
+        <div class="list-item-projects">
+          <a class="projects-link" mat-list-item routerLink="./projects">
+            <div>
+              <p class="projects-label">Project</p>
+              <p class="project-title">{{project.title}}</p>
+            </div>
+          </a>
+          <!-- <mat-icon class="project-selector" [matMenuTriggerFor]="menu">more_vert</mat-icon> -->
+  
+          <button mat-icon-button class="project-selector" [matMenuTriggerFor]="menu">
+            <mat-icon>more_vert</mat-icon>
+          </button>
+          <mat-menu #menu="matMenu">
+            @for (p of projects?.data; track p.id) {
+              <button mat-menu-item>
+                @if (project.id == p.id) {
+                  <mat-icon>check</mat-icon>
+                }
+                <span>{{ p.title }}</span>
+              </button>
+            }
+<!-- 
 
-<mat-nav-list class="root-menu">
-  <a mat-list-item routerLink="./projects">Projects</a>
-  <a mat-list-item routerLink="./persons">Persons</a>
-</mat-nav-list>
-
-<router-outlet></router-outlet>
+        
+            <button mat-menu-item>
+              <mat-icon>dialpad</mat-icon>
+              <span>Redial</span>
+            </button>
+            <button mat-menu-item disabled>
+              <mat-icon>voicemail</mat-icon>
+              <span>Check voice mail</span>
+            </button>
+            <button mat-menu-item>
+              <mat-icon>notifications_off</mat-icon>
+              <span>Disable alerts</span>
+            </button> -->
+          </mat-menu>
+        </div>
+        <!-- <a mat-list-item routerLink="./projects">Projects</a> -->
+        <a mat-list-item routerLink="./persons">Persons</a>
+  
+      }
+    </mat-nav-list>
+  </mat-sidenav>
+  <router-outlet></router-outlet>
+</mat-sidenav-container>

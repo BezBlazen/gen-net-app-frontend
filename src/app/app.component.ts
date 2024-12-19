@@ -6,11 +6,12 @@ import { ApiDataWrapper } from './services/api-data-wrapper';
 import { Account, AccountRole } from './models/account.model';
 import { MatButtonModule } from '@angular/material/button';
 import { AuthService } from './services/auth.service';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [MatToolbarModule, AccountMenuComponent, MatButtonModule, RouterLink, RouterOutlet],
+  imports: [MatToolbarModule, AccountMenuComponent, MatButtonModule, RouterLink, RouterOutlet, MatSlideToggleModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
