@@ -36,9 +36,14 @@
         right: 0px;
     }
 }
-::ng-deep .mat-mdc-icon-button .mat-mdc-button-persistent-ripple {
-    border-radius: var(--mat-list-active-indicator-shape, var(--mat-app-corner-full)) !important;
+
+:host ::ng-deep .projects-mat-menu {
+    background-color: aqua !important;
 }
-::ng-deep .mat-mdc-icon-button .mat-mdc-button-ripple {
-    border-radius: var(--mat-list-active-indicator-shape, var(--mat-app-corner-full)) !important;
+
+::ng-deep .projects-mat-menu .mat-mdc-menu-item .mat-icon {
+    order: 2;
+    margin-left: var(--mat-menu-item-spacing);
+    margin-right: 0px;
 }
+

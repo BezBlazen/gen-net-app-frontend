@@ -1,1 +1,7 @@
 .example-spacer { flex: 1 1 auto; }
+::ng-deep .mat-mdc-icon-button .mat-mdc-button-persistent-ripple {
+    border-radius: var(--mat-list-active-indicator-shape, var(--mat-app-corner-full)) !important;
+}
+::ng-deep .mat-mdc-icon-button .mat-mdc-button-ripple {
+    border-radius: var(--mat-list-active-indicator-shape, var(--mat-app-corner-full)) !important;
+}

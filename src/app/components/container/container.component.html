@@ -5,6 +5,7 @@
       @if (project == undefined) {
         <a mat-list-item  (click)="postProject()">New Project</a>
       } @else {
+        <a mat-list-item  (click)="postProject2()">New Project</a>
         <div class="list-item-projects">
           <a class="projects-link" mat-list-item routerLink="./projects">
             <div>
@@ -14,16 +15,16 @@
           </a>
           <!-- <mat-icon class="project-selector" [matMenuTriggerFor]="menu">more_vert</mat-icon> -->
   
-          <button mat-icon-button class="project-selector" [matMenuTriggerFor]="menu">
+          <button mat-icon-button class="project-selector" [matMenuTriggerFor]="projectsMenu">
             <mat-icon>more_vert</mat-icon>
           </button>
-          <mat-menu #menu="matMenu">
+          <mat-menu class="projects-mat-menu" #projectsMenu="matMenu">
             @for (p of projects?.data; track p.id) {
-              <button mat-menu-item>
+              <button mat-menu-item (click)="onClickProjectMenuItem(p)">
+                <span>{{ p.title }}</span>
                 @if (project.id == p.id) {
                   <mat-icon>check</mat-icon>
                 }
-                <span>{{ p.title }}</span>
               </button>
             }
 <!-- 

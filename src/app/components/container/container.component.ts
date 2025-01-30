@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject, Type } from '@angular/core';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import { MatListModule } from '@angular/material/list';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -12,6 +12,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { ApiDataWrapper } from '../../services/api-data-wrapper';
 import { Project } from '../../models/project.model';
 import { DataService } from '../../services/data.service';
+import { MatDialog } from '@angular/material/dialog';
+import { ProjectPresentationEditComponent } from '../project-presentation/project-presentation-edit/project-presentation-edit.component';
 
 @Component({
   selector: 'app-container',
@@ -39,7 +41,23 @@ export class ContainerComponent {
       this.dataService.getProjects();
     });
   }
+  postProject2() {
+    this.openDialog();
+  }
   getProjects() {
     this.dataService.getProjects();
-  }  
+  }
+  onClickProjectMenuItem(project:Project) {
+    if (project.id != this.project?.id)
+      this.dataService.selectProject(project);
+  }
+  readonly dialog = inject(MatDialog);
+
+  openDialog(): void {
+    const dialogRef = this.dialog.open(ProjectPresentationEditComponent);
+    // dialogRef.componentInstance.isDialog = true;
+    //     const dialogRef = this.dialog.open(EntityViewDialogComponent, {
+    //   data: this.project,
+    // });
+  }
 }

@@ -1,5 +1,5 @@
 <mat-toolbar class="entity-toolbar">
-    <button mat-icon-button (click)="postProject()">
+    <button mat-icon-button (click)="openAddProjectDialog()">
         <mat-icon>add</mat-icon>
     </button>
 </mat-toolbar>
@@ -18,7 +18,9 @@
     </ng-container>
   
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"(click)="selectProject(row)"> </tr>
   </table>
-  
-<app-project></app-project>
+@if (projectObj != undefined) {
+  <app-project-presentation-edit [projectObj]="projectObj"></app-project-presentation-edit>
+}  
+

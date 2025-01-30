@@ -1,0 +1,27 @@
+@if (dialogRef == undefined) {
+    <mat-toolbar class="entity-toolbar">
+        <button mat-icon-button (click)="postProject()">
+            <mat-icon>save</mat-icon>
+        </button>    
+    </mat-toolbar>
+}
+
+<form [formGroup]="projectForm">
+    <mat-dialog-content>
+        <mat-form-field class="cdk-visually-hidden">
+            <mat-label>Id</mat-label>
+            <input matInput formControlName="id"/>
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>Title</mat-label>
+            <input matInput formControlName="title"/>
+        </mat-form-field>
+    </mat-dialog-content>    
+</form>
+
+@if (dialogRef != undefined) {
+    <mat-dialog-actions>
+        <button mat-button mat-dialog-close (click)="postProject()">Ok</button>
+        <button mat-button mat-dialog-close (click)="closeDialog()" cdkFocusInitial>Cancel</button>
+    </mat-dialog-actions>  
+}
