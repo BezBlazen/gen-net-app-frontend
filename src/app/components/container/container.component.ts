@@ -14,11 +14,12 @@ import { Project } from '../../models/project.model';
 import { DataService } from '../../services/data.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ProjectPresentationEditComponent } from '../project-presentation/project-presentation-edit/project-presentation-edit.component';
+import { SlicePipe } from '@angular/common';
 
 @Component({
   selector: 'app-container',
   standalone: true,
-  imports: [RouterLink, RouterOutlet, MatListModule, MatToolbarModule, MatSidenavModule, MatFormFieldModule, MatSelectModule, MatInputModule, MatIconModule, MatButtonModule, MatMenuModule],
+  imports: [SlicePipe, RouterLink, RouterOutlet, MatListModule, MatToolbarModule, MatSidenavModule, MatFormFieldModule, MatSelectModule, MatInputModule, MatIconModule, MatButtonModule, MatMenuModule],
   templateUrl: './container.component.html',
   styleUrl: './container.component.scss'
 })
@@ -41,21 +42,28 @@ export class ContainerComponent {
       this.dataService.getProjects();
     });
   }
-  postProject2() {
-    this.openDialog();
-  }
+  // postProject2() {
+  //   this.openDialog();
+  // }
   getProjects() {
     this.dataService.getProjects();
   }
+  getProjectTitle() : string | undefined {
+    const title = this.project?.title;
+    if (title == undefined)
+      return undefined;
+    return title.length > 10 ? title.substring(0,7) + "..." : title;
+  }  
   onClickProjectMenuItem(project:Project) {
     if (project.id != this.project?.id)
       this.dataService.selectProject(project);
   }
-  readonly dialog = inject(MatDialog);
 
-  openDialog(): void {
-    const dialogRef = this.dialog.open(ProjectPresentationEditComponent);
-    // dialogRef.componentInstance.isDialog = true;
+  readonly dialog = inject(MatDialog);
+  openAddProjectDialog(): void {
+    const dialogRef = this.dialog.open(ProjectPresentationEditComponent, { disableClose: true });
+    dialogRef.componentInstance.projectObj = new Project(-1, '');
+    dialogRef.componentInstance.dialogRef = dialogRef;
     //     const dialogRef = this.dialog.open(EntityViewDialogComponent, {
     //   data: this.project,
     // });

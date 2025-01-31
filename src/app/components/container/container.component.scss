@@ -2,21 +2,13 @@
     height: 100%; 
     mat-sidenav-container { 
         height: 100%; 
-        width: auto; 
+        width: auto;
+    }
+    mat-sidenav {
+        min-width: 150px;
     }
 }
-// .list-item-projects2 {
-//     height: auto !important;
-// //     .mat-mdc-form-field-subscript-wrapper {
-// //         display: none !important;
-// //     }
-// }
-// ::ng-deep .no-line .mdc-line-ripple {
-//     display: none;
-// }
-// ::ng-deep .no-line .mdc-text-field {
-//     padding: 0%;
-// }
+
 .list-item-projects {
     display: flex;
     .projects-link {

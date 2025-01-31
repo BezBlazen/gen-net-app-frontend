@@ -65,6 +65,14 @@ export class DataService {
         catchError((err) => of({error: err instanceof Error ? err.message : 'Data loading failed' }))
       );
   }
+  public putProject(project : Project) : Observable<ApiDataWrapper<Project>> {
+    return this.httpClient
+      .put<Project>(this.baseUrl + '/projects', project, {withCredentials: true,})
+      .pipe(
+        map((project) => ({data: project, error: undefined})),
+        catchError((err) => of({error: err instanceof Error ? err.message : 'Data loading failed' }))
+      );
+  }  
   public selectProject(project : Project | undefined) {
     this._project.next(project);
   }  

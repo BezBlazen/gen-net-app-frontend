@@ -1,9 +1,10 @@
 @if (dialogRef == undefined) {
     <mat-toolbar class="entity-toolbar">
-        <button mat-icon-button (click)="postProject()">
+        <button mat-icon-button (click)="putProject()">
             <mat-icon>save</mat-icon>
         </button>    
     </mat-toolbar>
+    <mat-divider></mat-divider>
 }
 
 <form [formGroup]="projectForm">

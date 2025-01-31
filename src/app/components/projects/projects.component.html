@@ -21,6 +21,7 @@
     <tr mat-row *matRowDef="let row; columns: displayedColumns;"(click)="selectProject(row)"> </tr>
   </table>
 @if (projectObj != undefined) {
+  <mat-divider></mat-divider>
   <app-project-presentation-edit [projectObj]="projectObj"></app-project-presentation-edit>
 }  
 

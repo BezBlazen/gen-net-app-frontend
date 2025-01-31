@@ -8,11 +8,12 @@ import { MatButtonModule } from '@angular/material/button';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatDividerModule } from '@angular/material/divider';
 
 @Component({
   selector: 'app-project-presentation-edit',
   standalone: true,
-  imports: [MatToolbarModule, MatIconModule, MatButtonModule, MatDialogActions, MatFormFieldModule, FormsModule, MatInputModule, MatDialogContent, ReactiveFormsModule],
+  imports: [MatDividerModule, MatToolbarModule, MatIconModule, MatButtonModule, MatDialogActions, MatFormFieldModule, FormsModule, MatInputModule, MatDialogContent, ReactiveFormsModule],
   templateUrl: './project-presentation-edit.component.html',
   styleUrl: './project-presentation-edit.component.scss'
 })
@@ -37,12 +38,16 @@ export class ProjectPresentationEditComponent {
   }
 
   postProject() {
-    console.log(this.projectForm.value);
-    // const project = new Project(-1, 'Test');
     this.dataService.postProject(this.projectForm.value).subscribe((project) => {
       this.dataService.getProjects();
+      this.closeDialog();
     });
   }
+  putProject() {
+    this.dataService.putProject(this.projectForm.value).subscribe((project) => {
+      this.dataService.getProjects();
+    });
+  }  
   closeDialog() {
     this.dialogRef?.close();
   }  

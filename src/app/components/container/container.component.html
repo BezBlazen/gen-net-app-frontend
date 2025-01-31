@@ -1,16 +1,15 @@
 <mat-sidenav-container autosize>
   <mat-sidenav mode="side" opened>
     <mat-nav-list>
-
       @if (project == undefined) {
-        <a mat-list-item  (click)="postProject()">New Project</a>
+        <a mat-list-item  (click)="openAddProjectDialog()">New Project</a>
       } @else {
-        <a mat-list-item  (click)="postProject2()">New Project</a>
+        <!-- <a mat-list-item  (click)="postProject2()">New Project</a> -->
         <div class="list-item-projects">
           <a class="projects-link" mat-list-item routerLink="./projects">
             <div>
               <p class="projects-label">Project</p>
-              <p class="project-title">{{project.title}}</p>
+              <p class="project-title">{{getProjectTitle()}}</p>
             </div>
           </a>
           <!-- <mat-icon class="project-selector" [matMenuTriggerFor]="menu">more_vert</mat-icon> -->
