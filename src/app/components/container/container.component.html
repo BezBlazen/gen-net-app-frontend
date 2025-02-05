@@ -4,7 +4,6 @@
       @if (project == undefined) {
         <a mat-list-item  (click)="openAddProjectDialog()">New Project</a>
       } @else {
-        <!-- <a mat-list-item  (click)="postProject2()">New Project</a> -->
         <div class="list-item-projects">
           <a class="projects-link" mat-list-item routerLink="./projects">
             <div>
@@ -12,8 +11,6 @@
               <p class="project-title">{{getProjectTitle()}}</p>
             </div>
           </a>
-          <!-- <mat-icon class="project-selector" [matMenuTriggerFor]="menu">more_vert</mat-icon> -->
-  
           <button mat-icon-button class="project-selector" [matMenuTriggerFor]="projectsMenu">
             <mat-icon>more_vert</mat-icon>
           </button>
@@ -26,26 +23,9 @@
                 }
               </button>
             }
-<!-- 
-
-        
-            <button mat-menu-item>
-              <mat-icon>dialpad</mat-icon>
-              <span>Redial</span>
-            </button>
-            <button mat-menu-item disabled>
-              <mat-icon>voicemail</mat-icon>
-              <span>Check voice mail</span>
-            </button>
-            <button mat-menu-item>
-              <mat-icon>notifications_off</mat-icon>
-              <span>Disable alerts</span>
-            </button> -->
           </mat-menu>
         </div>
-        <!-- <a mat-list-item routerLink="./projects">Projects</a> -->
         <a mat-list-item routerLink="./persons">Persons</a>
-  
       }
     </mat-nav-list>
   </mat-sidenav>

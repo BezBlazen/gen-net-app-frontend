@@ -1,4 +1,5 @@
 .example-spacer { flex: 1 1 auto; }
+.app-root-container {height: calc(100% - var(--mat-toolbar-standard-height));}
 ::ng-deep .mat-mdc-icon-button .mat-mdc-button-persistent-ripple {
     border-radius: var(--mat-list-active-indicator-shape, var(--mat-app-corner-full)) !important;
 }

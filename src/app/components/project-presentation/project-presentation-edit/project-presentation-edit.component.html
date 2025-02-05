@@ -1,12 +1,13 @@
 @if (dialogRef == undefined) {
     <mat-toolbar class="entity-toolbar">
-        <button mat-icon-button (click)="putProject()">
-            <mat-icon>save</mat-icon>
-        </button>    
+        <button mat-icon-button (click)="deleteProject()"><mat-icon color="warn">remove</mat-icon></button>    
+        <button mat-icon-button (click)="putProject()"><mat-icon>save</mat-icon></button>    
     </mat-toolbar>
-    <mat-divider></mat-divider>
+    <mat-progress-bar mode="indeterminate" [class.visibilityHidden]="serviceProject?.isLoading != true"></mat-progress-bar>
+} @else {
+    <h2 mat-dialog-title>{{(projectObj.id > 0) ? 'Edit' : 'Create'}} project</h2>
 }
-
+<mat-divider></mat-divider>
 <form [formGroup]="projectForm">
     <mat-dialog-content>
         <mat-form-field class="cdk-visually-hidden">
@@ -25,4 +26,5 @@
         <button mat-button mat-dialog-close (click)="postProject()">Ok</button>
         <button mat-button mat-dialog-close (click)="closeDialog()" cdkFocusInitial>Cancel</button>
     </mat-dialog-actions>  
+    <mat-progress-bar mode="indeterminate" [class.visibilityHidden]="serviceProject?.isLoading != true"></mat-progress-bar>
 }

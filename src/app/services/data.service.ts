@@ -1,6 +1,6 @@
 import { Injectable, numberAttribute } from '@angular/core';
 import { HttpClient} from '@angular/common/http';
-import { BehaviorSubject, catchError, map, Observable, of, Subject} from 'rxjs';
+import { BehaviorSubject, catchError, map, Observable, of, startWith, delay, Subject} from 'rxjs';
 import { ApiDataWrapper } from './api-data-wrapper';
 import { Project } from '../models/project.model';
 import { Account } from '../models/account.model';
@@ -26,8 +26,8 @@ export class DataService {
     this.httpClient
       .get<Account>(this.baseUrl + '/auth/account', {withCredentials: true})
       .pipe(
-        map((account) => ({data: account, error: undefined})),
-        catchError((err) => of({error: err instanceof Error ? err.message : 'Data loading failed' })),
+        map((account) => ({data: account, error: undefined, isLoading: false})),
+        catchError((err) => of({error: err instanceof Error ? err.message : 'Data loading failed', isLoading: false})),
       )
       .subscribe((account) => {
         this._account.next(account);
@@ -40,8 +40,8 @@ export class DataService {
     this.httpClient
       .get<Project[]>(this.baseUrl + '/projects', {withCredentials: true})
       .pipe(
-        map((projects) => ({data: projects, error: undefined})),
-        catchError((err) => of({data: undefined, error: err instanceof Error ? err.message : 'Data loading failed'})),
+        map((projects) => ({data: projects, error: undefined, isLoading: false})),
+        catchError((err) => of({data: undefined, error: err instanceof Error ? err.message : 'Data loading failed', isLoading: false})),
       )
       .subscribe((projects) => {
         console.log("DS getProjects: " + projects.data);
@@ -57,22 +57,56 @@ export class DataService {
       });
       return this.projects$;
   }
-  public postProject(project : Project) : Observable<ApiDataWrapper<Project>> {
-    return this.httpClient
+  public postProject(project : Project) : Observable<ApiDataWrapper<Project> | null> {
+    const _project = new BehaviorSubject<ApiDataWrapper<Project> | null>(null);
+    this.httpClient
       .post<Project>(this.baseUrl + '/projects', project, {withCredentials: true,})
       .pipe(
-        map((project) => ({data: project, error: undefined})),
-        catchError((err) => of({error: err instanceof Error ? err.message : 'Data loading failed' }))
-      );
+        // delay(3000),
+        map((project) => ({data: project, error: undefined, isLoading: false})),
+        catchError((err) => of({data: undefined, error: err instanceof Error ? err.message : 'Data loading failed', isLoading: false})),
+        startWith({data: undefined, error: undefined, isLoading: true})
+      )
+      .subscribe((project) => {
+        _project.next(project);
+      });
+    return _project.asObservable();      
   }
-  public putProject(project : Project) : Observable<ApiDataWrapper<Project>> {
-    return this.httpClient
+  public putProject(project : Project) : Observable<ApiDataWrapper<Project> | null> {
+    const _project = new BehaviorSubject<ApiDataWrapper<Project> | null>(null);
+    this.httpClient
       .put<Project>(this.baseUrl + '/projects', project, {withCredentials: true,})
       .pipe(
-        map((project) => ({data: project, error: undefined})),
-        catchError((err) => of({error: err instanceof Error ? err.message : 'Data loading failed' }))
-      );
-  }  
+        map((project) => ({data: project, error: undefined, isLoading: false})),
+        catchError((err) => of({data: undefined, error: err instanceof Error ? err.message : 'Data loading failed', isLoading: false})),
+        startWith({data: undefined, error: undefined, isLoading: true})
+      )
+      .subscribe((project) => {
+        _project.next(project);
+      });
+    return _project.asObservable();      
+    // return this.httpClient
+    //   .put<Project>(this.baseUrl + '/projects', project, {withCredentials: true,})
+    //   .pipe(
+    //     map((project) => ({data: project, error: undefined, isLoading: false})),
+    //     catchError((err) => of({error: err instanceof Error ? err.message : 'Data loading failed', isLoading: false}))
+    //   );
+  }
+  public deleteProject(project : Project) : Observable<ApiDataWrapper<Project> | null> {
+    const _project = new BehaviorSubject<ApiDataWrapper<Project> | null>(null);
+    this.httpClient
+      .delete<Project>(this.baseUrl + '/projects/' + project.id, {withCredentials: true,})
+      .pipe(
+        // delay(3000),
+        map((project) => ({data: project, error: undefined, isLoading: false})),
+        catchError((err) => of({data: undefined, error: err instanceof Error ? err.message : 'Data loading failed', isLoading: false})),
+        startWith({data: undefined, error: undefined, isLoading: true})
+      )
+      .subscribe((project) => {
+        _project.next(project);
+      });
+    return _project.asObservable();      
+  }
   public selectProject(project : Project | undefined) {
     this._project.next(project);
   }  

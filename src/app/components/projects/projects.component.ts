@@ -26,8 +26,12 @@ export class ProjectsComponent {
   displayedColumns: string[] = ['id', 'title'];
   constructor(private dataService: DataService) {
     this.dataService.getProjects().subscribe(projects => {
-      if (projects?.data != undefined)
+      if (projects?.data != undefined) {
         this.dataSource.data = projects?.data;
+      } 
+      if (projects?.data == undefined || projects?.data.length == 0) {
+        this.projectObj = undefined;
+      }
     });
   }
   postProject() {

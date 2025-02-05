@@ -14,12 +14,11 @@ import { Project } from '../../models/project.model';
 import { DataService } from '../../services/data.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ProjectPresentationEditComponent } from '../project-presentation/project-presentation-edit/project-presentation-edit.component';
-import { SlicePipe } from '@angular/common';
 
 @Component({
   selector: 'app-container',
   standalone: true,
-  imports: [SlicePipe, RouterLink, RouterOutlet, MatListModule, MatToolbarModule, MatSidenavModule, MatFormFieldModule, MatSelectModule, MatInputModule, MatIconModule, MatButtonModule, MatMenuModule],
+  imports: [RouterLink, RouterOutlet, MatListModule, MatToolbarModule, MatSidenavModule, MatFormFieldModule, MatSelectModule, MatInputModule, MatIconModule, MatButtonModule, MatMenuModule],
   templateUrl: './container.component.html',
   styleUrl: './container.component.scss'
 })
