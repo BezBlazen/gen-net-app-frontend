@@ -1,9 +1,9 @@
-import { Component, inject, Input, SimpleChanges } from '@angular/core';
+import { Component, Inject, inject, Input, Optional, SimpleChanges } from '@angular/core';
 import { Project } from '../../../models/project.model';
 import { MatIconModule } from '@angular/material/icon';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { DataService } from '../../../services/data.service';
-import { MatDialog, MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -21,32 +21,43 @@ import { ConfirmationDialogComponent } from '../../confirmation-dialog/confirmat
   styleUrl: './project-presentation-edit.component.scss'
 })
 export class ProjectPresentationEditComponent {
-  @Input() projectObj!: Project;
-  @Input() dialogRef: MatDialogRef<ProjectPresentationEditComponent> | undefined;
+  @Input() project!: Project;
+  // @Input() dialogRef: MatDialogRef<ProjectPresentationEditComponent> | undefined;
   projectForm: FormGroup;
   serviceProject: ApiDataWrapper<Project> | null = null;
   readonly dialog = inject(MatDialog);
 
-  constructor(private dataService: DataService, private formBuilder: FormBuilder) {
+  constructor(
+      @Optional() public dialogRef: MatDialogRef<ProjectPresentationEditComponent>,
+      @Optional() @Inject(MAT_DIALOG_DATA) public data: Project,
+      private dataService: DataService, 
+      private formBuilder: FormBuilder) {
+
     this.projectForm = formBuilder.group({
       id: ['', Validators.required],
       title: ['', Validators.required]
     });
+
+    // If component used as dialog, use received data
+    if (this.dialogRef)
+      this.project = this.data;
     
   }
 
   ngOnInit() {
-    this.projectForm.patchValue(this.projectObj);
+    // if (this.data != undefined)
+    this.projectForm.patchValue(this.project);
   }
   ngOnChanges(changes: SimpleChanges) {
-    this.projectForm.patchValue(changes['projectObj'].currentValue);
+    this.projectForm.patchValue(changes['project'].currentValue);
   }
 
   postProject() {
     this.dataService.postProject(this.projectForm.value).subscribe( (project) => {
       this.serviceProject = project;
       if (project?.isLoading == false && project.error == null) {
-        this.dataService.getProjects();
+        this.dataService.rereadAppProjectList();
+        this.dataService.rereadProjectsProjectList();
         this.closeDialog();
       }
     });
@@ -55,33 +66,31 @@ export class ProjectPresentationEditComponent {
     this.dataService.putProject(this.projectForm.value).subscribe( (project) => {
       this.serviceProject = project;
       if (project?.isLoading == false && project.error == null) {
-        this.dataService.getProjects();
+        this.dataService.rereadAppProjectList();
+        this.dataService.rereadProjectsProjectList();
       }
     });    
-  }  
+  }
+  setAppProject(project: Project) {
+    this.dataService.setAppProject(project);   
+  }    
   deleteProject() {
     const dialogRef = this.dialog.open(ConfirmationDialogComponent, { disableClose: true });
     dialogRef.componentInstance.title = "Delete project";
-    dialogRef.componentInstance.action = "remove project '"+this.projectObj.title+"'";
+    dialogRef.componentInstance.action = "remove project '"+this.project.title+"'";
     dialogRef.componentInstance.dialogRef = dialogRef;
     dialogRef.componentInstance.onConfirm.subscribe(() => {
-      this.dataService.deleteProject(this.projectObj).subscribe((project) => {
+      this.dataService.deleteProject(this.project).subscribe((project) => {
         if (project?.isLoading == false && project.error == null) {
+          this.dataService.rereadAppProjectList();
+          this.dataService.rereadProjectsProjectList();
           dialogRef.close();
-          this.dataService.getProjects();
         } else {
           dialogRef.componentInstance.isLoading = project?.isLoading;
           dialogRef.componentInstance.errorMessage = project?.error;
         }
       });
     });    
-    // this.dataService.deleteProject(this.projectForm.value).subscribe((project) => {
-    //   this.serviceProject = project;
-    //   if (project?.isLoading == false && project.error == null) {
-    //     this.dataService.getProjects();
-    //     this.closeDialog();
-    //   }
-    // });
   }
   closeDialog() {
     this.dialogRef?.close();

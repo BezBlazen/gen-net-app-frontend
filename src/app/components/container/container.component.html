@@ -1,8 +1,11 @@
 <mat-sidenav-container autosize>
   <mat-sidenav mode="side" opened>
     <mat-nav-list>
-      @if (project == undefined) {
-        <a mat-list-item  (click)="openAddProjectDialog()">New Project</a>
+      @if (projects?.isLoading == true) {
+          <a mat-list-item disabled>Loading...</a>
+          <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+      } @else if (projects == undefined || projects.data == undefined || projects.data.length <= 0) {
+          <a mat-list-item  (click)="openAddProjectDialog()">Create project</a>
       } @else {
         <div class="list-item-projects">
           <a class="projects-link" mat-list-item routerLink="./projects">
@@ -15,10 +18,10 @@
             <mat-icon>more_vert</mat-icon>
           </button>
           <mat-menu class="projects-mat-menu" #projectsMenu="matMenu">
-            @for (p of projects?.data; track p.id) {
+            @for (p of projects.data; track p.id) {
               <button mat-menu-item (click)="onClickProjectMenuItem(p)">
                 <span>{{ p.title }}</span>
-                @if (project.id == p.id) {
+                @if (project?.id == p.id) {
                   <mat-icon>check</mat-icon>
                 }
               </button>

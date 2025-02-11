@@ -20,33 +20,43 @@ import { MatDialog } from '@angular/material/dialog';
   styleUrl: './projects.component.scss'
 })
 export class ProjectsComponent {
-  @Input() projectObj: Project | undefined;
+  project: Project | undefined;
   dataSource = new MatTableDataSource();
 
   displayedColumns: string[] = ['id', 'title'];
   constructor(private dataService: DataService) {
-    this.dataService.getProjects().subscribe(projects => {
-      if (projects?.data != undefined) {
-        this.dataSource.data = projects?.data;
-      } 
-      if (projects?.data == undefined || projects?.data.length == 0) {
-        this.projectObj = undefined;
+    this.dataService.rereadProjectsProjectList();    
+    this.dataService.projectsProjectList$.subscribe((projects) =>  {
+      if (projects?.isLoading != true) {
+        this.dataSource.data = projects?.data == undefined ? new Array<Project>() : projects?.data;
+        if (projects?.data == undefined || projects.data.findIndex(e => e.id === this.project?.id) < 0) {
+          this.project = projects?.data == undefined ? undefined : projects.data[0]
+        }      
       }
     });
+    // this.dataService.getProjects().subscribe(projects => {
+    //   if (projects?.data != undefined) {
+    //     this.dataSource.data = projects?.data;
+    //   } 
+    //   // Reset project edit form
+    //   if (!(projects?.data?.some(prj => prj.id == this.projectObj?.id))) {
+    //     this.projectObj = undefined;
+    //   }
+    // });
   }
   postProject() {
-    const project = new Project(-1, 'Test');
-    this.dataService.postProject(project).subscribe((project) => {
-      this.dataService.getProjects();
-    });
+    // const project = new Project(-1, 'Test');
+    // this.dataService.postProject(project).subscribe((project) => {
+    //   this.dataService.getProjects();
+    // });
   }
   selectProject(row:Project) {
-    this.projectObj = row;
+    this.project = row;
   }
   readonly dialog = inject(MatDialog);
   openAddProjectDialog(): void {
     const dialogRef = this.dialog.open(ProjectPresentationEditComponent, { disableClose: true });
-    dialogRef.componentInstance.projectObj = new Project(-1, '');
+    dialogRef.componentInstance.project = new Project(-1, '');
     dialogRef.componentInstance.dialogRef = dialogRef;
     //     const dialogRef = this.dialog.open(EntityViewDialogComponent, {
     //   data: this.project,
