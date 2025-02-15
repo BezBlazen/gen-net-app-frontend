@@ -1,13 +1,13 @@
 import { inject } from '@angular/core';
 import { map } from 'rxjs';
 import { CanActivateFn, Router } from '@angular/router';
-import { AuthService } from '../services/auth.service';
+import { DataService } from '../services/data.service';
 
 export const authGuard: CanActivateFn = (route, state) => {
   const router: Router = inject(Router);
-  const authService: AuthService = inject(AuthService);
+  const dataService: DataService = inject(DataService);
 
-  return authService.isAuthenticated().pipe(map((result) => {
+  return dataService.isUser().pipe(map((result) => {
     if (result)
       return true;
     else
@@ -18,9 +18,9 @@ export const authGuard: CanActivateFn = (route, state) => {
 
 export const unAuthGuard: CanActivateFn = (route, state) => {
   const router: Router = inject(Router);
-  const authService: AuthService = inject(AuthService);
+  const dataService: DataService = inject(DataService);
 
-  return authService.isAuthenticated().pipe(map((result) => {
+  return dataService.isUser().pipe(map((result) => {
     if (!result)
       return true;
     else

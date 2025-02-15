@@ -12,6 +12,9 @@
                     <input matInput type="password" formControlName="password" cdkFocusInitial/>
                 </mat-form-field>
             </mat-dialog-content>
+            @if (signInAccount?.error != undefined) {
+                <button mat-button color="warn">{{signInAccount?.error}}</button>
+            }
             <mat-dialog-actions>
                 <button mat-button (click)="onSignIn()">Login</button>
                 <button mat-button (click)="onClose()">Cancel</button>
@@ -36,6 +39,9 @@
                     <input matInput type="password" formControlName="confirmPassword"/>
                 </mat-form-field>
             </mat-dialog-content>
+            @if (signUpAccount?.error != undefined) {
+                <button mat-button color="warn">{{signUpAccount?.error}}</button>
+            }
             <mat-dialog-actions>
                 <button mat-button (click)="onSignUp()">Registration</button>
                 <button mat-button (click)="onClose()">Cancel</button>
@@ -43,4 +49,5 @@
         </form>        
     </mat-tab>
 </mat-tab-group>
+<mat-progress-bar mode="indeterminate" [class.visibilityHidden]="account?.isLoading != true && signUpAccount?.isLoading != true"></mat-progress-bar>
 

@@ -25,7 +25,7 @@ export class ProjectsComponent {
 
   displayedColumns: string[] = ['id', 'title'];
   constructor(private dataService: DataService) {
-    this.dataService.rereadProjectsProjectList();    
+    this.dataService.rereadProjectsProjectList();
     this.dataService.projectsProjectList$.subscribe((projects) =>  {
       if (projects?.isLoading != true) {
         this.dataSource.data = projects?.data == undefined ? new Array<Project>() : projects?.data;

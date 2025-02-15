@@ -6,7 +6,7 @@ import { DataService } from '../../services/data.service';
 import { MatButtonModule } from '@angular/material/button';
 import { ApiDataWrapper } from '../../services/api-data-wrapper';
 import { SignComponent } from '../sign/sign.component';
-import { AuthService } from '../../services/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-account-menu',
@@ -20,23 +20,15 @@ export class AccountMenuComponent {
   accountRoleEnum = AccountRole
   account:ApiDataWrapper<Account> | null = null;
 
-  constructor(private authService: AuthService) {
-    this.authService.account$.subscribe(account => this.account = account);
+  constructor(private dataService: DataService, private router: Router) {
+    this.dataService.account$.subscribe(account => this.account = account);
   }
 
   openDialog() {
     const dialogRef = this.dialog.open(SignComponent, { disableClose: true });
   }
   signOut() {
-    this.authService.postSignOut();
-  }  
-  getAccount() {
-    this.authService.getAccount();
-  }    
-  newSession() {
-    this.authService.postNewSession();
-  }  
-  logout() {
-    this.authService.postSignOut();
+    this.dataService.postSignOut();
+    this.router.navigate(["/"]);
   }  
 }

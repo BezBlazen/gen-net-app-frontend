@@ -4,7 +4,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { ApiDataWrapper } from '../../services/api-data-wrapper';
 import { Account, AccountRole } from '../../models/account.model';
 import { Router } from '@angular/router';
-import { AuthService } from '../../services/auth.service';
+
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
 
@@ -18,17 +18,9 @@ import { MatListModule } from '@angular/material/list';
 export class WelcomeComponent {
   account: ApiDataWrapper<Account> | null = null;
 
-  constructor(private authService: AuthService, private router: Router) {
-    this.authService.account$.subscribe(account => {this.account = account});
+  constructor(private router: Router) {
   } 
 
-  newSession() {
-    this.authService.postNewSession().subscribe((account) => {
-      if (account?.data?.role == AccountRole.Session) {
-        this.router.navigate(['/app']);
-      }
-    });;
-  }
   gotoApp() {
     this.router.navigate(['/app']);
   }

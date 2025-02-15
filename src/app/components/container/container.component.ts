@@ -15,6 +15,7 @@ import { DataService } from '../../services/data.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ProjectPresentationEditComponent } from '../project-presentation/project-presentation-edit/project-presentation-edit.component';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { ProjectsTmpComponent } from '../projects-tmp/projects-tmp.component';
 
 @Component({
   selector: 'app-container',
@@ -26,11 +27,16 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 export class ContainerComponent {
   project: Project | undefined;
   projects: ApiDataWrapper<Project[]> | null = null;
+  // tmpProjects: ApiDataWrapper<Project[]> | null = null;  
 
   constructor(private dataService: DataService) {
     this.dataService.rereadAppProjectList();
     this.dataService.appProjectList$.subscribe(projects => this.projects = projects);
     this.dataService.appProject$.subscribe(project => this.project = project);
+    this.dataService.appTmpProjectList$.subscribe(projects => {
+      if (projects?.data != undefined && projects?.data.length > 0)
+        this.openTmpProjectDialog(projects?.data);
+    });
   }
   postProject() {
     const  project : Project = { id: -1, title: 'Test'};
@@ -63,4 +69,10 @@ export class ContainerComponent {
       data: newProject
     });
   }
+  openTmpProjectDialog(projects : Project[]): void {
+    const dialogRef = this.dialog.open(ProjectsTmpComponent, { 
+      disableClose: true, 
+      data: projects
+    });
+  }  
 }

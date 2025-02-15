@@ -4,8 +4,14 @@ export enum AccountRole {
     // Admin = "ROLE_ADMIN"
 }
 
-export interface Account {
-    role: AccountRole;
+export class Account {
+    role: AccountRole | undefined;
     username: string;
+    password: string | undefined;
+    constructor(username: string, password?: string, role?: AccountRole) {
+        this.username = username;
+        this.password = password;
+        this.role = role;
+    }
 } 
 

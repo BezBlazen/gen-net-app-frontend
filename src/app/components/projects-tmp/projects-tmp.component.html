@@ -1,0 +1,17 @@
+<h2 mat-dialog-title>What to do with temporary projects?</h2>
+<mat-divider></mat-divider>
+<mat-dialog-content>
+@for (project of data; track project) {
+    <li>{{project.title}}</li>
+}
+@if (tmpProjects?.error != undefined) {
+    <mat-divider></mat-divider>
+    <button mat-button color="warn">Error: {{tmpProjects?.error}}</button>
+}
+</mat-dialog-content>
+<mat-divider></mat-divider>
+<mat-dialog-actions>
+    <button mat-button (click)="onSave()" cdkFocusInitial>Save</button>
+    <button mat-button (click)="onDelete()">Delete</button>
+</mat-dialog-actions>
+<mat-progress-bar mode="indeterminate" [class.visibilityHidden]="tmpProjects?.isLoading != true"></mat-progress-bar>

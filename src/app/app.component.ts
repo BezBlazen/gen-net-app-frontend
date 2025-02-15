@@ -5,8 +5,8 @@ import { AccountMenuComponent } from "./components/account-menu/account-menu.com
 import { ApiDataWrapper } from './services/api-data-wrapper';
 import { Account, AccountRole } from './models/account.model';
 import { MatButtonModule } from '@angular/material/button';
-import { AuthService } from './services/auth.service';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { DataService } from './services/data.service';
 
 @Component({
   selector: 'app-root',
@@ -20,7 +20,8 @@ export class AppComponent {
   accountRoleEnum = AccountRole;
   account: ApiDataWrapper<Account> | null = null;
 
-  constructor(private authService: AuthService, private router: Router) {
-    this.authService.account$.subscribe(account => {this.account = account;});
+  constructor(private dataService: DataService, private router: Router) {
+    this.dataService.account$.subscribe(account => {this.account = account;});
+    this.dataService.rereadAccount();
   }  
 }
