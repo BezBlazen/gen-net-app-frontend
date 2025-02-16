@@ -20,8 +20,10 @@ export class ProjectsTmpComponent {
   constructor(public dialogRef: MatDialogRef<ProjectsTmpComponent>, @Inject(MAT_DIALOG_DATA) public data: Project[], private dataService: DataService) {
     this.dataService.appTmpProjectList$.subscribe(projects => {
       this.tmpProjects = projects;
-      if (this.onAction && projects?.isLoading != true && projects?.error == undefined)
+      if (this.onAction && projects?.isLoading != true && projects?.error == undefined) {
         this.dialogRef.close();
+        this.dataService.rereadProjectsProjectList();
+      }
     });
   }
   onSave() {

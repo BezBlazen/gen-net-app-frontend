@@ -24,6 +24,11 @@
 </form>
 
 @if (dialogRef != undefined) {
+    @if (errorMessage != undefined) {
+        <mat-divider></mat-divider>
+        <button mat-button color="warn">{{errorMessage}}</button>
+        <mat-divider></mat-divider>
+    }    
     <mat-dialog-actions>
         <button mat-button mat-dialog-close (click)="postProject()">Ok</button>
         <button mat-button mat-dialog-close (click)="closeDialog()" cdkFocusInitial>Cancel</button>

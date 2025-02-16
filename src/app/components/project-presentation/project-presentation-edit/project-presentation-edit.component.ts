@@ -11,7 +11,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatProgressBarModule} from '@angular/material/progress-bar';
 import { ApiDataWrapper } from '../../../services/api-data-wrapper';
-import { ConfirmationDialogComponent } from '../../confirmation-dialog/confirmation-dialog.component';
+import { DialogConfirmationComponent } from '../../dialog-confirmation/dialog-confirmation.component';
+import { DialogWarningComponent } from '../../dialog-warning/dialog-warning.component';
 
 @Component({
   selector: 'app-project-presentation-edit',
@@ -22,9 +23,9 @@ import { ConfirmationDialogComponent } from '../../confirmation-dialog/confirmat
 })
 export class ProjectPresentationEditComponent {
   @Input() project!: Project;
-  // @Input() dialogRef: MatDialogRef<ProjectPresentationEditComponent> | undefined;
   projectForm: FormGroup;
   serviceProject: ApiDataWrapper<Project> | null = null;
+  errorMessage: string | undefined;
   readonly dialog = inject(MatDialog);
 
   constructor(
@@ -55,19 +56,33 @@ export class ProjectPresentationEditComponent {
   postProject() {
     this.dataService.postProject(this.projectForm.value).subscribe( (project) => {
       this.serviceProject = project;
-      if (project?.isLoading == false && project.error == null) {
-        this.dataService.rereadAppProjectList();
-        this.dataService.rereadProjectsProjectList();
-        this.closeDialog();
+      this.errorMessage = undefined;
+      if (project?.isLoading != true) {
+        if (project?.error != undefined) {
+          this.errorMessage = project?.error;
+          if (this.dialogRef == undefined)
+            this.dialog.open(DialogWarningComponent, {data: project.error, disableClose: true });
+        } else {
+          this.dataService.rereadAppProjectList();
+          this.dataService.rereadProjectsProjectList();
+          this.closeDialog();
+        }
       }
     });
   }
   putProject() {
     this.dataService.putProject(this.projectForm.value).subscribe( (project) => {
       this.serviceProject = project;
-      if (project?.isLoading == false && project.error == null) {
-        this.dataService.rereadAppProjectList();
-        this.dataService.rereadProjectsProjectList();
+      this.errorMessage = undefined;
+      if (project?.isLoading != true) {
+        if (project?.error != undefined) {
+          this.errorMessage = project?.error;
+          if (this.dialogRef == undefined)
+            this.dialog.open(DialogWarningComponent, {data: project.error, disableClose: true });
+        } else {
+          this.dataService.rereadAppProjectList();
+          this.dataService.rereadProjectsProjectList();
+        }
       }
     });    
   }
@@ -75,7 +90,7 @@ export class ProjectPresentationEditComponent {
     this.dataService.setAppProject(project);   
   }    
   deleteProject() {
-    const dialogRef = this.dialog.open(ConfirmationDialogComponent, { disableClose: true });
+    const dialogRef = this.dialog.open(DialogConfirmationComponent, { disableClose: true });
     dialogRef.componentInstance.title = "Delete project";
     dialogRef.componentInstance.action = "remove project '"+this.project.title+"'";
     dialogRef.componentInstance.dialogRef = dialogRef;
