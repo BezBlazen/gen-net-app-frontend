@@ -56,7 +56,7 @@ export class ProjectsComponent {
   readonly dialog = inject(MatDialog);
   openAddProjectDialog(): void {
     const dialogRef = this.dialog.open(ProjectPresentationEditComponent, { disableClose: true });
-    dialogRef.componentInstance.project = new Project(-1, '');
+    dialogRef.componentInstance.project = new Project('', '');
     dialogRef.componentInstance.dialogRef = dialogRef;
     //     const dialogRef = this.dialog.open(EntityViewDialogComponent, {
     //   data: this.project,

@@ -39,7 +39,7 @@ export class ContainerComponent {
     });
   }
   postProject() {
-    const  project : Project = { id: -1, title: 'Test'};
+    const  project : Project = { id: '', title: 'Test'};
     // this.dataService.postProject(project).subscribe((project) => {
     //   this.dataService.getProjects();
     // });
@@ -63,7 +63,7 @@ export class ContainerComponent {
 
   readonly dialog = inject(MatDialog);
   openAddProjectDialog(): void {
-    const newProject = new Project(-1, '');
+    const newProject = new Project('', '');
     const dialogRef = this.dialog.open(ProjectPresentationEditComponent, { 
       disableClose: true, 
       data: newProject

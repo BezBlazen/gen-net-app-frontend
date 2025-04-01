@@ -1,3 +1,3 @@
 export class Project {
-  constructor(public id: number, public title: string) {}
+  constructor(public id: string, public title: string) {}
 } 

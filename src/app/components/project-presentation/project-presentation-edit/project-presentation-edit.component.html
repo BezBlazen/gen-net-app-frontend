@@ -7,7 +7,7 @@
     </mat-toolbar>
     <mat-progress-bar mode="indeterminate" [class.visibilityHidden]="serviceProject?.isLoading != true"></mat-progress-bar>
 } @else {
-    <h2 mat-dialog-title>{{(project.id > 0) ? 'Edit' : 'Create'}} project</h2>
+    <h2 mat-dialog-title>{{(project.id.length) ? 'Edit' : 'Create'}} project</h2>
 }
 <mat-divider></mat-divider>
 <form [formGroup]="projectForm">
