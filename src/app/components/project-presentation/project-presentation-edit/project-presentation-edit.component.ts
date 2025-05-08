@@ -50,11 +50,12 @@ export class ProjectPresentationEditComponent {
     this.projectForm.patchValue(this.project);
   }
   ngOnChanges(changes: SimpleChanges) {
-    this.projectForm.patchValue(changes['project'].currentValue);
+    this.data = changes['project'].currentValue;
+    // this.projectForm.patchValue(changes['project'].currentValue);
   }
 
   postProject() {
-    this.dataService.postProject(this.projectForm.value).subscribe( (project) => {
+    this.dataService.postProject(this.data).subscribe( (project) => {
       this.serviceProject = project;
       this.errorMessage = undefined;
       if (project?.isLoading != true) {
@@ -71,7 +72,7 @@ export class ProjectPresentationEditComponent {
     });
   }
   putProject() {
-    this.dataService.putProject(this.projectForm.value).subscribe( (project) => {
+    this.dataService.putProject(this.data).subscribe( (project) => {
       this.serviceProject = project;
       this.errorMessage = undefined;
       if (project?.isLoading != true) {
@@ -109,5 +110,55 @@ export class ProjectPresentationEditComponent {
   }
   closeDialog() {
     this.dialogRef?.close();
-  }  
+  }
+  
+  // renderers = angularMaterialRenderers;
+  form_config_edit = {
+    uischema : {
+      type: 'VerticalLayout',
+      elements: [
+        {
+          type: 'Control',
+          scope: '#/properties/id',
+          options: {
+            readonly: true
+          }
+        },
+        {
+          type: 'Control',
+          scope: '#/properties/title',
+        },
+        {
+          type: 'Control',
+          scope: '#/properties/create_date',
+          options: {
+            readonly: true
+          }
+        },
+      ],
+    },
+    schema : {
+      type: 'object',
+      properties: {
+        id: {
+          type: 'string'
+        },
+        title: {
+          type: 'string',
+          minLength: 1,
+        },
+        create_date: {
+          type: 'string',
+          format: 'date',
+        },
+      },
+      required: ['title'],
+    }
+  }
+  uischema = this.form_config_edit.uischema;
+  schema = this.form_config_edit.schema;
+  // datas = {};
+  onDataChange(data: any) {
+    this.data = data;
+  }
 }

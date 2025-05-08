@@ -11,6 +11,8 @@ import { Project } from '../../models/project.model';
 import { MatDividerModule } from '@angular/material/divider';
 import { ProjectPresentationEditComponent } from "../project-presentation/project-presentation-edit/project-presentation-edit.component";
 import { MatDialog } from '@angular/material/dialog';
+import { ProjectPresentationComponent } from '../project-presentation/project-presentation.component';
+import { PresentationMode, PresentationDataWrapper} from '../../models/presentation.model';
 
 @Component({
   selector: 'app-projects',
@@ -55,9 +57,10 @@ export class ProjectsComponent {
   }
   readonly dialog = inject(MatDialog);
   openAddProjectDialog(): void {
-    const dialogRef = this.dialog.open(ProjectPresentationEditComponent, { disableClose: true });
-    dialogRef.componentInstance.project = new Project('', '');
-    dialogRef.componentInstance.dialogRef = dialogRef;
+    const dialogRef = this.dialog.open(ProjectPresentationComponent, { disableClose: true });
+    dialogRef.componentInstance.payload = {data: new Project(), mode: PresentationMode.Create, dialogRef: dialogRef};
+    // dialogRef.componentInstance.project = new Project('', '');
+    // dialogRef.componentInstance.dialogRef = dialogRef;
     //     const dialogRef = this.dialog.open(EntityViewDialogComponent, {
     //   data: this.project,
     // });

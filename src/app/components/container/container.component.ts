@@ -63,7 +63,7 @@ export class ContainerComponent {
 
   readonly dialog = inject(MatDialog);
   openAddProjectDialog(): void {
-    const newProject = new Project('', '');
+    const newProject = new Project();
     const dialogRef = this.dialog.open(ProjectPresentationEditComponent, { 
       disableClose: true, 
       data: newProject

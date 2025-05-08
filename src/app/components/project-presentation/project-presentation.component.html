@@ -3,12 +3,13 @@
         <button mat-icon-button (click)="deleteProject()"><mat-icon color="warn">remove</mat-icon></button>    
         <mat-divider vertical style="height: 100%"></mat-divider>
         <button mat-icon-button (click)="putProject()"><mat-icon>save</mat-icon></button>
-        <button mat-icon-button (click)="setAppProject(project)"><mat-icon>publish</mat-icon></button>    
+        <button mat-icon-button (click)="setAppProject(data)"><mat-icon>publish</mat-icon></button>    
     </mat-toolbar>
     <mat-progress-bar mode="indeterminate" [class.visibilityHidden]="serviceProject?.isLoading != true"></mat-progress-bar>
 } @else {
-    <h2 mat-dialog-title>{{(project.id.length) ? 'Edit' : 'Create'}} project</h2>
+    <h2 mat-dialog-title>{{payload.mode}} project</h2>
 }
+{{isFormValid}}
 <mat-divider></mat-divider>
 <!-- <form [formGroup]="projectForm">
     <mat-dialog-content>
@@ -22,14 +23,16 @@
         </mat-form-field>
     </mat-dialog-content>    
 </form> -->
-
-<jsonforms
-    [data]="data"
-    [schema]="schema"
-    [uischema]="uischema"
-    [renderers]="renderers"
-    (dataChange)="onDataChange($event)"
-></jsonforms>
+<form [formGroup]="form">
+    <!-- <jsonforms
+        [data]="data"
+        [schema]="schema"
+        [uischema]="uischema"
+        [renderers]="renderers"
+        (dataChange)="onDataChange($event)"
+        (errors)="onErrors($event)"
+    ></jsonforms> -->
+</form>
 
 @if (dialogRef != undefined) {
     @if (errorMessage != undefined) {
@@ -38,7 +41,7 @@
         <mat-divider></mat-divider>
     }    
     <mat-dialog-actions>
-        <button mat-button mat-dialog-close (click)="postProject()">Ok</button>
+        <button mat-button mat-dialog-close [disabled]="form.invalid" (click)="postProject()">Ok</button>
         <button mat-button mat-dialog-close (click)="closeDialog()" cdkFocusInitial>Cancel</button>
     </mat-dialog-actions>  
     <mat-progress-bar mode="indeterminate" [class.visibilityHidden]="serviceProject?.isLoading != true"></mat-progress-bar>
