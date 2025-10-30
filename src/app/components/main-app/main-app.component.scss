@@ -1,0 +1,117 @@
+// * {
+//     margin: 0;
+//     padding: 0;
+// }
+
+* {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+:host {
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    top: 0;
+    left: 0;
+    margin: 0;
+    padding: 0;
+}
+
+$app-header-height: 48px;
+$app-wrapper-menu-width: 160px;
+
+.app {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+
+    .app-header {
+        line-height: $app-header-height;
+        display: flex;
+        flex-direction: row;
+        overflow: hidden;
+
+        .app-header-logo {
+            margin: 0 8px;
+        }
+
+        .app-header-account-menu {
+            flex-grow: 1;
+            text-align: right;
+            margin: 0 8px;
+        }
+    }
+
+    .app-wrapper {
+        display: flex;
+        flex-direction: row;
+        flex-grow: 1;
+        height: calc(100% - $app-header-height - 1px); // - top border
+        border-top: 1px solid lightgray;
+        overflow: hidden;
+
+        .app-wrapper-menu {
+            width: $app-wrapper-menu-width;
+            height: 100%;
+            padding: 4px;
+        }
+
+        .app-wrapper-container {
+            width: calc(100% - $app-wrapper-menu-width - 1px); // - left border
+            border-left: 1px solid lightgray;
+            flex-grow: 1;
+            height: 100%;
+        }
+    }
+}
+
+.dialog-sign {
+    border: none !important;
+    border-left: 1px solid black !important;
+    margin-left: auto;
+    margin-right: 0;
+    height: 100vh;
+    max-height: none;
+    max-width: none;
+    width: 300px;
+
+    .footer {
+        display: flex;
+        flex-direction: row;
+        padding-top: 16px;
+
+        div:last-child {
+            flex-grow: 1;
+            text-align: right;
+        }
+
+        a {
+            color: -webkit-link;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+    }
+
+    .loading {
+        background: url("/assets/images/sample.gif");
+        border: none;
+        background-repeat: no-repeat;
+        object-fit: cover;
+    }
+
+}
+
+.app-alert {
+    border: 1px solid black;
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translate(-50%,0);
+    padding: 8px;
+    text-align: center;
+    background-color: lightcoral;
+    * {
+        margin: 0px;
+    }
+}

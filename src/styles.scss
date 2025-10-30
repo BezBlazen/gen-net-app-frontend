@@ -1,1 +1,18 @@
 /* You can add global styles to this file, and also import other style files */
+
+button {
+    min-width: 60px;
+}
+
+div button:not(:first-child) {
+    margin-left: 2px;
+}
+
+.is-loading-div {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.3);
+}

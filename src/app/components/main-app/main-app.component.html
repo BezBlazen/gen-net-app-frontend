@@ -1,0 +1,67 @@
+<div class="app">
+    <div class="app-header">
+        <div class="app-header-logo">
+            <a routerLink="/">gen-net-app</a>
+        </div>
+        <div class="app-header-account-menu">
+            @if (account?.role == accountRoleEnum.User) {
+                <select (change)="onAccountMenuChange($event)">
+                    <option value="default" disabled selected>{{account?.username}}</option>
+                    <option value="profile">Profile</option>
+                    <option value="signOut">Logout</option>
+                </select>
+            } @else {
+                <button (click)="openDialog(dialogSignIn)">Login</button>
+            }
+        </div>
+    </div>
+    <div class="app-wrapper">
+        <div class="app-wrapper-menu">menu</div>
+        <div class="app-wrapper-container">container</div>
+    </div>
+</div>
+
+<dialog class="dialog-sign" #dialogSignIn>
+    <form [formGroup]="signInForm">
+        <div class="header">
+            <h3>Login</h3>
+        </div>
+        <div class="content">
+            <formly-form [form]="signInForm" [fields]="signInFields" [options]="signInOptions" [model]="signInModel"></formly-form>
+        </div>
+        <div class="footer">
+            <div>
+                <a (click)="switchDialog(dialogSignIn, dialogSignUp)">or Register</a>
+            </div>
+            <div>
+                <button (click)="onSignInFormSubmit()">Ok</button>
+                <button (click)="closeDialog(dialogSignIn)">Cancel</button>
+            </div>
+        </div>
+    </form>
+    <div class="is-loading-div" [style.visibility]="!isLoading? 'hidden': 'visible'"></div>
+</dialog>
+<dialog class="dialog-sign" #dialogSignUp>
+    <form [formGroup]="signUpForm">
+        <div class="header">
+            <h3>Registration</h3>
+        </div>
+        <div class="content">
+            <formly-form [form]="signUpForm" [fields]="signUpFields" [options]="signUpOptions" [model]="signUpModel"></formly-form>
+        </div>
+        <div class="footer">
+            <div>
+                <a (click)="switchDialog(dialogSignUp, dialogSignIn)">or Login</a>
+            </div>
+            <div>
+                <button (click)="onSignUpFormSubmit()">Ok</button>
+                <button (click)="closeDialog(dialogSignUp)">Cancel</button>
+            </div>
+        </div>
+    </form>
+</dialog>
+<div class="app-alert" [style.visibility]="!errorMessage? 'hidden': 'visible'">
+    <p>{{errorMessage}}</p>
+</div>
+<ngx-spinner bdColor="rgba(0, 0, 0, 0.2)" size="default" color="#fff" type="ball-8bits"
+    [fullScreen]="true"></ngx-spinner>
