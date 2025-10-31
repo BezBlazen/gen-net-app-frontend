@@ -55,6 +55,13 @@ $app-wrapper-menu-width: 160px;
             width: $app-wrapper-menu-width;
             height: 100%;
             padding: 4px;
+
+            menu {
+                padding-inline-start: 28px;
+                a {
+                    cursor: pointer;
+                }
+            }
         }
 
         .app-wrapper-container {
@@ -107,10 +114,11 @@ $app-wrapper-menu-width: 160px;
     position: absolute;
     top: 0;
     left: 50%;
-    transform: translate(-50%,0);
+    transform: translate(-50%, 0);
     padding: 8px;
     text-align: center;
     background-color: lightcoral;
+
     * {
         margin: 0px;
     }

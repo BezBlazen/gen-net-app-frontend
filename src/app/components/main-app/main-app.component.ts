@@ -1,11 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, ViewChild, inject } from '@angular/core';
 import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { Router, RouterLink } from "@angular/router";
+import { Router, RouterLink, RouterOutlet } from "@angular/router";
 import { FormlyFieldConfig, FormlyFormOptions, FormlyModule } from '@ngx-formly/core';
 import { DataService } from '../../services/data.service';
 import { Account, AccountRole } from '../../models/account.model';
 import { NgxSpinnerComponent, NgxSpinnerService } from 'ngx-spinner';
+import { Project } from '../../models/project.model';
 
 @Component({
   selector: 'app-main-app',
@@ -15,7 +16,8 @@ import { NgxSpinnerComponent, NgxSpinnerService } from 'ngx-spinner';
     FormlyModule,
     NgxSpinnerComponent,
     ReactiveFormsModule,
-    RouterLink],
+    RouterLink,
+    RouterOutlet],
   templateUrl: './main-app.component.html',
   styleUrl: './main-app.component.scss'
 })
@@ -29,6 +31,10 @@ export class MainAppComponent {
   account: Account | null = null;
   accountRoleEnum = AccountRole;
   // [var] Account
+  // --------------------------------
+  // [var] Projects
+  projects: Project[] = [];
+  // [var] Projects
   // --------------------------------
   // [var] SignForm
   signInForm = new FormGroup({});
@@ -117,12 +123,13 @@ export class MainAppComponent {
     private router: Router,
     private spinner: NgxSpinnerService
   ) {
-    this.dataService.rereadAccount();
+    this.dataService.rereadAccount();    
     this.dataService.isSignInSuccess$.subscribe(success => {
       if (success) {
         // TODO Reset errors not working
         this.signInModel = { username: "", password: "" };
         this.closeDialog(this.dialogSignIn.nativeElement);
+        // this.dataService.doGetProjects();
       }
     });
     this.dataService.isSignUpSuccess$.subscribe(success => {
@@ -136,18 +143,24 @@ export class MainAppComponent {
     });
     this.dataService.account$.subscribe(account => {
       this.account = account;
+      this.dataService.doGetProjects();
     });
-    this.dataService.state$.subscribe(dataServiceState => {
-      this.isLoading = dataServiceState?.isLoading ?? false;
-      if (dataServiceState?.errorMessage) {
-        this.showAlert(dataServiceState.errorMessage)
-      }
-
-      if (dataServiceState?.isLoading) {
+    this.dataService.isLoading$.subscribe(isLoading => {
+      this.isLoading = isLoading;
+      if (this.isLoading) {
         this.spinner.show();
       } else {
         this.spinner.hide();
       }
+    });
+    this.dataService.errorMessage$.subscribe(errorMessage => {
+      if (errorMessage) {
+        this.showAlert(errorMessage);
+      }
+    });
+    this.dataService.projects$.subscribe(projects => {
+      this.projects = projects;
+      console.log(this.projects);
     });
   }
   ngAfterViewInit() {
@@ -161,16 +174,16 @@ export class MainAppComponent {
   }
   onSignInFormSubmit() {
     if (this.signInForm.valid) {
-      this.dataService.postSignIn(new Account(this.signInModel.username, this.signInModel.password));
+      this.dataService.doPostSignIn(new Account(this.signInModel.username, this.signInModel.password));
     }
   }
   onSignUpFormSubmit() {
     if (this.signUpForm.valid) {
-      this.dataService.postSignUp(new Account(this.signUpModel.username, this.signUpModel.password));
+      this.dataService.doPostSignUp(new Account(this.signUpModel.username, this.signUpModel.password));
     }
   }
   onSignOut() {
-    this.dataService.postSignOut();
+    this.dataService.doPostSignOut();
   }
   onAccountMenuChange(event: Event) {
     const select = event.target as HTMLSelectElement;

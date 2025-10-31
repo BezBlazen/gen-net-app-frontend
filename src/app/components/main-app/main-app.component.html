@@ -1,23 +1,42 @@
 <div class="app">
     <div class="app-header">
         <div class="app-header-logo">
-            <a routerLink="/">gen-net-app</a>
+            <a [routerLink]="['/', 'app']">gen-net-app</a>
         </div>
         <div class="app-header-account-menu">
             @if (account?.role == accountRoleEnum.User) {
-                <select (change)="onAccountMenuChange($event)">
-                    <option value="default" disabled selected>{{account?.username}}</option>
-                    <option value="profile">Profile</option>
-                    <option value="signOut">Logout</option>
-                </select>
+            <select (change)="onAccountMenuChange($event)">
+                <option value="default" disabled selected>{{account?.username}}</option>
+                <option value="profile">Profile</option>
+                <option value="signOut">Logout</option>
+            </select>
             } @else {
-                <button (click)="openDialog(dialogSignIn)">Login</button>
+            <button (click)="openDialog(dialogSignIn)">Login</button>
             }
         </div>
     </div>
     <div class="app-wrapper">
-        <div class="app-wrapper-menu">menu</div>
-        <div class="app-wrapper-container">container</div>
+        <div class="app-wrapper-menu">
+            <menu>
+                <li><a [routerLink]="['/', 'app', 'projects']">Projects</a>
+                    <ul>
+                        @for (project of projects; track project.id) {
+                            <li><a [routerLink]="['/', 'app', 'projects', project.id]">{{ project.title }}</a></li>
+                        } @empty {
+                            <li>Add new</li>
+                        }
+
+                    </ul>
+                    <!-- <ul>
+                        <li>Sub of Second</li>
+                        <li>Another Sub</li>
+                    </ul> -->
+                </li>
+            </menu>
+        </div>
+        <div class="app-wrapper-container">
+            <router-outlet></router-outlet>
+        </div>
     </div>
 </div>
 
@@ -27,7 +46,8 @@
             <h3>Login</h3>
         </div>
         <div class="content">
-            <formly-form [form]="signInForm" [fields]="signInFields" [options]="signInOptions" [model]="signInModel"></formly-form>
+            <formly-form [form]="signInForm" [fields]="signInFields" [options]="signInOptions"
+                [model]="signInModel"></formly-form>
         </div>
         <div class="footer">
             <div>
@@ -47,7 +67,8 @@
             <h3>Registration</h3>
         </div>
         <div class="content">
-            <formly-form [form]="signUpForm" [fields]="signUpFields" [options]="signUpOptions" [model]="signUpModel"></formly-form>
+            <formly-form [form]="signUpForm" [fields]="signUpFields" [options]="signUpOptions"
+                [model]="signUpModel"></formly-form>
         </div>
         <div class="footer">
             <div>

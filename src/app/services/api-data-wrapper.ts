@@ -1,6 +1,10 @@
-
-export type ApiDataWrapper<T> = {
+export class ApiDataWrapper<T> {
   data?: T;
-  error?: string;
+  errorMessage: string | null;
   isLoading: boolean;
+  constructor(data: T, isLoading: boolean, errorMessage: string | null) {
+    this.data = data;
+    this.isLoading = isLoading;
+    this.errorMessage = errorMessage;
+  }
 };
