@@ -7,7 +7,6 @@
             @if (account?.role == accountRoleEnum.User) {
             <select (change)="onAccountMenuChange($event)">
                 <option value="default" disabled selected>{{account?.username}}</option>
-                <option value="profile">Profile</option>
                 <option value="signOut">Logout</option>
             </select>
             } @else {
@@ -23,14 +22,9 @@
                         @for (project of projects; track project.id) {
                             <li><a [routerLink]="['/', 'app', 'projects', project.id]">{{ project.title }}</a></li>
                         } @empty {
-                            <li>Add new</li>
+                            <!-- TODO: add new project -->
                         }
-
                     </ul>
-                    <!-- <ul>
-                        <li>Sub of Second</li>
-                        <li>Another Sub</li>
-                    </ul> -->
                 </li>
             </menu>
         </div>

@@ -1,1 +1,30 @@
-<p>projects works!</p>
+<div class="selector">
+    <div class="toolbar">
+        <button class="icon-button">
+            <img class="icon" src="./assets/icons/icons8-plus-math-24.png" />
+        </button>
+    </div>
+    <div class="table">
+        <table>
+            <thead>
+                <tr>
+                    <th>Title</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (project of projects; track project.id) {
+                <tr (click)="setProject(project)">
+                    <td>{{ project.title }}</td>
+                </tr>
+                }
+            </tbody>
+        </table>
+
+    </div>
+    <!-- <div class="selector">selector</div> -->
+</div>
+<app-project class="view" [project]="project"></app-project>
+<!-- <div class="project-view">
+    <div class="toolbar">toolbar</div>
+    <div class="view">view</div>
+</div> -->

@@ -16,3 +16,12 @@ div button:not(:first-child) {
     bottom: 0;
     background-color: rgba(0, 0, 0, 0.3);
 }
+
+.icon-button {
+    min-width: 0;
+    cursor: pointer;
+    margin: 1px;
+    .icon {
+        width: 22px;
+    }
+}
