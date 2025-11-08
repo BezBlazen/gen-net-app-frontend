@@ -24,6 +24,7 @@ import { Project } from '../../models/project.model';
 export class MainAppComponent {
   @ViewChild('dialogSignIn') dialogSignIn!: ElementRef<HTMLDialogElement>;
   @ViewChild('dialogSignUp') dialogSignUp!: ElementRef<HTMLDialogElement>;
+  @ViewChild('dialogSpinner') dialogSpinner!: ElementRef<HTMLDialogElement>;
   isLoading = false;
   errorMessage: string | null = null;
   // --------------------------------
@@ -148,8 +149,10 @@ export class MainAppComponent {
       this.isLoading = isLoading;
       if (this.isLoading) {
         this.spinner.show();
+        this.dialogSpinner.nativeElement.showModal();
       } else {
         this.spinner.hide();
+        this.dialogSpinner.nativeElement.close();
       }
     });
     this.dataService.errorMessage$.subscribe(errorMessage => {
@@ -199,8 +202,5 @@ export class MainAppComponent {
         this.errorMessage = null;
       }, 3000);
     }
-  }
-  printProjects() {
-    console.log(this.projects);
   }
 }

@@ -6,7 +6,7 @@
     (cancel)="onClose()"
     >
     <div class="body">
-        <formly-form [form]="form" [fields]="fields" [options]="options" [model]="project"></formly-form>
+        <formly-form [form]="form" [fields]="fields" [options]="options" [model]="model"></formly-form>
     </div>
 </app-base-view-dialog-layout>
 } @else {
@@ -15,38 +15,7 @@
     (save)="onSave()"
     >
     <div class="body">
-        <formly-form [form]="form" [fields]="fields" [options]="options" [model]="project"></formly-form>
+        <formly-form [form]="form" [fields]="fields" [options]="options" [model]="model"></formly-form>
     </div>
 </app-base-view-page-layout>
 }
-<!-- <app-base-view-dialog-layout> -->
-    <!-- @if (viewMode === ViewMode.EDIT) {
-    <button header class="icon-button">
-        <img class="icon" src="./assets/icons/icons8-delete-16.png" />
-    </button>
-    } -->
-    <!-- <button header class="icon-button">
-
-        <img class="icon" src="./assets/icons/icons8-undo-16.png" />
-    </button>
-    <button header class="icon-button">
-
-        <img class="icon" src="./assets/icons/icons8-external-link-16.png" />
-    </button> -->
-    <!-- <div class="toolbar">
-        @if (viewMode === ViewMode.EDIT) {
-        <button class="icon-button">
-            <img class="icon" src="./assets/icons/icons8-delete-16.png" />
-        </button>
-        }
-        <button class="icon-button">
-            <img class="icon" src="./assets/icons/icons8-save-16.png" />
-        </button>
-        @if (viewMode === ViewMode.EDIT) {
-
-        }
-    </div> -->
-    <!-- <div class="body">
-        <formly-form [form]="form" [fields]="fields" [options]="options" [model]="project"></formly-form>
-    </div> -->
-<!-- </app-base-view-dialog-layout> -->

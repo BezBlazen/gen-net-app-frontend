@@ -53,7 +53,6 @@
             </div>
         </div>
     </form>
-    <div class="is-loading-div" [style.visibility]="!isLoading? 'hidden': 'visible'"></div>
 </dialog>
 <dialog class="dialog-sign" #dialogSignUp>
     <form [formGroup]="signUpForm">
@@ -78,5 +77,11 @@
 <div class="app-alert" [style.visibility]="!errorMessage? 'hidden': 'visible'">
     <p>{{errorMessage}}</p>
 </div>
+
+<dialog class="dialog-spinner" #dialogSpinner>
 <ngx-spinner bdColor="rgba(0, 0, 0, 0.2)" size="default" color="#fff" type="ball-8bits"
     [fullScreen]="true"></ngx-spinner>
+</dialog>
+
+<!-- <ngx-spinner bdColor="rgba(0, 0, 0, 0.2)" size="default" color="#fff" type="ball-8bits"
+    [fullScreen]="true"></ngx-spinner> -->

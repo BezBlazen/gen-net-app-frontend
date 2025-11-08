@@ -21,16 +21,11 @@
         </table>
 
     </div>
-    <!-- <div class="selector">selector</div> -->
 </div>
-<app-project class="view" [project]="project" [viewMode]="ViewMode.EDIT"></app-project>
-<!-- [viewMode]="ViewMode.EDIT" -->
-<!-- <div class="project-view">
-    <div class="toolbar">toolbar</div>
-    <div class="view">view</div>
-</div> -->
+@if (project) {
+    <app-project class="view" [project]="project" [viewMode]="ViewMode.EDIT"></app-project>
+}
 
 <dialog class="dialog-central" #dialogProjectNew>
     <app-project class="view" [viewMode]="ViewMode.CREATE" [dialogRef]="dialogProjectNew"></app-project>
-    <!-- [viewMode]="ViewMode.CREATE" -->
 </dialog>

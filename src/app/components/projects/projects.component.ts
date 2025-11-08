@@ -31,8 +31,10 @@ export class ProjectsComponent {
       this.projects = projects;
       if (!this.isLoading) {
         if (projects != null && projects.length > 0) {
-          this.project = projects.find(project => project.id === this.project?.id);
-          if (!this.project) {
+          const p = projects.find(project => project.id === this.project?.id);
+          if (p) {
+            this.project = p;
+          } else {
             this.project = projects[0];
           }
         } else {
@@ -42,7 +44,7 @@ export class ProjectsComponent {
     });
   }
   setProject(row: Project) {
-    this.project = { ...row };
+    this.project = row;
   }
   openDialog(dialog: HTMLDialogElement) {
     dialog.showModal();

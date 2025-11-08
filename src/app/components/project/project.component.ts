@@ -18,11 +18,8 @@ export enum FormViewMode {
 @Component({
   selector: 'app-project',
   imports: [
-    // BaseViewComponent,
     BaseViewDialogLayoutComponent,
     BaseViewPageLayoutComponent,
-    // BaseViewLayoutComponent,
-    // JsonPipe,
     FormsModule,
     FormlyModule
   ],
@@ -30,11 +27,14 @@ export enum FormViewMode {
   styleUrl: './project.component.scss'
 })
 export class ProjectComponent extends BaseViewComponent {
-  @Input() project?: Project = { title: '' };
+  emptyProject: Project = { title: '' };
+  model?: Project;
+  @Input() set project(value: Project) {
+      this.model = {...value}
+  }
   baseConfig: BaseViewLayoutConfig = {};
   createViewConfig: BaseViewLayoutConfig = { mode: BaseViewLayoutMode.DIALOG };
   form = new FormGroup({});
-  // model = this.project ? this.project : {title: ''};
   options: FormlyFormOptions = {};
   fields: FormlyFieldConfig[] = [
     {
@@ -74,19 +74,22 @@ export class ProjectComponent extends BaseViewComponent {
     },
   ];
   override onClose(): void {
+    this.resetForm();
     this.dialogRef?.close();
   }
   override onOk(): void {
-    if (this.project && this.form.valid) {
+    if (this.model && this.form.valid) {
       if (this.viewMode == ViewMode.CREATE) {
-        this.dataService.doPostProject(this.project).subscribe((success) => {
+        this.dataService.doPostProject(this.model).subscribe((success) => {
           if (success) {
+            this.resetForm();
             this.dialogRef?.close();
           }
         });
       } else if (this.viewMode == ViewMode.EDIT) {
-        this.dataService.doPutProject(this.project).subscribe((success) => {
+        this.dataService.doPutProject(this.model).subscribe((success) => {
           if (success) {
+            this.resetForm();
             this.dialogRef?.close();
           }
         });
@@ -95,10 +98,11 @@ export class ProjectComponent extends BaseViewComponent {
   }
 
   override onSave(): void {
-    if (this.project && this.form.valid) {
+    if (this.model && this.form.valid) {
       if (this.viewMode == ViewMode.EDIT) {
-        this.dataService.doPutProject(this.project).subscribe((success) => {
+        this.dataService.doPutProject(this.model).subscribe((success) => {
           if (success) {
+            this.resetForm();
             this.dialogRef?.close();
           }
         });
@@ -106,10 +110,11 @@ export class ProjectComponent extends BaseViewComponent {
     }
   }
   override onDelete(): void {
-    if (this.project && this.form.valid) {
+    if (this.model && this.form.valid) {
       if (this.viewMode == ViewMode.EDIT) {
-        this.dataService.doDeleteProject(this.project).subscribe((success) => {
+        this.dataService.doDeleteProject(this.model).subscribe((success) => {
           if (success) {
+            this.resetForm();
             this.dialogRef?.close();
           }
         });
@@ -124,40 +129,24 @@ export class ProjectComponent extends BaseViewComponent {
     super();
   }
   getDialogTitle() {
-    if (this.project) {
-      return 'Project: ' + this.project.title;
-    } else {
+    if (this.viewMode == ViewMode.CREATE) {
       return 'Create Project';
+    } else {
+      return 'Project: ' + this.model?.title;
     }
   }
   ngOnInit() {
     if (this.dialogRef != null) {
       this.baseConfig.mode = BaseViewLayoutMode.DIALOG;
-      this.baseConfig.title = this.viewMode == ViewMode.CREATE ? 'Create Project' : 'Edit Project';
-      if (this.project) {
-        this.baseConfig.title += this.project.title + ": " + this.project.title;
-      }
-      this.baseConfig.showCloseButton = true;
     }
-    // if (this.project) {
-    //   this.baseConfig.title
-    //   if (this.viewMode == ViewMode.CREATE) {
-    //     this.baseConfig = {
-    //       title: 'Create Project',
-    //       showDeleteButton: false,
-    //       showSaveButton: true,
-    //       showCloseButton: true,
-    //     };
-    //   }
-    // }
-    // this.baseConfig = {
-    //   title: 'Project',
-    //   showDeleteButton: this.viewMode == ViewMode.EDIT,
-    //   showSaveButton: this.viewMode == ViewMode.EDIT || this.viewMode == ViewMode.CREATE,
-    //   showCloseButton: this.dialogRef != null,
-    // }
+    if (this.viewMode == ViewMode.CREATE) {
+      this.model = this.emptyProject;
+    }
   }
   isViewModeCreate() {
     return this.viewMode == ViewMode.CREATE;
+  }
+  resetForm() {
+    this.form.reset();
   }
 }

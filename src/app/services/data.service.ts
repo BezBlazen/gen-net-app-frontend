@@ -158,6 +158,7 @@ export class DataService {
     this.httpClient
       .post<Project>(this.baseUrl + '/projects', project, {withCredentials: true,})
       .pipe(
+        // delay(3000),
         map((project) => (new ApiDataWrapper(project, false, null))),
         catchError((err) => of(new ApiDataWrapper(undefined, false, this.getErrorMessage(err)))),
         startWith(new ApiDataWrapper(undefined, true, null))  
@@ -177,6 +178,7 @@ export class DataService {
     this.httpClient
       .put<Project>(this.baseUrl + '/projects', project, {withCredentials: true,})
       .pipe(
+        // delay(3000),
         map((project) => (new ApiDataWrapper(project, false, null))),
         catchError((err) => of(new ApiDataWrapper(undefined, false, this.getErrorMessage(err)))),
         startWith(new ApiDataWrapper(undefined, true, null))  

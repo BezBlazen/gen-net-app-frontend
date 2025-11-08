@@ -59,11 +59,18 @@ $app-wrapper-menu-width: 160px;
 
             menu {
                 padding-inline-start: 28px;
+
                 a {
                     cursor: pointer;
+                    display: block;
+                    width: 100px;
+                    overflow: hidden;
+                    white-space: nowrap;
+                    text-overflow: ellipsis;
                 }
+
                 ul {
-                   padding-inline-start: 16px; 
+                    padding-inline-start: 16px;
                 }
             }
         }
@@ -113,6 +120,10 @@ $app-wrapper-menu-width: 160px;
 
 }
 
+.dialog-spinner {
+    border: none !important;
+    background: none;
+}
 .app-alert {
     border: 1px solid black;
     position: absolute;
