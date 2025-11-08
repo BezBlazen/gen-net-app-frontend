@@ -5,7 +5,7 @@ button {
 }
 
 div button:not(:first-child) {
-    margin-left: 2px;
+    // margin-left: 1px;
 }
 
 .is-loading-div {
@@ -20,8 +20,21 @@ div button:not(:first-child) {
 .icon-button {
     min-width: 0;
     cursor: pointer;
-    margin: 1px;
-    .icon {
-        width: 22px;
-    }
+    margin-left: 1px;
+    // .icon {
+    //     width: 16px;
+    // }
+}
+
+.dialog-central {
+    border: 1px solid black !important;
+    padding: 0;
+    max-height: none;
+    max-width: none;
+}
+.border-top {
+    border-top: 1px solid lightgray;
+}
+.border-bottom {
+    border-bottom: 1px solid lightgray;
 }

@@ -1,0 +1,14 @@
+<div class="toolbar border-bottom">
+    <div>
+        <button header class="icon-button" (click)="delete.emit()">
+            <img class="icon" src="./assets/icons/icons8-delete-16.png" />
+        </button>
+        <button class="icon-button" (click)="save.emit()">
+            <img class="icon" src="./assets/icons/icons8-save-16.png" />
+        </button>
+        <ng-content select="[header]"></ng-content>
+    </div>
+</div>
+<div class="body">
+    <ng-content></ng-content>
+</div>

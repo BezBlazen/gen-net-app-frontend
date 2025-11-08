@@ -1,5 +1,5 @@
 export interface Project {
-  id: string;
+  id?: string;
   title: string;
   createdAt?: Date;
 }

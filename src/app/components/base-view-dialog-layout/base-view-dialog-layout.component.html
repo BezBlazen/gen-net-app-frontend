@@ -1,0 +1,17 @@
+<div class="header border-bottom">
+    <div class="title">{{title}}</div>
+    <div class="flex-grow-1-text-align-right">
+        <button class="icon-button" (click)="close.emit()">
+            <img class="icon" src="./assets/icons/icons8-close-16.png" />
+        </button>
+    </div>
+</div>
+<div class="body">
+    <ng-content></ng-content>
+</div>
+<div class="footer border-top">
+    <div class="flex-grow-1-text-align-right">
+        <button (click)="ok.emit()">Ok</button>
+        <button (click)="cancel.emit()">Cancel</button>
+    </div>
+</div>

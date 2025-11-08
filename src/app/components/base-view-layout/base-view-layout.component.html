@@ -1,0 +1,50 @@
+@if (config.mode == LayoutMode.DIALOG) {
+<div class="header">
+    <div>{{config.title}}</div>
+    <div class="flex-grow-1-text-align-right">
+        @if (config.showCloseButton) {
+        <button class="icon-button" (click)="close.emit()">
+            <img class="icon" src="./assets/icons/icons8-close-16.png" />
+        </button>
+        }
+    </div>
+</div>
+}
+<div class="toolbar">
+    <div>
+        @if (config.showDeleteButton) {
+        <button header class="icon-button">
+            <img class="icon" src="./assets/icons/icons8-delete-16.png" />
+        </button>
+        }
+        @if (config.showSaveButton) {
+        <button class="icon-button">
+            <img class="icon" src="./assets/icons/icons8-save-16.png" />
+        </button>
+        }
+        <ng-content select="[header]"></ng-content>
+    </div>
+
+    <!-- <div class="flex-grow-1-text-align-right">
+        @if (config.showCloseButton) {
+        <button class="icon-button" (click)="close.emit()">
+            <img class="icon" src="./assets/icons/icons8-close-16.png" />
+        </button>
+        }
+    </div> -->
+</div>
+<div class="body">
+    <ng-content></ng-content>
+</div>
+@if (config.mode == LayoutMode.DIALOG) {
+<div class="footer">
+    <div class="flex-grow-1-text-align-right">
+        <button class="icon-button">
+            <img class="icon" src="./assets/icons/icons8-save-16.png" />
+        </button>
+        <button class="icon-button">
+            <img class="icon" src="./assets/icons/icons8-save-16.png" />
+        </button>
+    </div>
+</div>
+}

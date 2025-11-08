@@ -1,0 +1,22 @@
+.toolbar {
+    border-bottom: 1px solid lightgray;
+    display: flex;
+    flex-direction: row;
+
+    div button {
+        margin-left: 1px;
+    }
+
+    .flex-grow-1-text-align-right {
+        flex-grow: 1;
+        text-align: right;
+
+        button:last-child {
+            margin-right: 1px;
+        }
+    }
+}
+
+.body {
+    padding: 8px;
+}

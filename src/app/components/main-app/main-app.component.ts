@@ -129,7 +129,6 @@ export class MainAppComponent {
         // TODO Reset errors not working
         this.signInModel = { username: "", password: "" };
         this.closeDialog(this.dialogSignIn.nativeElement);
-        // this.dataService.doGetProjects();
       }
     });
     this.dataService.isSignUpSuccess$.subscribe(success => {
@@ -160,7 +159,6 @@ export class MainAppComponent {
     });
     this.dataService.projects$.subscribe(projects => {
       this.projects = projects;
-      console.log(this.projects);
     });
   }
   ngAfterViewInit() {
@@ -201,5 +199,8 @@ export class MainAppComponent {
         this.errorMessage = null;
       }, 3000);
     }
+  }
+  printProjects() {
+    console.log(this.projects);
   }
 }

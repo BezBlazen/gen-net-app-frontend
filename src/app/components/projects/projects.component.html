@@ -1,7 +1,7 @@
 <div class="selector">
     <div class="toolbar">
-        <button class="icon-button">
-            <img class="icon" src="./assets/icons/icons8-plus-math-24.png" />
+        <button class="icon-button" (click)="openDialog(dialogProjectNew)">
+            <img class="icon" src="./assets/icons/icons8-plus-math-16.png" />
         </button>
     </div>
     <div class="table">
@@ -23,8 +23,14 @@
     </div>
     <!-- <div class="selector">selector</div> -->
 </div>
-<app-project class="view" [project]="project"></app-project>
+<app-project class="view" [project]="project" [viewMode]="ViewMode.EDIT"></app-project>
+<!-- [viewMode]="ViewMode.EDIT" -->
 <!-- <div class="project-view">
     <div class="toolbar">toolbar</div>
     <div class="view">view</div>
 </div> -->
+
+<dialog class="dialog-central" #dialogProjectNew>
+    <app-project class="view" [viewMode]="ViewMode.CREATE" [dialogRef]="dialogProjectNew"></app-project>
+    <!-- [viewMode]="ViewMode.CREATE" -->
+</dialog>

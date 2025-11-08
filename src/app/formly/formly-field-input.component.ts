@@ -28,7 +28,7 @@ import { FieldType, FieldTypeConfig, FormlyModule } from '@ngx-formly/core';
   `,
   styles: [`
     .form-group { display: flex; padding-top: 4px; }
-    .form-group label { flex: 0 0 100px; }
+    .form-group label { flex: 0 0 100px; font-size: 13px;}
     .form-group input { flex: 1; }
     .error { box-shadow: 0 0 5px red; }
     .required { color: red; }
