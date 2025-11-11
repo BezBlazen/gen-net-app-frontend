@@ -1,13 +1,12 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { DataService } from '../../services/data.service';
 import { Project } from '../../models/project.model';
-import { ProjectComponent, FormViewMode } from "../project/project.component";
-import { FormlyAttributes } from "@ngx-formly/core";
 import { ViewMode } from '../base-view/base-view.component';
+import { ProjectViewComponent } from '../project-view/project-view.component';
 
 @Component({
   selector: 'app-projects',
-  imports: [ProjectComponent],
+  imports: [ProjectViewComponent],
   templateUrl: './projects.component.html',
   styleUrl: './projects.component.scss'
 })

@@ -124,6 +124,9 @@ export class DataService {
   // Account
   // --------------------------
   // Projects
+  getProject(projectId: string): Project | undefined {
+    return this._projects.value.find((project) => project.id === projectId);
+  }
   addProject(project: Project): void {
     const projects = this._projects.value;
     this._projects.next([...projects, project]);

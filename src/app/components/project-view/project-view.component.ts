@@ -1,14 +1,13 @@
-import { Component, Directive, Input, TemplateRef, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Project } from '../../models/project.model';
 import { FormGroup, FormsModule } from '@angular/forms';
 import { FormlyFieldConfig, FormlyFormOptions, FormlyModule } from '@ngx-formly/core';
 import { BaseViewComponent, ViewMode } from '../base-view/base-view.component';
-import { BaseViewLayoutComponent, BaseViewLayoutConfig, BaseViewLayoutMode } from '../base-view-layout/base-view-layout.component';
+import { BaseViewLayoutConfig, BaseViewLayoutMode } from '../base-view-layout/base-view-layout.component';
 import { BaseViewDialogLayoutComponent } from '../base-view-dialog-layout/base-view-dialog-layout.component';
 import { BaseViewPageLayoutComponent } from '../base-view-page-layout/base-view-page-layout.component';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { DataService } from '../../services/data.service';
-import { JsonPipe } from '@angular/common';
 
 export enum FormViewMode {
   CREATE,
@@ -23,15 +22,16 @@ export enum FormViewMode {
     FormsModule,
     FormlyModule
   ],
-  templateUrl: './project.component.html',
-  styleUrl: './project.component.scss'
+  templateUrl: './project-view.component.html',
+  styleUrl: './project-view.component.scss'
 })
-export class ProjectComponent extends BaseViewComponent {
+export class ProjectViewComponent extends BaseViewComponent {
   emptyProject: Project = { title: '' };
   model?: Project;
   @Input() set project(value: Project) {
-      this.model = {...value}
+    this.model = { ...value }
   }
+  @Output() onDeleted = new EventEmitter<void>();
   baseConfig: BaseViewLayoutConfig = {};
   createViewConfig: BaseViewLayoutConfig = { mode: BaseViewLayoutMode.DIALOG };
   form = new FormGroup({});
@@ -112,12 +112,16 @@ export class ProjectComponent extends BaseViewComponent {
   override onDelete(): void {
     if (this.model && this.form.valid) {
       if (this.viewMode == ViewMode.EDIT) {
-        this.dataService.doDeleteProject(this.model).subscribe((success) => {
-          if (success) {
-            this.resetForm();
-            this.dialogRef?.close();
-          }
-        });
+        let isConfirmed = confirm("Delete project: '" + this.model?.title + "' ?");
+        if (isConfirmed) {
+          this.dataService.doDeleteProject(this.model).subscribe((success) => {
+            if (success) {
+              this.resetForm();
+              this.dialogRef?.close();
+              this.onDeleted.emit();
+            }
+          });
+        }
       }
     }
   }
@@ -134,6 +138,7 @@ export class ProjectComponent extends BaseViewComponent {
     } else {
       return 'Project: ' + this.model?.title;
     }
+
   }
   ngOnInit() {
     if (this.dialogRef != null) {

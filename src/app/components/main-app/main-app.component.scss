@@ -124,6 +124,7 @@ $app-wrapper-menu-width: 160px;
     border: none !important;
     background: none;
 }
+
 .app-alert {
     border: 1px solid black;
     position: absolute;
@@ -137,4 +138,8 @@ $app-wrapper-menu-width: 160px;
     * {
         margin: 0px;
     }
+}
+
+.active-link {
+    color: red;
 }

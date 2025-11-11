@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, ViewChild, inject } from '@angular/core';
 import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { Router, RouterLink, RouterOutlet } from "@angular/router";
+import { Router, RouterLink, RouterLinkActive, RouterOutlet } from "@angular/router";
 import { FormlyFieldConfig, FormlyFormOptions, FormlyModule } from '@ngx-formly/core';
 import { DataService } from '../../services/data.service';
 import { Account, AccountRole } from '../../models/account.model';
@@ -17,6 +17,7 @@ import { Project } from '../../models/project.model';
     NgxSpinnerComponent,
     ReactiveFormsModule,
     RouterLink,
+    RouterLinkActive,
     RouterOutlet],
   templateUrl: './main-app.component.html',
   styleUrl: './main-app.component.scss'
@@ -149,10 +150,10 @@ export class MainAppComponent {
       this.isLoading = isLoading;
       if (this.isLoading) {
         this.spinner.show();
-        this.dialogSpinner.nativeElement.showModal();
+        this.dialogSpinner?.nativeElement.showModal();
       } else {
         this.spinner.hide();
-        this.dialogSpinner.nativeElement.close();
+        this.dialogSpinner?.nativeElement.close();
       }
     });
     this.dataService.errorMessage$.subscribe(errorMessage => {

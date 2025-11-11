@@ -20,7 +20,7 @@
                 <li><a [routerLink]="['/', 'app', 'projects']">Projects</a>
                     <ul>
                         @for (project of projects; track project.id) {
-                            <li><a [routerLink]="['/', 'app', 'projects', project.id]">{{ project.title }}</a></li>
+                            <li><a [routerLink]="['/', 'app', 'projects', project.id]" routerLinkActive="active-link">{{ project.title }}</a></li>
                         } @empty {
                             <!-- TODO: add new project -->
                         }

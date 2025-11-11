@@ -7,8 +7,6 @@ export enum BaseViewLayoutMode {
 export interface BaseViewLayoutConfig {
   mode?: BaseViewLayoutMode;
   title?: string;
-  // showDeleteButton?: boolean;
-  // showDeleteButton?: boolean;
   showCloseButton?: boolean;
   showOkButton?: boolean;
   showCancelButton?: boolean;
@@ -23,12 +21,7 @@ export interface BaseViewLayoutConfig {
   styleUrl: './base-view-layout.component.scss'
 })
 export class BaseViewLayoutComponent {
-  @Input() config: BaseViewLayoutConfig = {
-    // title: '',
-    // showDeleteButton: false,
-    // showSaveButton: false,
-    // showCloseButton: true,
-  };
+  @Input() config: BaseViewLayoutConfig = {};
   @Output() close = new EventEmitter<void>();
   readonly LayoutMode = BaseViewLayoutMode;
 }
