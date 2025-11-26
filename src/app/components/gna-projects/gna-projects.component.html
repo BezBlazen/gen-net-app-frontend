@@ -1,0 +1,9 @@
+<app-project-selector class="selector" (onSelect)="onSelectProject($event)"></app-project-selector>
+
+@if (projectId) {
+    <app-project-view class="view" [projectId]="projectId" [viewMode]="ViewMode.EDIT"></app-project-view>
+}
+
+<dialog class="dialog-central" #dialogProjectNew>
+    <app-project-view class="view" [viewMode]="ViewMode.CREATE" [dialogRef]="dialogProjectNew"></app-project-view>
+</dialog>

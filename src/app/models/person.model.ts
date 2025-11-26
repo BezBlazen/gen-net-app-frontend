@@ -1,5 +1,5 @@
-export interface Project {
-  id: string;
+export interface Person {
+  id?: string;
   title: string;
   createdAt?: Date;
 }

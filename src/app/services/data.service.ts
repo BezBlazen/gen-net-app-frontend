@@ -4,6 +4,7 @@ import { BehaviorSubject, catchError, map, Observable, of, startWith, delay, Sub
 import { ApiDataWrapper } from './api-data-wrapper';
 import { Account, AccountRole } from '../models/account.model';
 import { Project } from '../models/project.model';
+import { Person } from '../models/person.model';
 
 export class DataServiceState {
   errorMessage?: string;
@@ -34,6 +35,9 @@ export class DataService {
 
   private _projects = new BehaviorSubject<Project[]>([]);
   public projects$ = this._projects.asObservable();
+
+  private _persons = new BehaviorSubject<Person[]>([]);
+  public persons$ = this._projects.asObservable();
 
   errorMessageUnexpected:string = "Unexpected server error";
 
@@ -217,6 +221,99 @@ export class DataService {
   }
   // Projects
   // --------------------------
-
+  // Persons
+  getPerson(personId: string): Person | undefined {
+    return this._persons.value.find((person) => person.id === personId);
+  }
+  addPerson(person: Person): void {
+    const persons = this._persons.value;
+    this._persons.next([...persons, person]);
+  }
+  updatePerson(person: Person): void {
+    const persons = this._persons.value;
+    const newPersons = persons.map(item => item.id === person.id ? { ...item, ...person } : item);
+    this._persons.next(newPersons);
+  }
+  deletePerson(person: Person): void {
+    const persons = this._persons.value;
+    const newPersons = persons.filter(item => item.id !== person.id);
+    this._persons.next(newPersons);
+  }
+  public doGetPersons() {
+    this.httpClient
+      .get<Person[]>(this.baseUrl + '/persons', {withCredentials: true})
+      .pipe(
+        map((persons) => (new ApiDataWrapper(persons, false, null))),
+        catchError((err) => of(new ApiDataWrapper(undefined, false, this.getErrorMessage(err)))),
+        startWith(new ApiDataWrapper(undefined, true, null))  
+      )
+      .subscribe((pipeData) => {
+        this._isLoading.next(pipeData.isLoading);
+        this._errorMessage.next(pipeData.errorMessage);
+        if (!pipeData.isLoading && pipeData.data)     
+          this._persons.next(pipeData.data);
+      });
+  }
+  public doPostPerson(person : Person) : Observable<boolean> {
+    const _success = new BehaviorSubject<boolean>(false);
+    this.httpClient
+      .post<Person>(this.baseUrl + '/persons', person, {withCredentials: true,})
+      .pipe(
+        // delay(3000),
+        map((person) => (new ApiDataWrapper(person, false, null))),
+        catchError((err) => of(new ApiDataWrapper(undefined, false, this.getErrorMessage(err)))),
+        startWith(new ApiDataWrapper(undefined, true, null))  
+      )
+      .subscribe((pipeData) => {
+        this._isLoading.next(pipeData.isLoading);
+        this._errorMessage.next(pipeData.errorMessage);
+        if (pipeData?.data) {
+          this.addPerson(pipeData?.data);
+          _success.next(true);
+        }
+      });
+    return _success.asObservable(); 
+  }
+  public doPutPerson(person : Person) : Observable<boolean> {
+    const _success = new BehaviorSubject<boolean>(false);
+    this.httpClient
+      .put<Person>(this.baseUrl + '/persons', person, {withCredentials: true,})
+      .pipe(
+        // delay(3000),
+        map((person) => (new ApiDataWrapper(person, false, null))),
+        catchError((err) => of(new ApiDataWrapper(undefined, false, this.getErrorMessage(err)))),
+        startWith(new ApiDataWrapper(undefined, true, null))  
+      )
+      .subscribe((pipeData) => {
+        this._isLoading.next(pipeData.isLoading);
+        this._errorMessage.next(pipeData.errorMessage);
+        if (pipeData?.data) {
+          this.updatePerson(pipeData?.data);
+          _success.next(true);
+        }
+      });
+    return _success.asObservable(); 
+  }
+  public doDeletePerson(person : Person) : Observable<boolean> {
+    const _success = new BehaviorSubject<boolean>(false);
+    this.httpClient
+      .delete<Person>(this.baseUrl + '/persons/' + person.id, {withCredentials: true,})
+      .pipe(
+        map((person) => (new ApiDataWrapper(person, false, null))),
+        catchError((err) => of(new ApiDataWrapper(undefined, false, this.getErrorMessage(err)))),
+        startWith(new ApiDataWrapper(undefined, true, null))  
+      )
+      .subscribe((pipeData) => {
+        this._isLoading.next(pipeData.isLoading);
+        this._errorMessage.next(pipeData.errorMessage);
+        if (!pipeData.isLoading && !pipeData.errorMessage) {
+          this.deletePerson(person);
+          _success.next(true);
+        }
+      });
+    return _success.asObservable(); 
+  }
+  // Persons
+  // --------------------------
 
 }

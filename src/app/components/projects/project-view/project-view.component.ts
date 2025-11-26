@@ -1,13 +1,13 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { Project } from '../../models/project.model';
+import { Project } from '../../../models/project.model';
 import { FormGroup, FormsModule } from '@angular/forms';
 import { FormlyFieldConfig, FormlyFormOptions, FormlyModule } from '@ngx-formly/core';
-import { BaseViewComponent, ViewMode } from '../base-view/base-view.component';
-import { BaseViewLayoutConfig, BaseViewLayoutMode } from '../base-view-layout/base-view-layout.component';
-import { BaseViewDialogLayoutComponent } from '../base-view-dialog-layout/base-view-dialog-layout.component';
-import { BaseViewPageLayoutComponent } from '../base-view-page-layout/base-view-page-layout.component';
+import { BaseViewComponent, ViewMode } from '../../base-view/base-view.component';
+import { BaseViewLayoutConfig, BaseViewLayoutMode } from '../../base-view-layout/base-view-layout.component';
+import { BaseViewDialogLayoutComponent } from '../../base-view-dialog-layout/base-view-dialog-layout.component';
+import { BaseViewPageLayoutComponent } from '../../base-view-page-layout/base-view-page-layout.component';
 import { NgxSpinnerService } from 'ngx-spinner';
-import { DataService } from '../../services/data.service';
+import { DataService } from '../../../services/data.service';
 
 export enum FormViewMode {
   CREATE,
@@ -15,7 +15,7 @@ export enum FormViewMode {
   VIEW
 }
 @Component({
-  selector: 'app-project',
+  selector: 'app-project-view',
   imports: [
     BaseViewDialogLayoutComponent,
     BaseViewPageLayoutComponent,
@@ -28,8 +28,12 @@ export enum FormViewMode {
 export class ProjectViewComponent extends BaseViewComponent {
   emptyProject: Project = { title: '' };
   model?: Project;
-  @Input() set project(value: Project) {
-    this.model = { ...value }
+  @Input() set projectId(value: string | undefined) {
+    if (value) {
+      this.model = { ...this.dataService.getProject(value) }
+    } else {
+      this.model = {};
+    }
   }
   @Output() onDeleted = new EventEmitter<void>();
   baseConfig: BaseViewLayoutConfig = {};
@@ -102,7 +106,9 @@ export class ProjectViewComponent extends BaseViewComponent {
       if (this.viewMode == ViewMode.EDIT) {
         this.dataService.doPutProject(this.model).subscribe((success) => {
           if (success) {
-            this.resetForm();
+            if (this.model?.id) {
+              this.model = { ...this.dataService.getProject(this.model?.id) }
+            }
             this.dialogRef?.close();
           }
         });
@@ -128,7 +134,6 @@ export class ProjectViewComponent extends BaseViewComponent {
 
   constructor(
     private dataService: DataService,
-    private spinner: NgxSpinnerService
   ) {
     super();
   }

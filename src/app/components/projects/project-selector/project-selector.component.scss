@@ -1,0 +1,33 @@
+:host {
+    display: flex;
+    flex-direction: column;
+}
+
+.table {
+    flex: 1;
+    overflow: auto;
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+        border-spacing: 0px;
+    }
+
+    thead {
+        position: sticky;
+        top: 0;
+        background: white;
+        z-index: 10;
+        background-color: #ddd;
+    }
+
+    tbody tr:hover {
+        background-color: #ddd;
+    }
+
+    td,
+    th {
+        padding-left: 8px;
+    }
+}

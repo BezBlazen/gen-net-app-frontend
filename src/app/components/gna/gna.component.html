@@ -1,7 +1,7 @@
 <div class="app">
     <div class="app-header">
         <div class="app-header-logo">
-            <a [routerLink]="['/', 'app']">gen-net-app</a>
+            <a [routerLink]="['/', 'gna']">gen-net-app</a>
         </div>
         <div class="app-header-account-menu">
             @if (account?.role == accountRoleEnum.User) {
@@ -17,12 +17,13 @@
     <div class="app-wrapper">
         <div class="app-wrapper-menu">
             <menu>
-                <li><a [routerLink]="['/', 'app', 'projects']">Projects</a>
+                <li><a [routerLink]="['/', 'gna', 'projects']">Projects</a>
                     <ul>
                         @for (project of projects; track project.id) {
-                            <li><a [routerLink]="['/', 'app', 'projects', project.id]" routerLinkActive="active-link">{{ project.title }}</a></li>
+                        <li><a [routerLink]="['/', 'gna', 'projects', project.id]" routerLinkActive="active-link">{{
+                                project.title }}</a></li>
                         } @empty {
-                            <!-- TODO: add new project -->
+                        <!-- TODO: add new project -->
                         }
                     </ul>
                 </li>
@@ -79,9 +80,6 @@
 </div>
 
 <dialog class="dialog-spinner" #dialogSpinner>
-<ngx-spinner bdColor="rgba(0, 0, 0, 0.2)" size="default" color="#fff" type="ball-8bits"
-    [fullScreen]="true"></ngx-spinner>
+    <ngx-spinner bdColor="rgba(0, 0, 0, 0.2)" size="default" color="#fff" type="ball-8bits"
+        [fullScreen]="true"></ngx-spinner>
 </dialog>
-
-<!-- <ngx-spinner bdColor="rgba(0, 0, 0, 0.2)" size="default" color="#fff" type="ball-8bits"
-    [fullScreen]="true"></ngx-spinner> -->

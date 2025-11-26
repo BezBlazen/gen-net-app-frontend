@@ -9,7 +9,7 @@ import { NgxSpinnerComponent, NgxSpinnerService } from 'ngx-spinner';
 import { Project } from '../../models/project.model';
 
 @Component({
-  selector: 'app-main-app',
+  selector: 'app-gna',
   imports: [
     CommonModule,
     FormsModule,
@@ -19,10 +19,10 @@ import { Project } from '../../models/project.model';
     RouterLink,
     RouterLinkActive,
     RouterOutlet],
-  templateUrl: './main-app.component.html',
-  styleUrl: './main-app.component.scss'
+  templateUrl: './gna.component.html',
+  styleUrl: './gna.component.scss'
 })
-export class MainAppComponent {
+export class GnaComponent {
   @ViewChild('dialogSignIn') dialogSignIn!: ElementRef<HTMLDialogElement>;
   @ViewChild('dialogSignUp') dialogSignUp!: ElementRef<HTMLDialogElement>;
   @ViewChild('dialogSpinner') dialogSpinner!: ElementRef<HTMLDialogElement>;
@@ -205,3 +205,4 @@ export class MainAppComponent {
     }
   }
 }
+

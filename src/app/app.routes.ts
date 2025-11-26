@@ -1,41 +1,40 @@
 import { Routes } from '@angular/router';
-import { MainSiteComponent } from './components/main-site/main-site.component';
-import { MainAppComponent } from './components/main-app/main-app.component';
-import { ProjectsComponent } from './components/projects/projects.component';
-import { ProjectViewComponent } from './components/project-view/project-view.component';
-import { ProjectItemsComponent } from './components/project-items/project-items.component';
-import { PersonsComponent } from './components/persons/persons.component';
-import { RelationshipsComponent } from './components/relationships/relationships.component';
-import { ProjectGeneralComponent } from './components/project-general/project-general.component';
+import { GnaComponent } from './components/gna/gna.component';
+import { GnaProjectsComponent } from './components/gna-projects/gna-projects.component';
+import { GnaProjectComponent } from './components/gna-project/gna-project.component';
+import { GnaProjectGeneralComponent } from './components/gna-project-general/gna-project-general.component';
+import { GnaProjectPersonsComponent } from './components/gna-project-persons/gna-project-persons.component';
+import { GnaProjectRelationshipsComponent } from './components/gna-project-relationships/gna-project-relationships.component';
 
 export const routes: Routes = [
     {
         path: '',
-        component: MainSiteComponent,
+        redirectTo: '/gna',
+        pathMatch: 'full'
     },
     {
-        path: 'app',
-        component: MainAppComponent,
+        path: 'gna',
+        component: GnaComponent,
         children: [
             {
                 path: 'projects',
-                component: ProjectsComponent,
+                component: GnaProjectsComponent,
             },
             {
                 path: 'projects/:id',
-                component: ProjectItemsComponent,
+                component: GnaProjectComponent,
                 children: [
                     {
                         path: '',
-                        component: ProjectGeneralComponent,
+                        component: GnaProjectGeneralComponent,
                     },
                     {
                         path: 'persons',
-                        component: PersonsComponent,
+                        component: GnaProjectPersonsComponent,
                     },
                     {
                         path: 'relationships',
-                        component: RelationshipsComponent,
+                        component: GnaProjectRelationshipsComponent,
                     }
                 ]
             }

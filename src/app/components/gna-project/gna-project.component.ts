@@ -1,19 +1,18 @@
 import { Component } from '@angular/core';
-import { ActivatedRoute, NavigationEnd, Router, RouterLink, RouterOutlet } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink, RouterOutlet } from '@angular/router';
 import { Project } from '../../models/project.model';
 import { DataService } from '../../services/data.service';
 
 @Component({
-  selector: 'app-project-items',
+  selector: 'app-gna-project',
   imports: [
     RouterLink,
-
     RouterOutlet
   ],
-  templateUrl: './project-items.component.html',
-  styleUrl: './project-items.component.scss'
+  templateUrl: './gna-project.component.html',
+  styleUrl: './gna-project.component.scss'
 })
-export class ProjectItemsComponent {
+export class GnaProjectComponent {
   isLoading = false;
   // urlPath: any[] = [];
   parentPath: any[] = [];
