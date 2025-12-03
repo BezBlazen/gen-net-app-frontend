@@ -56,4 +56,10 @@ export class EntitySelectorComponent {
   @Output() refresh = new EventEmitter<void>();
   @Output() ok = new EventEmitter<void>();
   @Output() cancel = new EventEmitter<void>();
+  openDialog(dialog: HTMLDialogElement) {
+    dialog.showModal();
+  }
+  closeDialog(dialog: HTMLDialogElement) {
+    dialog.close();
+  }
 }

@@ -3,8 +3,9 @@ import { Project } from '../../../models/project.model';
 import { FormGroup, FormsModule } from '@angular/forms';
 import { FormlyFieldConfig, FormlyFormOptions, FormlyModule } from '@ngx-formly/core';
 import { DataService } from '../../../services/data.service';
-import { EntityPresentationComponent, PresentationUIConfig } from '../../entity-presentation/entity-presentation.component';
+import { EntityPresentationComponent, PresentationUIConfig, PresentationViewMode } from '../../entity-presentation/entity-presentation.component';
 import { Subject, Subscription } from 'rxjs';
+import { JsonPipe } from '@angular/common';
 
 @Component({
   selector: 'app-project-view',
@@ -12,6 +13,7 @@ import { Subject, Subscription } from 'rxjs';
     EntityPresentationComponent,
     FormsModule,
     FormlyModule,
+    JsonPipe
   ],
   templateUrl: './project-view.component.html',
   styleUrl: './project-view.component.scss'
@@ -24,6 +26,7 @@ export class ProjectViewComponent extends EntityPresentationComponent {
   model?: Project;
   @Input() projectId?: string;
   @Output() onDeleted = new EventEmitter<void>();
+  readonly PresentationViewMode = PresentationViewMode;
   // [variables]
   // --------------------------------
   // [variables] Subscriptions
@@ -32,6 +35,22 @@ export class ProjectViewComponent extends EntityPresentationComponent {
   // [variables] Subscriptions
   // --------------------------------
   // [variables] Formly
+  // Create
+  modelCreate: Project = {};
+  formCreate = new FormGroup({});
+  optionsCreate: FormlyFormOptions = {};
+  fieldsCreate: FormlyFieldConfig[] = [
+    {
+      key: 'title',
+      type: 'input',
+      props: {
+        label: 'Title',
+        required: true,
+        errorTitle: '6-64 chars',
+      }
+    },
+  ];
+  // Edit, View
   form = new FormGroup({});
   options: FormlyFormOptions = {};
   fields: FormlyFieldConfig[] = [
@@ -79,7 +98,7 @@ export class ProjectViewComponent extends EntityPresentationComponent {
     }
   }
   onSave(): void {
-    if (this.model && this.form.valid) {
+    if (this.model && this.formCreate.valid) {
       this.dataService.doPutProject(this.model).subscribe((success) => {
         if (success) {
           if (this.model?.id) {
@@ -92,6 +111,28 @@ export class ProjectViewComponent extends EntityPresentationComponent {
   }
   onRefresh(): void {
     this.reloadProjects();
+  }
+  onClose(): void {
+    if (this.dialogRef) {
+      this.dialogRef.close();
+    }
+  }
+  onOk(): void {
+    if (this.config.mode == PresentationViewMode.CREATE && this.modelCreate && this.form.valid) {
+      this.dataService.doPostProject(this.modelCreate).subscribe((success) => {
+        if (success) {
+          if (this.model?.id) {
+            this.model = { ...this.dataService.getProject(this.model?.id) }
+          }
+          this.dialogRef?.close();
+        }
+      });
+    }
+  }
+  onCancel(): void {
+    if (this.dialogRef) {
+      this.dialogRef.close();
+    }
   }
   // [events]
   // --------------------------------
@@ -123,6 +164,10 @@ export class ProjectViewComponent extends EntityPresentationComponent {
   // [constructor]
   // --------------------------------
   getConfig(): PresentationUIConfig {
+    if (this.config) {
+      return this.config
+    }
+
     const config: PresentationUIConfig = {
       title: 'Project',
     };

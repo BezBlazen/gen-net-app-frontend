@@ -3,8 +3,3 @@
 @if (projectId) {
     <app-project-view class="view" [projectId]="projectId" (onDeleted)="onDeleted()"></app-project-view>
 }
-
-
-<dialog class="dialog-central" #dialogProjectNew>
-    <app-project-view class="view" [dialogRef]="dialogProjectNew"></app-project-view>
-</dialog>

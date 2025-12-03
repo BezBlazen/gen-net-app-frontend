@@ -19,16 +19,9 @@ export class GnaProjectsComponent {
   projectId?: string;
   project?: Project;
   projects: Project[] = [];
-  @ViewChild('dialogProjectNew') dialogProjectNew!: ElementRef<HTMLDialogElement>;
   // [vars]
   // --------------------------------
   constructor(private router: Router) {
-  }
-  openDialog(dialog: HTMLDialogElement) {
-    dialog.showModal();
-  }
-  closeDialog(dialog: HTMLDialogElement) {
-    dialog.close();
   }
   onSelectProject(projectId: string | undefined) {
     this.projectId = projectId;

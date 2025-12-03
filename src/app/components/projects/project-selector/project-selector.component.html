@@ -16,3 +16,6 @@
         </table>
     </div>
 </app-entity-selector>
+<dialog class="dialog-central" #dialogProjectNew>
+    <app-project-view class="view" [config]="getNewProjectDialodConfig()" [dialogRef]="dialogProjectNew"></app-project-view>
+</dialog>

@@ -1,6 +1,13 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 
+export enum PresentationViewMode {
+  CREATE,
+  EDIT,
+  VIEW
+}
+
 export interface PresentationUIConfig {
+  mode?: PresentationViewMode;
   title?: string;
   toolbar?: boolean;
 }
@@ -14,6 +21,7 @@ export interface PresentationUIConfig {
 export class EntityPresentationComponent {
   @Input() dialogRef?: HTMLDialogElement;
   @Input() config: PresentationUIConfig = {
+    mode: PresentationViewMode.EDIT,
     title: '',
     toolbar: true,
   };

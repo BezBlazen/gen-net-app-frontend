@@ -8,4 +8,20 @@
     padding: 8px;
 }
 
+.header, .footer {
+    display: flex;
+    flex-direction: row;
+    .title {
+        padding: 8px 0 0 8px;
+    }
+    .flex-grow-1-text-align-right {
+        flex-grow: 1;
+        text-align: right;
+
+        button:last-child {
+            margin: 1px;
+        }
+    }
+}
+
 // :host ::ng-deep {}

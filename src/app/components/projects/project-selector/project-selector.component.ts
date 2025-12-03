@@ -3,10 +3,15 @@ import { Project } from '../../../models/project.model';
 import { DataService } from '../../../services/data.service';
 import { EntitySelectorComponent, SelectorUIConfig } from '../../entity-selector/entity-selector.component';
 import { BehaviorSubject } from 'rxjs';
+import { ProjectViewComponent } from '../project-view/project-view.component';
+import { PresentationUIConfig, PresentationViewMode } from '../../entity-presentation/entity-presentation.component';
 
 @Component({
   selector: 'app-project-selector',
-  imports: [EntitySelectorComponent],
+  imports: [
+    EntitySelectorComponent,
+    ProjectViewComponent
+  ],
   templateUrl: './project-selector.component.html',
   styleUrl: './project-selector.component.scss'
 })
@@ -17,10 +22,12 @@ export class ProjectSelectorComponent extends EntitySelectorComponent {
   projects: Project[] = [];
   _projectId = new BehaviorSubject<string | undefined>(undefined);
   @Output() projectId = this._projectId.asObservable();
+  @ViewChild('dialogProjectNew') dialogProjectNew!: ElementRef<HTMLDialogElement>;
   // [variables]
   // --------------------------------
   // [events]
   onAdd(): void {
+    this.openDialog(this.dialogProjectNew.nativeElement);
   }
   onRefresh(): void {
     this.reloadProjects();
@@ -59,6 +66,13 @@ export class ProjectSelectorComponent extends EntitySelectorComponent {
   getConfig(): SelectorUIConfig {
     const config: SelectorUIConfig = {
       title: 'Select Project',
+    };
+    return config;
+  }
+  getNewProjectDialodConfig(): PresentationUIConfig {
+    const config: PresentationUIConfig = {
+      mode: PresentationViewMode.CREATE,
+      title: 'Create Project',
     };
     return config;
   }
