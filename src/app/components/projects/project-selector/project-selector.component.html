@@ -1,25 +1,18 @@
-<div class="toolbar">
-    <button class="icon-button" (click)="openDialog(dialogProjectNew)">
-        <img class="icon" src="./assets/icons/icons8-plus-math-16.png" />
-    </button>
-</div>
-<div class="table">
-    <table>
-        <thead>
-            <tr>
-                <th>Title</th>
-            </tr>
-        </thead>
-        <tbody>
-            @for (project of projects; track project.id) {
-            <tr (click)="setProject(project)">
-                <td>{{ project.title }}</td>
-            </tr>
-            }
-        </tbody>
-    </table>
-</div>
-
-<dialog class="dialog-central" #dialogProjectNew>
-    <app-project-view class="view" [viewMode]="ViewMode.CREATE" [dialogRef]="dialogProjectNew"></app-project-view>
-</dialog>
+<app-entity-selector [config]="getConfig()" (add)="onAdd()" (refresh)="onRefresh()">
+    <div class="table">
+        <table>
+            <thead class="border-bottom">
+                <tr>
+                    <th>Title</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (project of projects; track project.id) {
+                <tr (click)="setProject(project)" [class.active]="isActive(project.id)">
+                    <td>{{project.title}} </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</app-entity-selector>

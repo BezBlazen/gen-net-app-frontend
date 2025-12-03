@@ -1,4 +1,9 @@
-@if (dialogRef) {
+<app-entity-presentation [config]="getConfig()" (delete)="onDelete()" (save)="onSave()" (refresh)="onRefresh()">
+    <formly-form [form]="form" [fields]="fields" [options]="options" [model]="model"></formly-form>
+</app-entity-presentation>
+
+
+<!-- @if (dialogRef) {
 <app-base-view-dialog-layout
     [title]="getDialogTitle()"
     (ok)="onOk()"
@@ -18,4 +23,4 @@
         <formly-form [form]="form" [fields]="fields" [options]="options" [model]="model"></formly-form>
     </div>
 </app-base-view-page-layout>
-}
+} -->

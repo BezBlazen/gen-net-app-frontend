@@ -1,9 +1,8 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
-import { DataService } from '../../services/data.service';
 import { Project } from '../../models/project.model';
-import { ViewMode } from '../base-view/base-view.component';
 import { ProjectViewComponent } from '../projects/project-view/project-view.component';
 import { ProjectSelectorComponent } from '../projects/project-selector/project-selector.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-gna-projects',
@@ -15,18 +14,15 @@ import { ProjectSelectorComponent } from '../projects/project-selector/project-s
   styleUrl: './gna-projects.component.scss'
 })
 export class GnaProjectsComponent {
-  isLoading = false;
   // --------------------------------
-  // [var] Projects
+  // [vars]
   projectId?: string;
   project?: Project;
   projects: Project[] = [];
-  readonly ViewMode = ViewMode;
   @ViewChild('dialogProjectNew') dialogProjectNew!: ElementRef<HTMLDialogElement>;
-  // [var] Projects
+  // [vars]
   // --------------------------------
-  setProject(row: Project) {
-    this.project = row;
+  constructor(private router: Router) {
   }
   openDialog(dialog: HTMLDialogElement) {
     dialog.showModal();
@@ -34,7 +30,10 @@ export class GnaProjectsComponent {
   closeDialog(dialog: HTMLDialogElement) {
     dialog.close();
   }
-  onSelectProject(projectId: string) {
+  onSelectProject(projectId: string | undefined) {
     this.projectId = projectId;
+  }
+  onDeleted() {
+    this.router.navigate(['/', 'gna', 'projects']);
   }
 }

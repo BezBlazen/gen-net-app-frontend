@@ -1,43 +1,37 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, SimpleChanges } from '@angular/core';
 import { Project } from '../../../models/project.model';
 import { FormGroup, FormsModule } from '@angular/forms';
 import { FormlyFieldConfig, FormlyFormOptions, FormlyModule } from '@ngx-formly/core';
-import { BaseViewComponent, ViewMode } from '../../base-view/base-view.component';
-import { BaseViewLayoutConfig, BaseViewLayoutMode } from '../../base-view-layout/base-view-layout.component';
-import { BaseViewDialogLayoutComponent } from '../../base-view-dialog-layout/base-view-dialog-layout.component';
-import { BaseViewPageLayoutComponent } from '../../base-view-page-layout/base-view-page-layout.component';
-import { NgxSpinnerService } from 'ngx-spinner';
 import { DataService } from '../../../services/data.service';
+import { EntityPresentationComponent, PresentationUIConfig } from '../../entity-presentation/entity-presentation.component';
+import { Subject, Subscription } from 'rxjs';
 
-export enum FormViewMode {
-  CREATE,
-  EDIT,
-  VIEW
-}
 @Component({
   selector: 'app-project-view',
   imports: [
-    BaseViewDialogLayoutComponent,
-    BaseViewPageLayoutComponent,
+    EntityPresentationComponent,
     FormsModule,
-    FormlyModule
+    FormlyModule,
   ],
   templateUrl: './project-view.component.html',
   styleUrl: './project-view.component.scss'
 })
-export class ProjectViewComponent extends BaseViewComponent {
+export class ProjectViewComponent extends EntityPresentationComponent {
+  // --------------------------------
+  // [variables]
+  isLoading = false;
   emptyProject: Project = { title: '' };
   model?: Project;
-  @Input() set projectId(value: string | undefined) {
-    if (value) {
-      this.model = { ...this.dataService.getProject(value) }
-    } else {
-      this.model = {};
-    }
-  }
+  @Input() projectId?: string;
   @Output() onDeleted = new EventEmitter<void>();
-  baseConfig: BaseViewLayoutConfig = {};
-  createViewConfig: BaseViewLayoutConfig = { mode: BaseViewLayoutMode.DIALOG };
+  // [variables]
+  // --------------------------------
+  // [variables] Subscriptions
+  private projectsSubscription?: Subscription;
+  // private destroy$ = new Subject<void>();
+  // [variables] Subscriptions
+  // --------------------------------
+  // [variables] Formly
   form = new FormGroup({});
   options: FormlyFormOptions = {};
   fields: FormlyFieldConfig[] = [
@@ -47,12 +41,7 @@ export class ProjectViewComponent extends BaseViewComponent {
       props: {
         label: 'Id',
         disabled: true
-      },
-      expressions: {
-        hide: (field: FormlyFieldConfig) => {
-          return this.isViewModeCreate();
-        },
-      },
+      }
     },
     {
       key: 'title',
@@ -69,92 +58,88 @@ export class ProjectViewComponent extends BaseViewComponent {
       props: {
         label: 'Created at',
         disabled: true
-      },
-      expressions: {
-        hide: (field: FormlyFieldConfig) => {
-          return this.isViewModeCreate();
-        },
       }
     },
   ];
-  override onClose(): void {
-    this.resetForm();
-    this.dialogRef?.close();
-  }
-  override onOk(): void {
+  // [variables] Formly
+  // --------------------------------
+  // [events]
+  onDelete(): void {
     if (this.model && this.form.valid) {
-      if (this.viewMode == ViewMode.CREATE) {
-        this.dataService.doPostProject(this.model).subscribe((success) => {
+      let isConfirmed = confirm("Delete project: '" + this.model?.title + "' ?");
+      if (isConfirmed) {
+        this.dataService.doDeleteProject(this.model).subscribe((success) => {
           if (success) {
             this.resetForm();
             this.dialogRef?.close();
-          }
-        });
-      } else if (this.viewMode == ViewMode.EDIT) {
-        this.dataService.doPutProject(this.model).subscribe((success) => {
-          if (success) {
-            this.resetForm();
-            this.dialogRef?.close();
+            this.onDeleted.emit();
           }
         });
       }
     }
   }
-
-  override onSave(): void {
+  onSave(): void {
     if (this.model && this.form.valid) {
-      if (this.viewMode == ViewMode.EDIT) {
-        this.dataService.doPutProject(this.model).subscribe((success) => {
-          if (success) {
-            if (this.model?.id) {
-              this.model = { ...this.dataService.getProject(this.model?.id) }
-            }
-            this.dialogRef?.close();
+      this.dataService.doPutProject(this.model).subscribe((success) => {
+        if (success) {
+          if (this.model?.id) {
+            this.model = { ...this.dataService.getProject(this.model?.id) }
           }
-        });
-      }
-    }
-  }
-  override onDelete(): void {
-    if (this.model && this.form.valid) {
-      if (this.viewMode == ViewMode.EDIT) {
-        let isConfirmed = confirm("Delete project: '" + this.model?.title + "' ?");
-        if (isConfirmed) {
-          this.dataService.doDeleteProject(this.model).subscribe((success) => {
-            if (success) {
-              this.resetForm();
-              this.dialogRef?.close();
-              this.onDeleted.emit();
-            }
-          });
+          this.dialogRef?.close();
         }
-      }
+      });
     }
   }
-
+  onRefresh(): void {
+    this.reloadProjects();
+  }
+  // [events]
+  // --------------------------------
+  // [constructor]
   constructor(
-    private dataService: DataService,
+    private dataService: DataService
   ) {
     super();
-  }
-  getDialogTitle() {
-    if (this.viewMode == ViewMode.CREATE) {
-      return 'Create Project';
-    } else {
-      return 'Project: ' + this.model?.title;
-    }
+
 
   }
   ngOnInit() {
-    if (this.dialogRef != null) {
-      this.baseConfig.mode = BaseViewLayoutMode.DIALOG;
-    }
-    if (this.viewMode == ViewMode.CREATE) {
-      this.model = this.emptyProject;
+    // Allow subasiptions if not dialog
+    if (!this.dialogRef) {
+      this.projectsSubscription = this.dataService.projects$.subscribe(projects => {
+        this.rereadProject();
+      });
     }
   }
-  isViewModeCreate() {
-    return this.viewMode == ViewMode.CREATE;
+  ngOnDestroy() {
+    this.projectsSubscription?.unsubscribe();
+
+  }
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['projectId']) {
+      this.updateModel();
+    }
+  }
+  // [constructor]
+  // --------------------------------
+  getConfig(): PresentationUIConfig {
+    const config: PresentationUIConfig = {
+      title: 'Project',
+    };
+    return config;
+  }
+  rereadProject() {
+    this.updateModel();
+  }
+  updateModel() {
+    if (this.projectId) {
+      this.model = { ...this.dataService.getProject(this.projectId) }
+    } else {
+      this.model = {};
+    }
+  }
+  reloadProjects() {
+    this.dataService.doGetProjects();
   }
   resetForm() {
     this.form.reset();

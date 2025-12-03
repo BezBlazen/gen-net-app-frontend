@@ -1,5 +1,5 @@
 import { Injectable, numberAttribute } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { BehaviorSubject, catchError, map, Observable, of, startWith, delay, Subject } from 'rxjs';
 import { ApiDataWrapper } from './api-data-wrapper';
 import { Account, AccountRole } from '../models/account.model';
@@ -21,7 +21,7 @@ export class DataService {
 
   private _isLoading = new BehaviorSubject<boolean>(false);
   public isLoading$ = this._isLoading.asObservable();
-  private _errorMessage = new BehaviorSubject<string|null>(null);
+  private _errorMessage = new BehaviorSubject<string | null>(null);
   public errorMessage$ = this._errorMessage.asObservable();
 
   private _account = new BehaviorSubject<Account | null>(null);
@@ -37,26 +37,26 @@ export class DataService {
   public projects$ = this._projects.asObservable();
 
   private _persons = new BehaviorSubject<Person[]>([]);
-  public persons$ = this._projects.asObservable();
+  public persons$ = this._persons.asObservable();
 
-  errorMessageUnexpected:string = "Unexpected server error";
+  errorMessageUnexpected: string = "Unexpected server error";
 
   constructor(private httpClient: HttpClient) {
   }
 
-  static readonly  stateErrorNoIsLoadingFalse = {errorMessage: undefined, isLoading: false };
-  static readonly  stateErrorNoIsLoadingTrue = {errorMessage: undefined, isLoading: true };
+  static readonly stateErrorNoIsLoadingFalse = { errorMessage: undefined, isLoading: false };
+  static readonly stateErrorNoIsLoadingTrue = { errorMessage: undefined, isLoading: true };
 
   // Constructor
   // --------------------------
   // Errors
-  public getErrorMessage(error: any) : string | null {
+  public getErrorMessage(error: any): string | null {
     return error.error?.message != undefined ? error.error.message : this.errorMessageUnexpected;
   }
   // Errors
   // --------------------------
   // Account
-  public  getAccountLastUserName() : string | null {
+  public getAccountLastUserName(): string | null {
     return this._accountLastUserName;
   }
   public doPostSignIn(account: Account) {
@@ -80,7 +80,7 @@ export class DataService {
   }
   public doPostSignUp(account: Account) {
     this.httpClient
-      .post<Account>(this.baseUrl + '/auth/sign_up', account, {withCredentials: true,})
+      .post<Account>(this.baseUrl + '/auth/sign_up', account, { withCredentials: true, })
       .pipe(
         map((account) => (new ApiDataWrapper(account, false, null))),
         catchError((err) => of(new ApiDataWrapper(undefined, false, this.getErrorMessage(err)))),
@@ -96,11 +96,11 @@ export class DataService {
   }
   public doPostSignOut() {
     this.httpClient
-      .post<Account>(this.baseUrl + '/auth/sign_out', null, {withCredentials: true,})
+      .post<Account>(this.baseUrl + '/auth/sign_out', null, { withCredentials: true, })
       .pipe(
         map((account) => (new ApiDataWrapper(account, false, null))),
         catchError((err) => of(new ApiDataWrapper(undefined, false, this.getErrorMessage(err)))),
-        startWith(new ApiDataWrapper(undefined, true, null))     
+        startWith(new ApiDataWrapper(undefined, true, null))
       ).subscribe((pipeData) => {
         this._isLoading.next(pipeData.isLoading);
         this._errorMessage.next(pipeData.errorMessage);
@@ -109,11 +109,11 @@ export class DataService {
   }
   public rereadAccount() {
     this.httpClient
-      .get<Account>(this.baseUrl + '/auth/account', {withCredentials: true})
+      .get<Account>(this.baseUrl + '/auth/account', { withCredentials: true })
       .pipe(
         map((account) => (new ApiDataWrapper(account, false, null))),
         catchError((err) => of(new ApiDataWrapper(undefined, false, this.getErrorMessage(err)))),
-        startWith(new ApiDataWrapper(undefined, true, null))  
+        startWith(new ApiDataWrapper(undefined, true, null))
       ).subscribe((pipeData) => {
         this._isLoading.next(pipeData.isLoading);
         // Hide reread errors
@@ -131,6 +131,9 @@ export class DataService {
   getProject(projectId: string): Project | undefined {
     return this._projects.value.find((project) => project.id === projectId);
   }
+  getProjects(): Project[] {
+    return this._projects.value;
+  }
   addProject(project: Project): void {
     const projects = this._projects.value;
     this._projects.next([...projects, project]);
@@ -147,28 +150,29 @@ export class DataService {
   }
   public doGetProjects() {
     this.httpClient
-      .get<Project[]>(this.baseUrl + '/projects', {withCredentials: true})
+      .get<Project[]>(this.baseUrl + '/projects', { withCredentials: true })
       .pipe(
         map((projects) => (new ApiDataWrapper(projects, false, null))),
         catchError((err) => of(new ApiDataWrapper(undefined, false, this.getErrorMessage(err)))),
-        startWith(new ApiDataWrapper(undefined, true, null))  
+        startWith(new ApiDataWrapper(undefined, true, null))
       )
       .subscribe((pipeData) => {
         this._isLoading.next(pipeData.isLoading);
         this._errorMessage.next(pipeData.errorMessage);
-        if (!pipeData.isLoading && pipeData.data)     
-          this._projects.next(pipeData.data);
+        if (!pipeData.isLoading) {
+          this._projects.next(pipeData.data ? pipeData.data : <Project[]>[]);
+        }
       });
   }
-  public doPostProject(project : Project) : Observable<boolean> {
+  public doPostProject(project: Project): Observable<boolean> {
     const _success = new BehaviorSubject<boolean>(false);
     this.httpClient
-      .post<Project>(this.baseUrl + '/projects', project, {withCredentials: true,})
+      .post<Project>(this.baseUrl + '/projects', project, { withCredentials: true, })
       .pipe(
         // delay(3000),
         map((project) => (new ApiDataWrapper(project, false, null))),
         catchError((err) => of(new ApiDataWrapper(undefined, false, this.getErrorMessage(err)))),
-        startWith(new ApiDataWrapper(undefined, true, null))  
+        startWith(new ApiDataWrapper(undefined, true, null))
       )
       .subscribe((pipeData) => {
         this._isLoading.next(pipeData.isLoading);
@@ -178,17 +182,17 @@ export class DataService {
           _success.next(true);
         }
       });
-    return _success.asObservable(); 
+    return _success.asObservable();
   }
-  public doPutProject(project : Project) : Observable<boolean> {
+  public doPutProject(project: Project): Observable<boolean> {
     const _success = new BehaviorSubject<boolean>(false);
     this.httpClient
-      .put<Project>(this.baseUrl + '/projects', project, {withCredentials: true,})
+      .put<Project>(this.baseUrl + '/projects', project, { withCredentials: true, })
       .pipe(
         // delay(3000),
         map((project) => (new ApiDataWrapper(project, false, null))),
         catchError((err) => of(new ApiDataWrapper(undefined, false, this.getErrorMessage(err)))),
-        startWith(new ApiDataWrapper(undefined, true, null))  
+        startWith(new ApiDataWrapper(undefined, true, null))
       )
       .subscribe((pipeData) => {
         this._isLoading.next(pipeData.isLoading);
@@ -198,16 +202,16 @@ export class DataService {
           _success.next(true);
         }
       });
-    return _success.asObservable(); 
+    return _success.asObservable();
   }
-  public doDeleteProject(project : Project) : Observable<boolean> {
+  public doDeleteProject(project: Project): Observable<boolean> {
     const _success = new BehaviorSubject<boolean>(false);
     this.httpClient
-      .delete<Project>(this.baseUrl + '/projects/' + project.id, {withCredentials: true,})
+      .delete<Project>(this.baseUrl + '/projects/' + project.id, { withCredentials: true, })
       .pipe(
         map((project) => (new ApiDataWrapper(project, false, null))),
         catchError((err) => of(new ApiDataWrapper(undefined, false, this.getErrorMessage(err)))),
-        startWith(new ApiDataWrapper(undefined, true, null))  
+        startWith(new ApiDataWrapper(undefined, true, null))
       )
       .subscribe((pipeData) => {
         this._isLoading.next(pipeData.isLoading);
@@ -217,13 +221,19 @@ export class DataService {
           _success.next(true);
         }
       });
-    return _success.asObservable(); 
+    return _success.asObservable();
   }
   // Projects
   // --------------------------
   // Persons
   getPerson(personId: string): Person | undefined {
     return this._persons.value.find((person) => person.id === personId);
+  }
+  getPersons(projectId: string | undefined): Person[] {
+    if (projectId) {
+      return this._persons.value.filter((person) => person.projectId === projectId);
+    }
+    return this._persons.value;
   }
   addPerson(person: Person): void {
     const persons = this._persons.value;
@@ -239,30 +249,38 @@ export class DataService {
     const newPersons = persons.filter(item => item.id !== person.id);
     this._persons.next(newPersons);
   }
-  public doGetPersons() {
+  public doGetPersons(projectId: string | undefined) {
+    let params = new HttpParams();
+    if (projectId) {
+      params = params.append('project_id', projectId);
+    }
     this.httpClient
-      .get<Person[]>(this.baseUrl + '/persons', {withCredentials: true})
+      .get<Person[]>(this.baseUrl + '/persons', { withCredentials: true, params: params })
       .pipe(
         map((persons) => (new ApiDataWrapper(persons, false, null))),
         catchError((err) => of(new ApiDataWrapper(undefined, false, this.getErrorMessage(err)))),
-        startWith(new ApiDataWrapper(undefined, true, null))  
+        startWith(new ApiDataWrapper(undefined, true, null))
       )
       .subscribe((pipeData) => {
         this._isLoading.next(pipeData.isLoading);
         this._errorMessage.next(pipeData.errorMessage);
-        if (!pipeData.isLoading && pipeData.data)     
+        if (!pipeData.isLoading && pipeData.data)
           this._persons.next(pipeData.data);
       });
   }
-  public doPostPerson(person : Person) : Observable<boolean> {
+  public doPostPerson(person: Person, projectId: string | undefined): Observable<boolean> {
+    let params = new HttpParams();
+    if (projectId) {
+      params = params.append('project_id', projectId);
+    }
     const _success = new BehaviorSubject<boolean>(false);
     this.httpClient
-      .post<Person>(this.baseUrl + '/persons', person, {withCredentials: true,})
+      .post<Person>(this.baseUrl + '/persons', person, { withCredentials: true, params: params })
       .pipe(
         // delay(3000),
         map((person) => (new ApiDataWrapper(person, false, null))),
         catchError((err) => of(new ApiDataWrapper(undefined, false, this.getErrorMessage(err)))),
-        startWith(new ApiDataWrapper(undefined, true, null))  
+        startWith(new ApiDataWrapper(undefined, true, null))
       )
       .subscribe((pipeData) => {
         this._isLoading.next(pipeData.isLoading);
@@ -272,17 +290,17 @@ export class DataService {
           _success.next(true);
         }
       });
-    return _success.asObservable(); 
+    return _success.asObservable();
   }
-  public doPutPerson(person : Person) : Observable<boolean> {
+  public doPutPerson(person: Person): Observable<boolean> {
     const _success = new BehaviorSubject<boolean>(false);
     this.httpClient
-      .put<Person>(this.baseUrl + '/persons', person, {withCredentials: true,})
+      .put<Person>(this.baseUrl + '/persons', person, { withCredentials: true, })
       .pipe(
         // delay(3000),
         map((person) => (new ApiDataWrapper(person, false, null))),
         catchError((err) => of(new ApiDataWrapper(undefined, false, this.getErrorMessage(err)))),
-        startWith(new ApiDataWrapper(undefined, true, null))  
+        startWith(new ApiDataWrapper(undefined, true, null))
       )
       .subscribe((pipeData) => {
         this._isLoading.next(pipeData.isLoading);
@@ -292,16 +310,16 @@ export class DataService {
           _success.next(true);
         }
       });
-    return _success.asObservable(); 
+    return _success.asObservable();
   }
-  public doDeletePerson(person : Person) : Observable<boolean> {
+  public doDeletePerson(person: Person): Observable<boolean> {
     const _success = new BehaviorSubject<boolean>(false);
     this.httpClient
-      .delete<Person>(this.baseUrl + '/persons/' + person.id, {withCredentials: true,})
+      .delete<Person>(this.baseUrl + '/persons/' + person.id, { withCredentials: true, })
       .pipe(
         map((person) => (new ApiDataWrapper(person, false, null))),
         catchError((err) => of(new ApiDataWrapper(undefined, false, this.getErrorMessage(err)))),
-        startWith(new ApiDataWrapper(undefined, true, null))  
+        startWith(new ApiDataWrapper(undefined, true, null))
       )
       .subscribe((pipeData) => {
         this._isLoading.next(pipeData.isLoading);
@@ -311,7 +329,7 @@ export class DataService {
           _success.next(true);
         }
       });
-    return _success.asObservable(); 
+    return _success.asObservable();
   }
   // Persons
   // --------------------------

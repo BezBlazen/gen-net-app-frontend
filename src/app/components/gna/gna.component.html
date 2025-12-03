@@ -17,10 +17,10 @@
     <div class="app-wrapper">
         <div class="app-wrapper-menu">
             <menu>
-                <li><a [routerLink]="['/', 'gna', 'projects']">Projects</a>
+                <li><a [routerLink]="['/', 'gna', 'projects']" [routerLinkActive]="['active']" [routerLinkActiveOptions]="{exact:true}">Projects</a>
                     <ul>
                         @for (project of projects; track project.id) {
-                        <li><a [routerLink]="['/', 'gna', 'projects', project.id]" routerLinkActive="active-link">{{
+                        <li><a [routerLink]="['/', 'gna', 'projects', project.id]" routerLinkActive="active">{{
                                 project.title }}</a></li>
                         } @empty {
                         <!-- TODO: add new project -->

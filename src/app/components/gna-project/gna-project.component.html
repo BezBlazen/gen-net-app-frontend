@@ -3,9 +3,9 @@
     <!-- <div>{{urlPath}}</div> -->
     <div class="menu">
         <ul>
-            <li><a [routerLink]="['./']" [class.active-link]="isActive('./')">General</a></li>
-            <li><a [routerLink]="['./', 'persons']" [class.active-link]="isActive('./persons')">Persons</a></li>
-            <li><a [routerLink]="['./', 'relationships']" [class.active-link]="isActive('./relationships')">Relationships</a></li>
+            <li><a [routerLink]="['./']" [class.active]="isActive('./')">General</a></li>
+            <li><a [routerLink]="['./', 'persons']" [class.active]="isActive('./persons')">Persons</a></li>
+            <li><a [routerLink]="['./', 'relationships']" [class.active]="isActive('./relationships')">Relationships</a></li>
         </ul>
         <!-- <button [routerLink]="['./']">General</button>
         <button [routerLink]="['./', 'persons']">Persons</button>

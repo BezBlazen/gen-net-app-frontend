@@ -1,0 +1,49 @@
+@if (dialogRef) {
+<div class="header">
+    <div class="title">{{config.title}}</div>
+    <div class="flex-grow-1-text-align-right">
+        @if (close.observed) {
+        <button class="icon-button" (click)="close.emit()">
+            <img class="icon" src="./assets/icons/icons8-close-16.png" />
+        </button>
+        }
+    </div>
+</div>
+}
+@if (config.title) {
+<div class="toolbar border-top">
+    <div>
+        @if (delete.observed) {
+        <button header class="icon-button" (click)="delete.emit()">
+            <img class="icon" src="./assets/icons/icons8-delete-16.png" />
+        </button>
+        }
+        @if (save.observed) {
+        <button header class="icon-button" (click)="save.emit()">
+            <img class="icon" src="./assets/icons/icons8-save-16.png" />
+        </button>
+        }
+        @if (refresh.observed) {
+        <button header class="icon-button" (click)="refresh.emit()">
+            <img class="icon" src="./assets/icons/icons8-refresh-16.png" />
+        </button>
+        }
+        <ng-content select="[toolbar]"></ng-content>
+    </div>
+</div>
+}
+<div class="body border-top">
+    <ng-content></ng-content>
+</div>
+@if (dialogRef) {
+<div class="footer border-top">
+    <div class="flex-grow-1-text-align-right">
+        @if (ok.observed) {
+        <button (click)="ok.emit()">Ok</button>
+        }
+        @if (cancel.observed) {
+        <button (click)="cancel.emit()">Cancel</button>
+        }
+    </div>
+</div>
+}

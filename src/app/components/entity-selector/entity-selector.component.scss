@@ -1,0 +1,46 @@
+:host {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.body {
+    flex: 1;
+    overflow: auto;
+}
+
+:host ::ng-deep {
+    .table {
+        flex: 1;
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            border-spacing: 0px;
+        }
+
+        thead {
+            position: sticky;
+            top: 0;
+            background: white;
+            z-index: 10;
+            background-color: #ddd;
+        }
+
+        tbody {
+            tr:hover {
+                background-color: #e3f2ff;
+            }
+            tr.active {
+                // background-color: #bbb;
+                background-color: #99d1ff;
+            }
+        }
+
+        td,
+        th {
+            padding-left: 8px;
+        }
+    }
+}

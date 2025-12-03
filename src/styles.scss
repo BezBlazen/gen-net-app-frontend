@@ -32,9 +32,19 @@ div button:not(:first-child) {
     max-height: none;
     max-width: none;
 }
+
 .border-top {
     border-top: 1px solid lightgray;
 }
+
 .border-bottom {
     border-bottom: 1px solid lightgray;
+}
+
+a.active {
+    background-color: #99d1ff;
+}
+
+a:hover {
+    background-color: #e3f2ff;
 }
