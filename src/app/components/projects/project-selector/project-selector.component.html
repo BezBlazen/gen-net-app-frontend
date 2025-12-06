@@ -8,7 +8,7 @@
             </thead>
             <tbody>
                 @for (project of projects; track project.id) {
-                <tr (click)="setProject(project)" [class.active]="isActive(project.id)">
+                <tr (click)="setSelectedProjectId(project.id)" [class.active]="isActive(project.id)">
                     <td>{{project.title}} </td>
                 </tr>
                 }

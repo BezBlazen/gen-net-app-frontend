@@ -143,6 +143,9 @@ export class GnaComponent {
       }
     });
     this.dataService.account$.subscribe(account => {
+      if (!account || account.username != this.account?.username ) {
+        this.router.navigate(['/', 'gna', 'projects']);
+      }
       this.account = account;
       this.dataService.doGetProjects();
     });

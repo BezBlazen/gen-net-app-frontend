@@ -1,11 +1,9 @@
-@if (config.mode == PresentationViewMode.CREATE) {
-<app-entity-presentation [config]="getConfig()" [dialogRef]="dialogRef" (close)="onClose()" (ok)="onOk()"
-     (cancel)="onCancel()">
+@if (isCreateMode()) {
+<app-entity-presentation [config]="getConfig()" [dialogRef]="dialogRef" (close)="onClose()" (ok)="onOk()" (cancel)="onCancel()">
     <formly-form [form]="formCreate" [fields]="fieldsCreate" [options]="optionsCreate" [model]="modelCreate"></formly-form>
 </app-entity-presentation>
 } @else {
-<app-entity-presentation [config]="getConfig()" [dialogRef]="dialogRef" (delete)="onDelete()" (save)="onSave()"
-    (refresh)="onRefresh()">
+<app-entity-presentation [config]="getConfig()" [dialogRef]="dialogRef" (delete)="onDelete()" (save)="onSave()" (refresh)="onRefresh()">
     <formly-form [form]="form" [fields]="fields" [options]="options" [model]="model"></formly-form>
 </app-entity-presentation>
 }

@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, Output, ViewChild } from '@angular/core';
 import { Project } from '../../../models/project.model';
 import { DataService } from '../../../services/data.service';
 import { EntitySelectorComponent, SelectorUIConfig } from '../../entity-selector/entity-selector.component';
@@ -52,12 +52,12 @@ export class ProjectSelectorComponent extends EntitySelectorComponent {
     if (this.projects != null && this.projects.length > 0) {
       const p = this.projects.find(project => project.id === this._projectId.getValue());
       if (p) {
-        this.setProject(p);
+        this.setSelectedProjectId(p.id);
       } else {
-        this.setProject(this.projects[0]);
+        this.setSelectedProjectId(this.projects[0].id);
       }
     } else {
-      this.setProject(undefined);
+      this.setSelectedProjectId(undefined);
     }
   }
   reloadProjects() {
@@ -73,11 +73,12 @@ export class ProjectSelectorComponent extends EntitySelectorComponent {
     const config: PresentationUIConfig = {
       mode: PresentationViewMode.CREATE,
       title: 'Create Project',
+      toolbar: false
     };
     return config;
   }
-  setProject(project: Project | undefined) {
-    this._projectId.next(project?.id);
+  setSelectedProjectId(projectId: string | undefined) {
+    this._projectId.next(projectId);
   }
   isActive(id: string | undefined) {
     return id && this._projectId.getValue() === id;

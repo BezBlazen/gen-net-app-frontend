@@ -6,8 +6,7 @@ import { Router, ROUTER_OUTLET_DATA } from '@angular/router';
 @Component({
   selector: 'app-gna-project-persons',
   imports: [
-    PersonSelectorComponent,
-    // PersonViewComponent
+    PersonSelectorComponent
   ],
   templateUrl: './gna-project-persons.component.html',
   styleUrl: './gna-project-persons.component.scss'

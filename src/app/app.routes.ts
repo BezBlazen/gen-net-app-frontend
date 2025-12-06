@@ -31,7 +31,9 @@ export const routes: Routes = [
                 children: [
                     {
                         path: '',
-                        component: GnaProjectGeneralComponent,
+                        // component: GnaProjectGeneralComponent,
+                        redirectTo: 'persons',
+                        pathMatch: 'full'
                     },
                     {
                         path: 'persons',

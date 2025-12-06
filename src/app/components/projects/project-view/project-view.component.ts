@@ -4,16 +4,14 @@ import { FormGroup, FormsModule } from '@angular/forms';
 import { FormlyFieldConfig, FormlyFormOptions, FormlyModule } from '@ngx-formly/core';
 import { DataService } from '../../../services/data.service';
 import { EntityPresentationComponent, PresentationUIConfig, PresentationViewMode } from '../../entity-presentation/entity-presentation.component';
-import { Subject, Subscription } from 'rxjs';
-import { JsonPipe } from '@angular/common';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-project-view',
   imports: [
     EntityPresentationComponent,
     FormsModule,
-    FormlyModule,
-    JsonPipe
+    FormlyModule
   ],
   templateUrl: './project-view.component.html',
   styleUrl: './project-view.component.scss'
@@ -22,16 +20,12 @@ export class ProjectViewComponent extends EntityPresentationComponent {
   // --------------------------------
   // [variables]
   isLoading = false;
-  emptyProject: Project = { title: '' };
-  model?: Project;
   @Input() projectId?: string;
   @Output() onDeleted = new EventEmitter<void>();
-  readonly PresentationViewMode = PresentationViewMode;
   // [variables]
   // --------------------------------
   // [variables] Subscriptions
   private projectsSubscription?: Subscription;
-  // private destroy$ = new Subject<void>();
   // [variables] Subscriptions
   // --------------------------------
   // [variables] Formly
@@ -51,6 +45,7 @@ export class ProjectViewComponent extends EntityPresentationComponent {
     },
   ];
   // Edit, View
+  model?: Project;
   form = new FormGroup({});
   options: FormlyFormOptions = {};
   fields: FormlyFieldConfig[] = [
@@ -82,7 +77,7 @@ export class ProjectViewComponent extends EntityPresentationComponent {
   ];
   // [variables] Formly
   // --------------------------------
-  // [events]
+  // [events] EntityPresentation
   onDelete(): void {
     if (this.model && this.form.valid) {
       let isConfirmed = confirm("Delete project: '" + this.model?.title + "' ?");
@@ -134,7 +129,7 @@ export class ProjectViewComponent extends EntityPresentationComponent {
       this.dialogRef.close();
     }
   }
-  // [events]
+  // [events] EntityPresentation
   // --------------------------------
   // [constructor]
   constructor(
@@ -145,8 +140,8 @@ export class ProjectViewComponent extends EntityPresentationComponent {
 
   }
   ngOnInit() {
-    // Allow subasiptions if not dialog
-    if (!this.dialogRef) {
+    // Allow subscriptions if PresentationViewMode not CREATE
+    if (this.config.mode != PresentationViewMode.CREATE) {
       this.projectsSubscription = this.dataService.projects$.subscribe(projects => {
         this.rereadProject();
       });
@@ -154,7 +149,6 @@ export class ProjectViewComponent extends EntityPresentationComponent {
   }
   ngOnDestroy() {
     this.projectsSubscription?.unsubscribe();
-
   }
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['projectId']) {
@@ -172,6 +166,9 @@ export class ProjectViewComponent extends EntityPresentationComponent {
       title: 'Project',
     };
     return config;
+  }
+  isCreateMode(): boolean {
+    return this.config.mode == PresentationViewMode.CREATE;
   }
   rereadProject() {
     this.updateModel();

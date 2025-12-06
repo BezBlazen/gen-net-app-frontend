@@ -3,10 +3,15 @@ import { DataService } from '../../../services/data.service';
 import { Person } from '../../../models/person.model';
 import { EntitySelectorComponent, SelectorUIConfig } from '../../entity-selector/entity-selector.component';
 import { BehaviorSubject } from 'rxjs';
+import { PersonViewComponent } from '../person-view/person-view.component';
+import { PresentationUIConfig, PresentationViewMode } from '../../entity-presentation/entity-presentation.component';
 
 @Component({
   selector: 'app-person-selector',
-  imports: [EntitySelectorComponent],
+  imports: [
+    EntitySelectorComponent,
+    PersonViewComponent
+  ],
   templateUrl: './person-selector.component.html',
   styleUrl: './person-selector.component.scss'
 })
@@ -18,10 +23,12 @@ export class PersonSelectorComponent extends EntitySelectorComponent {
   _personId = new BehaviorSubject<string | undefined>(undefined);
   @Output() personId = this._personId.asObservable();
   @Input() projectId?: string;
+  @ViewChild('dialogPersonNew') dialogPersonNew!: ElementRef<HTMLDialogElement>;
   // [variables]
   // --------------------------------
   // [events]
   onAdd(): void {
+    this.openDialog(this.dialogPersonNew.nativeElement);
   }
   onRefresh(): void {
     this.reloadPersons();
@@ -48,43 +55,38 @@ export class PersonSelectorComponent extends EntitySelectorComponent {
       }
     }
   }
-  // onRefresh() {
-  //   this.dataService.doGetPersons(this.projectId);
-  // }  
-  // openDialog(dialog: HTMLDialogElement) {
-  //   dialog.showModal();
-  // }
-  // closeDialog(dialog: HTMLDialogElement) {
-  //   dialog.close();
-  // }
-  // onInput(event: Event) {
-  //   const value = (event.target as HTMLInputElement).value;
-  //   this.onSelect.emit(value);
-  // }
+  getNewPersonDialodConfig(): PresentationUIConfig {
+    const config: PresentationUIConfig = {
+      mode: PresentationViewMode.CREATE,
+      title: 'Create Person',
+      toolbar: false
+    };
+    return config;
+  }
   rereadPersons() {
     this.persons = this.dataService.getPersons(this.projectId);
     if (this.persons != null && this.persons.length > 0) {
       const p = this.persons.find(person => person.id === this._personId.getValue());
       if (p) {
-        this.setPerson(p);
+        this.setSelectedPerson(p.id);
       } else {
-        this.setPerson(this.persons[0]);
+        this.setSelectedPerson(this.persons[0].id);
       }
     } else {
-        this.setPerson(undefined);
+      this.setSelectedPerson(undefined);
     }
   }
   reloadPersons() {
     this.dataService.doGetPersons(this.projectId);
   }
   getConfig(): SelectorUIConfig {
-    const config: SelectorUIConfig = { 
+    const config: SelectorUIConfig = {
       title: 'Select Person',
     };
     return config;
   }
-  setPerson(person: Person | undefined) {
-    this._personId.next(person?.id);
+  setSelectedPerson(personId: string | undefined) {
+    this._personId.next(personId);
   }
   isActive(id: string | undefined) {
     return id && this._personId.getValue() === id;

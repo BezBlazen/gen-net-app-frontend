@@ -8,7 +8,7 @@
             </thead>
             <tbody>
                 @for (person of persons; track person.id) {
-                <tr (click)="setPerson(person)" [class.active]="isActive(person.id)">
+                <tr (click)="setSelectedPerson(person.id)" [class.active]="isActive(person.id)">
                     <td>{{person.id}} </td>
                 </tr>
                 }
@@ -16,32 +16,6 @@
         </table>
     </div>
 </app-entity-selector>
-<!-- 
-<div class="toolbar">
-    <button class="icon-button" (click)="openDialog(dialogProjectNew)">
-        <img class="icon" src="./assets/icons/icons8-plus-math-16.png" />
-    </button>
-    <button class="icon-button" (click)="onRefresh()">
-        <img class="icon" src="./assets/icons/icons8-refresh-16.png" />
-    </button>
-</div>
-<div class="table">
-    <table>
-        <thead>
-            <tr>
-                <th>Title</th>
-            </tr>
-        </thead>
-        <tbody>
-            @for (person of persons; track person.id) {
-            <tr (click)="setPerson(person)">
-                <td>{{ person.id }}</td>
-            </tr>
-            }
-        </tbody>
-    </table>
-</div>
-
-<dialog class="dialog-central" #dialogProjectNew>
-    <app-person-view class="view" [projectId]="projectId" [viewMode]="ViewMode.CREATE" [dialogRef]="dialogProjectNew"></app-person-view>
-</dialog> -->
+<dialog class="dialog-central" #dialogPersonNew>
+    <app-person-view class="view" [config]="getNewPersonDialodConfig()" [projectId]="projectId"  [dialogRef]="dialogPersonNew"></app-person-view>
+</dialog>
