@@ -2,7 +2,7 @@ import { Component, ElementRef, EventEmitter, Input, Output, SimpleChanges, View
 import { DataService } from '../../../services/data.service';
 import { Person } from '../../../models/person.model';
 import { EntitySelectorComponent, SelectorUIConfig } from '../../entity-selector/entity-selector.component';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subscription } from 'rxjs';
 import { PersonViewComponent } from '../person-view/person-view.component';
 import { PresentationUIConfig, PresentationViewMode } from '../../entity-presentation/entity-presentation.component';
 
@@ -26,12 +26,18 @@ export class PersonSelectorComponent extends EntitySelectorComponent {
   @ViewChild('dialogPersonNew') dialogPersonNew!: ElementRef<HTMLDialogElement>;
   // [variables]
   // --------------------------------
+  // [variables] Subscriptions
+  private personsSubscription?: Subscription;
+  // [variables] Subscriptions
+  // --------------------------------
   // [events]
   onAdd(): void {
     this.openDialog(this.dialogPersonNew.nativeElement);
   }
   onRefresh(): void {
-    this.reloadPersons();
+    if (this.projectId) {
+      this.reloadPersons(this.projectId);
+    }
   }
   // [events]
   // --------------------------------
@@ -43,15 +49,19 @@ export class PersonSelectorComponent extends EntitySelectorComponent {
       this.isLoading = isLoading;
     });
     this.dataService.persons$.subscribe(persons => {
-      this.rereadPersons();
+      if (this.projectId) {
+        this.rereadPersons(this.projectId);
+      }
     });
   }
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['projectId']) {
+      this.projectId = changes['projectId'].currentValue;
       if (this.projectId) {
-        this.persons = this.dataService.getPersons(this.projectId);
-      } else {
-        this.persons = [];
+        this.rereadPersons(this.projectId);
+        if (this.persons.length == 0) {
+          this.reloadPersons(this.projectId)
+        }
       }
     }
   }
@@ -63,8 +73,8 @@ export class PersonSelectorComponent extends EntitySelectorComponent {
     };
     return config;
   }
-  rereadPersons() {
-    this.persons = this.dataService.getPersons(this.projectId);
+  rereadPersons(projectId: string) {
+    this.persons = this.dataService.getPersons(projectId);
     if (this.persons != null && this.persons.length > 0) {
       const p = this.persons.find(person => person.id === this._personId.getValue());
       if (p) {
@@ -76,8 +86,8 @@ export class PersonSelectorComponent extends EntitySelectorComponent {
       this.setSelectedPerson(undefined);
     }
   }
-  reloadPersons() {
-    this.dataService.doGetPersons(this.projectId);
+  reloadPersons(projectId: string) {
+    this.dataService.doGetPersons(projectId);
   }
   getConfig(): SelectorUIConfig {
     const config: SelectorUIConfig = {
@@ -92,9 +102,11 @@ export class PersonSelectorComponent extends EntitySelectorComponent {
     return id && this._personId.getValue() === id;
   }
   onInit() {
-    this.rereadPersons();
-    if (!this.projectId) {
-      this.reloadPersons();
+    if (this.projectId) {
+      this.rereadPersons(this.projectId);
+      if (this.persons.length == 0) {
+        this.reloadPersons(this.projectId);
+      }
     }
   }
 }

@@ -30,15 +30,11 @@ export class GnaProjectComponent {
     private dataService: DataService
   ) {
     this.dataService.projects$.subscribe(projects => {
-      console.log('projects$.subscribe')
       this.rereadProject();
     });
   }
   ngOnInit() {
-    console.log('ngOnInit')
     this.activatedRoute.params.subscribe(params => {
-    console.log('activatedRoute')
-      // console.log(params['id'])
       this.projectId = params['id'];
       this.rereadProject();
     });
@@ -52,9 +48,5 @@ export class GnaProjectComponent {
   }
   rereadProject() {
       this.project = this.dataService.getProject(this.projectId);
-      console.log(2, this.projectId, this.project)
-      // if (!this.project){
-      //   this.router.navigate(['/', 'gna', 'projects']);
-      // }
   }
 }

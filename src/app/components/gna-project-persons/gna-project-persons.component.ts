@@ -19,7 +19,7 @@ export class GnaProjectPersonsComponent {
       this.projectId = this.routerData();
     });
   }
-  isLoading = false;
+  // isLoading = false;
   personId?: string;
 
   // this.dataService.doGetProjects();

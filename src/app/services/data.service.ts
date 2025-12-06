@@ -5,6 +5,7 @@ import { ApiDataWrapper } from './api-data-wrapper';
 import { Account, AccountRole } from '../models/account.model';
 import { Project } from '../models/project.model';
 import { Person } from '../models/person.model';
+import { I } from '@angular/cdk/keycodes';
 
 export class DataServiceState {
   errorMessage?: string;
@@ -19,6 +20,8 @@ export class DataServiceState {
 export class DataService {
   baseUrl: string = "http://localhost:8081/api/v1";
 
+  private loadingTimer: any;
+  private _rqActiveIds = new BehaviorSubject<string[]>([]);
   private _isLoading = new BehaviorSubject<boolean>(false);
   public isLoading$ = this._isLoading.asObservable();
   private _errorMessage = new BehaviorSubject<string | null>(null);
@@ -42,6 +45,21 @@ export class DataService {
   errorMessageUnexpected: string = "Unexpected server error";
 
   constructor(private httpClient: HttpClient) {
+    this._rqActiveIds.subscribe(ids => {
+      if (ids.length > 0) {
+        if (!this.loadingTimer) {
+          this.loadingTimer = setTimeout(() => {
+            if (this._rqActiveIds.value.length > 0) {
+              this._isLoading.next(true);
+            } else {
+            }
+          }, 500);
+        }
+      } else {
+        this.loadingTimer = null;
+        this._isLoading.next(false);
+      }
+    });
   }
 
   static readonly stateErrorNoIsLoadingFalse = { errorMessage: undefined, isLoading: false };
@@ -55,11 +73,41 @@ export class DataService {
   }
   // Errors
   // --------------------------
+  // IsLoading
+  private setIsLoading(isLoading: boolean): void {
+    console.log('setIsLoading', isLoading)
+    if (isLoading) {
+      if (!this.loadingTimer) {
+        console.log('loadingTimer +')
+        this.loadingTimer = setTimeout(() => {
+          this._isLoading.next(isLoading);
+          console.log('setIsLoading*', isLoading)
+        }, 1000);
+      }
+    } else {
+      this.loadingTimer = null;
+      console.log('loadingTimer -')
+      this._isLoading.next(isLoading);
+    }
+  }
+  private guid(): string {
+    return "rq-" + Math.random().toString(16).slice(2)
+  }
+  private updateRqIds(id: string, isLoading: boolean) {
+    if (isLoading) {
+      this._rqActiveIds.next(this._rqActiveIds.value.concat(id));
+    } else {
+      this._rqActiveIds.next(this._rqActiveIds.value.filter((rqId) => { rqId != id }));
+    }
+  }
+  // IsLoading
+  // --------------------------
   // Account
   public getAccountLastUserName(): string | null {
     return this._accountLastUserName;
   }
   public doPostSignIn(account: Account) {
+    const rqId = this.guid();
     this.httpClient
       .post<Account>(this.baseUrl + '/auth/sign_in', account, { withCredentials: true, })
       .pipe(
@@ -67,7 +115,8 @@ export class DataService {
         catchError((err) => of(new ApiDataWrapper(undefined, false, this.getErrorMessage(err)))),
         startWith(new ApiDataWrapper(undefined, true, null))
       ).subscribe((pipeData) => {
-        this._isLoading.next(pipeData.isLoading);
+        this.updateRqIds(rqId, pipeData.isLoading);
+        // this.updateRqIds(rqId, pipeData.isLoading);
         this._errorMessage.next(pipeData.errorMessage);
         if (pipeData.data != undefined) {
           this._account.next(pipeData.data);
@@ -79,6 +128,7 @@ export class DataService {
       });
   }
   public doPostSignUp(account: Account) {
+    const rqId = this.guid();
     this.httpClient
       .post<Account>(this.baseUrl + '/auth/sign_up', account, { withCredentials: true, })
       .pipe(
@@ -86,7 +136,7 @@ export class DataService {
         catchError((err) => of(new ApiDataWrapper(undefined, false, this.getErrorMessage(err)))),
         startWith(new ApiDataWrapper(undefined, true, null))
       ).subscribe((pipeData) => {
-        this._isLoading.next(pipeData.isLoading);
+        this.updateRqIds(rqId, pipeData.isLoading);
         this._errorMessage.next(pipeData.errorMessage);
         if (pipeData?.data?.username) {
           this._isSignUpSuccess.next(true);
@@ -95,6 +145,7 @@ export class DataService {
       });
   }
   public doPostSignOut() {
+    const rqId = this.guid();
     this.httpClient
       .post<Account>(this.baseUrl + '/auth/sign_out', null, { withCredentials: true, })
       .pipe(
@@ -102,12 +153,13 @@ export class DataService {
         catchError((err) => of(new ApiDataWrapper(undefined, false, this.getErrorMessage(err)))),
         startWith(new ApiDataWrapper(undefined, true, null))
       ).subscribe((pipeData) => {
-        this._isLoading.next(pipeData.isLoading);
+        this.updateRqIds(rqId, pipeData.isLoading);
         this._errorMessage.next(pipeData.errorMessage);
         this._account.next(null);
       });
   }
   public rereadAccount() {
+    const rqId = this.guid();
     this.httpClient
       .get<Account>(this.baseUrl + '/auth/account', { withCredentials: true })
       .pipe(
@@ -115,7 +167,7 @@ export class DataService {
         catchError((err) => of(new ApiDataWrapper(undefined, false, this.getErrorMessage(err)))),
         startWith(new ApiDataWrapper(undefined, true, null))
       ).subscribe((pipeData) => {
-        this._isLoading.next(pipeData.isLoading);
+        this.updateRqIds(rqId, pipeData.isLoading);
         // Hide reread errors
         // this._errorMessage.next(pipeData.errorMessage);
         if (pipeData.data != undefined) {
@@ -149,6 +201,7 @@ export class DataService {
     this._projects.next(newProjects);
   }
   public doGetProjects() {
+    const rqId = this.guid();
     this.httpClient
       .get<Project[]>(this.baseUrl + '/projects', { withCredentials: true })
       .pipe(
@@ -157,7 +210,7 @@ export class DataService {
         startWith(new ApiDataWrapper(undefined, true, null))
       )
       .subscribe((pipeData) => {
-        this._isLoading.next(pipeData.isLoading);
+        this.updateRqIds(rqId, pipeData.isLoading);
         this._errorMessage.next(pipeData.errorMessage);
         if (!pipeData.isLoading) {
           this._projects.next(pipeData.data ? pipeData.data : <Project[]>[]);
@@ -165,6 +218,7 @@ export class DataService {
       });
   }
   public doPostProject(project: Project): Observable<boolean> {
+    const rqId = this.guid();
     const _success = new BehaviorSubject<boolean>(false);
     this.httpClient
       .post<Project>(this.baseUrl + '/projects', project, { withCredentials: true, })
@@ -175,7 +229,7 @@ export class DataService {
         startWith(new ApiDataWrapper(undefined, true, null))
       )
       .subscribe((pipeData) => {
-        this._isLoading.next(pipeData.isLoading);
+        this.updateRqIds(rqId, pipeData.isLoading);
         this._errorMessage.next(pipeData.errorMessage);
         if (pipeData?.data) {
           this.addProject(pipeData?.data);
@@ -185,6 +239,7 @@ export class DataService {
     return _success.asObservable();
   }
   public doPutProject(project: Project): Observable<boolean> {
+    const rqId = this.guid();
     const _success = new BehaviorSubject<boolean>(false);
     this.httpClient
       .put<Project>(this.baseUrl + '/projects', project, { withCredentials: true, })
@@ -195,7 +250,7 @@ export class DataService {
         startWith(new ApiDataWrapper(undefined, true, null))
       )
       .subscribe((pipeData) => {
-        this._isLoading.next(pipeData.isLoading);
+        this.updateRqIds(rqId, pipeData.isLoading);
         this._errorMessage.next(pipeData.errorMessage);
         if (pipeData?.data) {
           this.updateProject(pipeData?.data);
@@ -205,6 +260,7 @@ export class DataService {
     return _success.asObservable();
   }
   public doDeleteProject(project: Project): Observable<boolean> {
+    const rqId = this.guid();
     const _success = new BehaviorSubject<boolean>(false);
     this.httpClient
       .delete<Project>(this.baseUrl + '/projects/' + project.id, { withCredentials: true, })
@@ -214,7 +270,7 @@ export class DataService {
         startWith(new ApiDataWrapper(undefined, true, null))
       )
       .subscribe((pipeData) => {
-        this._isLoading.next(pipeData.isLoading);
+        this.updateRqIds(rqId, pipeData.isLoading);
         this._errorMessage.next(pipeData.errorMessage);
         if (!pipeData.isLoading && !pipeData.errorMessage) {
           this.deleteProject(project);
@@ -250,6 +306,7 @@ export class DataService {
     this._persons.next(newPersons);
   }
   public doGetPersons(projectId: string | undefined) {
+    const rqId = this.guid();
     let params = new HttpParams();
     if (projectId) {
       params = params.append('project_id', projectId);
@@ -262,13 +319,14 @@ export class DataService {
         startWith(new ApiDataWrapper(undefined, true, null))
       )
       .subscribe((pipeData) => {
-        this._isLoading.next(pipeData.isLoading);
+        this.updateRqIds(rqId, pipeData.isLoading);
         this._errorMessage.next(pipeData.errorMessage);
-        if (!pipeData.isLoading && pipeData.data)
-          this._persons.next(pipeData.data);
+        if (!pipeData.isLoading)
+          this._persons.next(this._persons.value.filter((person) => person.projectId !== projectId).concat(pipeData.data ? pipeData.data : []));
       });
   }
   public doPostPerson(person: Person, projectId: string | undefined): Observable<boolean> {
+    const rqId = this.guid();
     let params = new HttpParams();
     if (projectId) {
       params = params.append('project_id', projectId);
@@ -283,7 +341,7 @@ export class DataService {
         startWith(new ApiDataWrapper(undefined, true, null))
       )
       .subscribe((pipeData) => {
-        this._isLoading.next(pipeData.isLoading);
+        this.updateRqIds(rqId, pipeData.isLoading);
         this._errorMessage.next(pipeData.errorMessage);
         if (pipeData?.data) {
           this.addPerson(pipeData?.data);
@@ -293,6 +351,7 @@ export class DataService {
     return _success.asObservable();
   }
   public doPutPerson(person: Person): Observable<boolean> {
+    const rqId = this.guid();
     const _success = new BehaviorSubject<boolean>(false);
     this.httpClient
       .put<Person>(this.baseUrl + '/persons', person, { withCredentials: true, })
@@ -303,7 +362,7 @@ export class DataService {
         startWith(new ApiDataWrapper(undefined, true, null))
       )
       .subscribe((pipeData) => {
-        this._isLoading.next(pipeData.isLoading);
+        this.updateRqIds(rqId, pipeData.isLoading);
         this._errorMessage.next(pipeData.errorMessage);
         if (pipeData?.data) {
           this.updatePerson(pipeData?.data);
@@ -313,6 +372,7 @@ export class DataService {
     return _success.asObservable();
   }
   public doDeletePerson(person: Person): Observable<boolean> {
+    const rqId = this.guid();
     const _success = new BehaviorSubject<boolean>(false);
     this.httpClient
       .delete<Person>(this.baseUrl + '/persons/' + person.id, { withCredentials: true, })
@@ -322,7 +382,7 @@ export class DataService {
         startWith(new ApiDataWrapper(undefined, true, null))
       )
       .subscribe((pipeData) => {
-        this._isLoading.next(pipeData.isLoading);
+        this.updateRqIds(rqId, pipeData.isLoading);
         this._errorMessage.next(pipeData.errorMessage);
         if (!pipeData.isLoading && !pipeData.errorMessage) {
           this.deletePerson(person);
