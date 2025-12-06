@@ -282,8 +282,8 @@ export class DataService {
   // Projects
   // --------------------------
   // Persons
-  getPerson(personId: string): Person | undefined {
-    return this._persons.value.find((person) => person.id === personId);
+  getPerson(projectId: string, personId: string): Person | undefined {
+    return this._persons.value.find((person) => person.projectId === projectId && person.id === personId);
   }
   getPersons(projectId: string | undefined): Person[] {
     if (projectId) {
@@ -325,15 +325,11 @@ export class DataService {
           this._persons.next(this._persons.value.filter((person) => person.projectId !== projectId).concat(pipeData.data ? pipeData.data : []));
       });
   }
-  public doPostPerson(person: Person, projectId: string | undefined): Observable<boolean> {
+  public doPostPerson(person: Person): Observable<boolean> {
     const rqId = this.guid();
-    let params = new HttpParams();
-    if (projectId) {
-      params = params.append('project_id', projectId);
-    }
     const _success = new BehaviorSubject<boolean>(false);
     this.httpClient
-      .post<Person>(this.baseUrl + '/persons', person, { withCredentials: true, params: params })
+      .post<Person>(this.baseUrl + '/persons', person, { withCredentials: true})
       .pipe(
         // delay(3000),
         map((person) => (new ApiDataWrapper(person, false, null))),

@@ -1,3 +1,10 @@
+:host {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
 .toolbar {
     display: flex;
     flex-direction: row;
@@ -11,9 +18,11 @@
         white-space: nowrap;
         text-overflow: ellipsis;
     }
+
     .menu {
         margin: auto 8px;
     }
+
     ul {
         display: flex;
         flex-direction: row;
@@ -30,4 +39,10 @@
     // div button {
     //     margin: 1px;
     // }
+}
+
+.body {
+    display: flex;
+    flex: 1;
+    height: calc(100% - 48px - 1px);
 }

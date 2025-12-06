@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, SimpleChanges } from '@angular/core';
 import { DataService } from '../../../services/data.service';
 import { FormGroup, FormsModule } from '@angular/forms';
 import { FormlyFieldConfig, FormlyFormOptions, FormlyModule } from '@ngx-formly/core';
@@ -92,11 +92,12 @@ export class PersonViewComponent extends EntityPresentationComponent {
     }
   }
   onOk(): void {
-    if (this.config.mode == PresentationViewMode.CREATE && this.modelCreate && this.form.valid) {
-      this.dataService.doPostPerson(this.modelCreate, this.projectId).subscribe((success) => {
+    if (this.config.mode == PresentationViewMode.CREATE && this.modelCreate && this.form.valid && this.projectId) {
+      this.modelCreate.projectId = this.projectId;
+      this.dataService.doPostPerson(this.modelCreate).subscribe((success) => {
         if (success) {
-          if (this.model?.id) {
-            this.model = { ...this.dataService.getPerson(this.model?.id) }
+          if (this.model?.id && this.projectId) {
+            this.model = { ...this.dataService.getPerson(this.model?.id, this.projectId) }
           }
           this.dialogRef?.close();
         }
@@ -115,6 +116,28 @@ export class PersonViewComponent extends EntityPresentationComponent {
   ) {
     super();
   }
+  ngOnInit() {
+    // Allow subscriptions if PresentationViewMode not CREATE
+    if (this.config.mode != PresentationViewMode.CREATE) {
+      this.personSubscription = this.dataService.persons$.subscribe(persons => {
+        this.rereadPerson();
+      });
+    }
+  }
+  ngOnDestroy() {
+    this.personSubscription?.unsubscribe();
+  }
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['projectId']) {
+      this.projectId = changes['projectId'].currentValue;
+      this.rereadPerson();
+    }
+    if (changes['personId']) {
+      this.personId = changes['personId'].currentValue;
+      this.rereadPerson();
+    }
+    
+  }
   getConfig(): PresentationUIConfig {
     const config: PresentationUIConfig = { 
       title: 'Person',
@@ -126,5 +149,18 @@ export class PersonViewComponent extends EntityPresentationComponent {
   }
   isCreateMode(): boolean {
     return this.config.mode == PresentationViewMode.CREATE;
+  }
+  rereadPerson() {
+    this.updateModel();
+  }
+  updateModel() {
+    if (this.projectId && this.personId) {
+      this.model = { ...this.dataService.getPerson(this.projectId, this.personId) }
+    } else {
+      this.model = {};
+    }
+  }
+  reloadProjects() {
+    this.dataService.doGetPersons(this.projectId);
   }
 }

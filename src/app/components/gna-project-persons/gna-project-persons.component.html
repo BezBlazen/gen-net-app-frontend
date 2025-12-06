@@ -1,1 +1,5 @@
 <app-person-selector class="selector" [projectId]="projectId" (personId)="onSelectPerson($event)"></app-person-selector>
+
+@if (personId) {
+    <app-person-view class="view" [projectId]="projectId" [personId]="personId"></app-person-view>
+}
