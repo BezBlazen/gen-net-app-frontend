@@ -8,6 +8,9 @@ import { AbstractControl, ReactiveFormsModule } from '@angular/forms';
 // import { NgxSpinnerModule } from 'ngx-spinner';
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { NgxSpinnerModule } from 'ngx-spinner';
+import { FormlyFieldSelectComponent } from './formly/formly-field-select.component';
+import { FormlyFieldDateComponent } from './formly/formly-field-date.component';
+import { provideEnvironmentNgxMask } from 'ngx-mask';
 
 export function passwordConfirmMatchValidator(control: AbstractControl) {
   const { password, passwordConfirm } = control.value;
@@ -28,6 +31,7 @@ export const appConfig: ApplicationConfig = {
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     provideHttpClient(),
+    provideEnvironmentNgxMask(),
     importProvidersFrom(
       BrowserAnimationsModule,
       ReactiveFormsModule,
@@ -36,7 +40,9 @@ export const appConfig: ApplicationConfig = {
           { name: 'passwordConfirmMatch', validation: passwordConfirmMatchValidator },
         ],
         types: [
-          { name: 'input', component: FormlyFieldInputComponent }
+          { name: 'input', component: FormlyFieldInputComponent },
+          { name: 'select', component: FormlyFieldSelectComponent },
+          { name: 'date', component: FormlyFieldDateComponent },
         ]
       }),
       NgxSpinnerModule.forRoot({ /* global config here */ })

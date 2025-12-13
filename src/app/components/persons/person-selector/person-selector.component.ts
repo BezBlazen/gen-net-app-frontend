@@ -74,7 +74,7 @@ export class PersonSelectorComponent extends EntitySelectorComponent {
     return config;
   }
   rereadPersons(projectId: string) {
-    this.persons = this.dataService.getPersons(projectId);
+    this.persons = this.dataService.getPersonsLocal(projectId);
     if (this.persons != null && this.persons.length > 0) {
       const p = this.persons.find(person => person.id === this._personId.getValue());
       if (p) {
@@ -87,7 +87,8 @@ export class PersonSelectorComponent extends EntitySelectorComponent {
     }
   }
   reloadPersons(projectId: string) {
-    this.dataService.doGetPersons(projectId);
+    this.dataService.getPersons(projectId).subscribe((success) => {
+    });
   }
   getConfig(): SelectorUIConfig {
     const config: SelectorUIConfig = {

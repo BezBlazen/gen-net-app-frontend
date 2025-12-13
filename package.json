@@ -20,6 +20,7 @@
     "@angular/router": "^19.2.0",
     "@ngx-formly/core": "^7.0.0",
     "@ngx-formly/schematics": "^7.0.0",
+    "ngx-mask": "^20.0.3",
     "ngx-spinner": "^19.0.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",

@@ -1,6 +1,6 @@
 import { Injectable, numberAttribute } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { BehaviorSubject, catchError, map, Observable, of, startWith, delay, Subject } from 'rxjs';
+import { BehaviorSubject, catchError, map, Observable, of, startWith, delay, Subject, skip, tap } from 'rxjs';
 import { ApiDataWrapper } from './api-data-wrapper';
 import { Account, AccountRole } from '../models/account.model';
 import { Project } from '../models/project.model';
@@ -75,18 +75,14 @@ export class DataService {
   // --------------------------
   // IsLoading
   private setIsLoading(isLoading: boolean): void {
-    console.log('setIsLoading', isLoading)
     if (isLoading) {
       if (!this.loadingTimer) {
-        console.log('loadingTimer +')
         this.loadingTimer = setTimeout(() => {
           this._isLoading.next(isLoading);
-          console.log('setIsLoading*', isLoading)
         }, 1000);
       }
     } else {
       this.loadingTimer = null;
-      console.log('loadingTimer -')
       this._isLoading.next(isLoading);
     }
   }
@@ -282,50 +278,119 @@ export class DataService {
   // Projects
   // --------------------------
   // Persons
-  getPerson(projectId: string, personId: string): Person | undefined {
-    return this._persons.value.find((person) => person.projectId === projectId && person.id === personId);
+  getPersonLocal(personId: string): Person | undefined {
+    return this._persons.value.find((person) => person.id === personId);
   }
-  getPersons(projectId: string | undefined): Person[] {
+  getPerson(personId: string): Observable<boolean> {
+    const rqId = this.guid();
+    this.updateRqIds(rqId, true);
+    return this.httpClient
+      .get<Person>(this.baseUrl + '/persons/' + personId, { withCredentials: true})
+      .pipe(
+        tap(() => this.updateRqIds(rqId, false)),
+        map((person) => {
+          this._persons.next(this._persons.value.map(item => item.id === person.id ? person : item));
+          return true;
+        }),
+        catchError((err) => {
+          this._errorMessage.next(this.getErrorMessage(err));
+          return of(false);
+        }),
+      );
+  }
+  getPersonsLocal(projectId: string | undefined): Person[] {
     if (projectId) {
       return this._persons.value.filter((person) => person.projectId === projectId);
     }
     return this._persons.value;
   }
-  addPerson(person: Person): void {
-    const persons = this._persons.value;
-    this._persons.next([...persons, person]);
-  }
-  updatePerson(person: Person): void {
-    const persons = this._persons.value;
-    const newPersons = persons.map(item => item.id === person.id ? { ...item, ...person } : item);
-    this._persons.next(newPersons);
-  }
-  deletePerson(person: Person): void {
-    const persons = this._persons.value;
-    const newPersons = persons.filter(item => item.id !== person.id);
-    this._persons.next(newPersons);
-  }
-  public doGetPersons(projectId: string | undefined) {
+  addPerson(person: Person): Observable<boolean> {
     const rqId = this.guid();
+    this.updateRqIds(rqId, true);
+    return this.httpClient
+      .post<Person>(this.baseUrl + '/persons', person, { withCredentials: true})
+      .pipe(
+        tap(() => this.updateRqIds(rqId, false)),
+        map((person) => {
+          this._persons.next([...this._persons.value, person]);
+          return true;
+        }),
+        catchError((err) => {
+          this._errorMessage.next(this.getErrorMessage(err));
+          return of(false);
+        }),
+      );
+  }
+  deletePerson(person: Person): Observable<boolean> {
+    const rqId = this.guid();
+    this.updateRqIds(rqId, true);
+    return this.httpClient
+      .delete<Person>(this.baseUrl + '/persons/' + person.projectId, { withCredentials: true})
+      .pipe(
+        tap(() => this.updateRqIds(rqId, false)),
+        map(() => {
+          this._persons.next(this._persons.value.filter(item => item.id !== person.id));
+          return true;
+        }),
+        catchError((err) => {
+          this._errorMessage.next(this.getErrorMessage(err));
+          return of(false);
+        }),
+      );
+  }
+  updatePerson(person: Person): Observable<boolean> {
+    const rqId = this.guid();
+    this.updateRqIds(rqId, true);
+    return this.httpClient
+      .post<Person>(this.baseUrl + '/persons', person, { withCredentials: true})
+      .pipe(
+        tap(() => this.updateRqIds(rqId, false)),
+        map((person) => {
+          this._persons.next(this._persons.value.map(item => item.id === person.id ? person : item));
+          return true;
+        }),
+        catchError((err) => {
+          this._errorMessage.next(this.getErrorMessage(err));
+          return of(false);
+        }),
+      );
+  }
+  // updatePerson(person: Person): void {
+  //   const persons = this._persons.value;
+  //   const newPersons = persons.map(item => item.id === person.id ? { ...item, ...person } : item);
+  //   this._persons.next(newPersons);
+  // }
+  // deletePerson(person: Person): void {
+  //   const persons = this._persons.value;
+  //   const newPersons = persons.filter(item => item.id !== person.id);
+  //   this._persons.next(newPersons);
+  // }
+  public getPersons(projectId: string | undefined) : Observable<boolean> {
+    const rqId = this.guid();
+    this.updateRqIds(rqId, true);
     let params = new HttpParams();
     if (projectId) {
       params = params.append('project_id', projectId);
     }
-    this.httpClient
+    return this.httpClient
       .get<Person[]>(this.baseUrl + '/persons', { withCredentials: true, params: params })
       .pipe(
-        map((persons) => (new ApiDataWrapper(persons, false, null))),
-        catchError((err) => of(new ApiDataWrapper(undefined, false, this.getErrorMessage(err)))),
-        startWith(new ApiDataWrapper(undefined, true, null))
+        tap(() => this.updateRqIds(rqId, false)),
+        map((persons) => {
+          if (projectId) {
+            this._persons.next(this._persons.value.filter((person) => person.projectId !== projectId).concat(persons));
+          } else {
+            this._persons.next(persons);
+          }          
+          return true;
+        }),
+        catchError((err) => {
+          this._errorMessage.next(this.getErrorMessage(err));
+          return of(false);
+        }),
       )
-      .subscribe((pipeData) => {
-        this.updateRqIds(rqId, pipeData.isLoading);
-        this._errorMessage.next(pipeData.errorMessage);
-        if (!pipeData.isLoading)
-          this._persons.next(this._persons.value.filter((person) => person.projectId !== projectId).concat(pipeData.data ? pipeData.data : []));
-      });
   }
-  public doPostPerson(person: Person): Observable<boolean> {
+  private doPostPerson(person: Person): Observable<boolean> {
     const rqId = this.guid();
     const _success = new BehaviorSubject<boolean>(false);
     this.httpClient

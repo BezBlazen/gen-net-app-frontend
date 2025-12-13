@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, Output, SimpleChanges } from '@angular/
 import { DataService } from '../../../services/data.service';
 import { FormGroup, FormsModule } from '@angular/forms';
 import { FormlyFieldConfig, FormlyFormOptions, FormlyModule } from '@ngx-formly/core';
-import { Person } from '../../../models/person.model';
+import { GenderOptions, NameForm, NamePart, NamePartType, Person, PersonCreate } from '../../../models/person.model';
 import { JsonPipe } from '@angular/common';
 import { EntityPresentationComponent, PresentationUIConfig, PresentationViewMode } from '../../entity-presentation/entity-presentation.component';
 import { Subscription } from 'rxjs';
@@ -13,6 +13,7 @@ import { Subscription } from 'rxjs';
     EntityPresentationComponent,
     FormsModule,
     FormlyModule,
+    JsonPipe
   ],
   templateUrl: './person-view.component.html',
   styleUrl: './person-view.component.scss'
@@ -23,6 +24,7 @@ export class PersonViewComponent extends EntityPresentationComponent {
   @Input() projectId?: string;
   @Input() personId?: string;
   @Output() onDeleted = new EventEmitter<void>();
+  readonly NamePartType = NamePartType;
   // [variables]
   // --------------------------------
   // [variables] Subscriptions
@@ -31,16 +33,44 @@ export class PersonViewComponent extends EntityPresentationComponent {
   // --------------------------------
   // [variables] Formly
   // Create
-  modelCreate: Person = {};
+  modelCreate: PersonCreate = {};
   formCreate = new FormGroup({});
   optionsCreate: FormlyFormOptions = {};
   fieldsCreate: FormlyFieldConfig[] = [
     {
       key: 'gender.type',
-      type: 'input',
+      type: 'select',
       props: {
         label: 'Gender',
-        errorTitle: '6-64 chars',
+        options: GenderOptions
+      }
+    },
+    {
+      key: 'names.first',
+      type: 'input',
+      props: {
+        label: 'First name',
+      }
+    },
+    {
+      key: 'names.last',
+      type: 'input',
+      props: {
+        label: 'Last name',
+      }
+    },
+    {
+      key: 'dates.birth',
+      type: 'date',
+      props: {
+        label: 'Birth date',
+      }
+    },
+    {
+      key: 'dates.death',
+      type: 'date',
+      props: {
+        label: 'Death date',
       }
     },
   ];
@@ -78,33 +108,90 @@ export class PersonViewComponent extends EntityPresentationComponent {
   // --------------------------------
   // [events] EntityPresentation
   onDelete(): void {
-    throw new Error('Method not implemented.');
-  }
-  onSave(): void {
-    throw new Error('Method not implemented.');
-  }
-  onRefresh(): void {
-    throw new Error('Method not implemented.');
-  }
-  onClose(): void {
-    if (this.dialogRef) {
-      this.dialogRef.close();
+    if (this.model) {
+      let isConfirmed = confirm("Delete person: '" + this.model?.id + "' ?");
+      if (isConfirmed) {
+        this.dataService.deletePerson(this.model).subscribe((success) => {
+          if (success) {
+            this.dialogRef?.close();
+            this.onDeleted.emit();
+          }
+        });
+      }
     }
   }
-  onOk(): void {
-    if (this.config.mode == PresentationViewMode.CREATE && this.modelCreate && this.form.valid && this.projectId) {
-      this.modelCreate.projectId = this.projectId;
-      this.dataService.doPostPerson(this.modelCreate).subscribe((success) => {
+  onSave(): void {
+    if (this.model) {
+      this.dataService.updatePerson(this.model).subscribe((success) => {
         if (success) {
-          if (this.model?.id && this.projectId) {
-            this.model = { ...this.dataService.getPerson(this.model?.id, this.projectId) }
-          }
           this.dialogRef?.close();
         }
       });
     }
   }
+  onRefresh(): void {
+    if (this.personId) {
+      this.dataService.getPerson(this.personId).subscribe((success) => {
+      });
+    }
+  }
+  onClose(): void {
+    this.resetForm();
+    if (this.dialogRef) {
+      this.dialogRef.close();
+    }
+  }
+  onOk(): void {
+    if (this.config.mode == PresentationViewMode.CREATE) {
+      if (this.modelCreate && this.formCreate.valid) {
+        const person: Person = {}
+        if (this.modelCreate.gender?.type) {
+          person.gender = {
+            type: this.modelCreate.gender?.type
+          }
+        }
+        let firstNamePart: NamePart | undefined = undefined;
+        let lastNamePart: NamePart | undefined = undefined;
+        if (this.modelCreate.names?.first) {
+          firstNamePart = {
+            type: NamePartType.GIVEN,
+            value: this.modelCreate.names?.first
+          }
+        }
+        if (this.modelCreate.names?.last) {
+          lastNamePart = {
+            type: NamePartType.SURNAME,
+            value: this.modelCreate.names?.last
+          }
+        }
+        if (firstNamePart || lastNamePart) {
+          person.names = [
+            {
+              type: '',
+              nameForms: [
+                {
+                  preferred: true,
+                  parts: [firstNamePart, lastNamePart].filter(x => x != undefined) as NamePart[]
+                }
+              ]
+            }
+          ]
+        }
+        person.projectId = this.projectId;
+
+        this.dataService.addPerson(person).subscribe((success) => {
+          if (success) {
+            this.dialogRef?.close();
+            this.resetForm();
+          }
+        });
+      }
+    } else {
+      throw new Error("Undefined yet");
+    }
+  }
   onCancel(): void {
+    this.resetForm();
     if (this.dialogRef) {
       this.dialogRef.close();
     }
@@ -120,7 +207,7 @@ export class PersonViewComponent extends EntityPresentationComponent {
     // Allow subscriptions if PresentationViewMode not CREATE
     if (this.config.mode != PresentationViewMode.CREATE) {
       this.personSubscription = this.dataService.persons$.subscribe(persons => {
-        this.rereadPerson();
+        this.updateModel()
       });
     }
   }
@@ -136,16 +223,20 @@ export class PersonViewComponent extends EntityPresentationComponent {
       this.personId = changes['personId'].currentValue;
       this.rereadPerson();
     }
-    
+
   }
   getConfig(): PresentationUIConfig {
-    const config: PresentationUIConfig = { 
-      title: 'Person',
+    const config: PresentationUIConfig = {
+      title: this.config.mode == PresentationViewMode.CREATE ? 'Create person' : "Person: ",
     };
     return config;
   }
   resetForm() {
     this.form.reset();
+    this.formCreate.reset();
+    if (this.config.mode == PresentationViewMode.CREATE) {
+      this.modelCreate = {};
+    }
   }
   isCreateMode(): boolean {
     return this.config.mode == PresentationViewMode.CREATE;
@@ -154,13 +245,10 @@ export class PersonViewComponent extends EntityPresentationComponent {
     this.updateModel();
   }
   updateModel() {
-    if (this.projectId && this.personId) {
-      this.model = { ...this.dataService.getPerson(this.projectId, this.personId) }
+    if (this.personId) {
+      this.model = { ...this.dataService.getPersonLocal(this.personId) }
     } else {
       this.model = {};
     }
-  }
-  reloadProjects() {
-    this.dataService.doGetPersons(this.projectId);
   }
 }
