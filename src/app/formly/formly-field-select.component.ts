@@ -23,6 +23,7 @@ import { FieldType, FieldTypeConfig, FormlyModule } from '@ngx-formly/core';
         [formControl]="formControl"
         [title]="getErrorTitle()"
         [class.error]="showError"
+        [id]="id"
         >
       @for (option of safeOptions; track option) {
         <option [value]="option.value">

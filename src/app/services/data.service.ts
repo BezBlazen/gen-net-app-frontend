@@ -179,8 +179,28 @@ export class DataService {
   getProject(projectId: string): Project | undefined {
     return this._projects.value.find((project) => project.id === projectId);
   }
-  getProjects(): Project[] {
-    return this._projects.value;
+  // getProjects(): Project[] {
+  //   return this._projects.value;
+  // }
+  getProjectsLocal(): Project[] {
+    return JSON.parse(JSON.stringify(this._projects.value));
+  }
+  getProjects(): Observable<boolean> {
+    const rqId = this.guid();
+    this.updateRqIds(rqId, true);
+    return this.httpClient
+      .get<Project[]>(this.baseUrl + '/projects', { withCredentials: true })
+      .pipe(
+        tap(() => this.updateRqIds(rqId, false)),
+        map((projects) => {
+          this._projects.next(projects);
+          return true;
+        }),
+        catchError((err) => {
+          this._errorMessage.next(this.getErrorMessage(err));
+          return of(false);
+        }),
+      );
   }
   addProject(project: Project): void {
     const projects = this._projects.value;
@@ -279,13 +299,13 @@ export class DataService {
   // --------------------------
   // Persons
   getPersonLocal(personId: string): Person | undefined {
-    return this._persons.value.find((person) => person.id === personId);
+    return personId ? JSON.parse(JSON.stringify(this._persons.value.find((person) => person.id === personId))) : undefined;
   }
   getPerson(personId: string): Observable<boolean> {
     const rqId = this.guid();
     this.updateRqIds(rqId, true);
     return this.httpClient
-      .get<Person>(this.baseUrl + '/persons/' + personId, { withCredentials: true})
+      .get<Person>(this.baseUrl + '/persons/' + personId, { withCredentials: true })
       .pipe(
         tap(() => this.updateRqIds(rqId, false)),
         map((person) => {
@@ -299,16 +319,16 @@ export class DataService {
       );
   }
   getPersonsLocal(projectId: string | undefined): Person[] {
-    if (projectId) {
-      return this._persons.value.filter((person) => person.projectId === projectId);
+    if (!projectId) {
+      return [];
     }
-    return this._persons.value;
+    return JSON.parse(JSON.stringify(this._persons.value.filter((person) => person.projectId === projectId)));
   }
   addPerson(person: Person): Observable<boolean> {
     const rqId = this.guid();
     this.updateRqIds(rqId, true);
     return this.httpClient
-      .post<Person>(this.baseUrl + '/persons', person, { withCredentials: true})
+      .post<Person>(this.baseUrl + '/persons', person, { withCredentials: true })
       .pipe(
         tap(() => this.updateRqIds(rqId, false)),
         map((person) => {
@@ -325,7 +345,7 @@ export class DataService {
     const rqId = this.guid();
     this.updateRqIds(rqId, true);
     return this.httpClient
-      .delete<Person>(this.baseUrl + '/persons/' + person.projectId, { withCredentials: true})
+      .delete<Person>(this.baseUrl + '/persons/' + person.projectId, { withCredentials: true })
       .pipe(
         tap(() => this.updateRqIds(rqId, false)),
         map(() => {
@@ -342,7 +362,7 @@ export class DataService {
     const rqId = this.guid();
     this.updateRqIds(rqId, true);
     return this.httpClient
-      .post<Person>(this.baseUrl + '/persons', person, { withCredentials: true})
+      .post<Person>(this.baseUrl + '/persons', person, { withCredentials: true })
       .pipe(
         tap(() => this.updateRqIds(rqId, false)),
         map((person) => {
@@ -365,7 +385,7 @@ export class DataService {
   //   const newPersons = persons.filter(item => item.id !== person.id);
   //   this._persons.next(newPersons);
   // }
-  public getPersons(projectId: string | undefined) : Observable<boolean> {
+  public getPersons(projectId: string | undefined): Observable<boolean> {
     const rqId = this.guid();
     this.updateRqIds(rqId, true);
     let params = new HttpParams();
@@ -381,7 +401,7 @@ export class DataService {
             this._persons.next(this._persons.value.filter((person) => person.projectId !== projectId).concat(persons));
           } else {
             this._persons.next(persons);
-          }          
+          }
           return true;
         }),
         catchError((err) => {
@@ -394,7 +414,7 @@ export class DataService {
     const rqId = this.guid();
     const _success = new BehaviorSubject<boolean>(false);
     this.httpClient
-      .post<Person>(this.baseUrl + '/persons', person, { withCredentials: true})
+      .post<Person>(this.baseUrl + '/persons', person, { withCredentials: true })
       .pipe(
         // delay(3000),
         map((person) => (new ApiDataWrapper(person, false, null))),

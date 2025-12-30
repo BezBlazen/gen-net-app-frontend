@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { ActivatedRoute, Router, RouterLink, RouterOutlet } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { Project } from '../../models/project.model';
 import { DataService } from '../../services/data.service';
 
@@ -7,13 +7,16 @@ import { DataService } from '../../services/data.service';
   selector: 'app-gna-project',
   imports: [
     RouterLink,
-    RouterOutlet
+    RouterOutlet,
+    RouterLinkActive
   ],
   templateUrl: './gna-project.component.html',
   styleUrl: './gna-project.component.scss'
 })
 export class GnaProjectComponent {
   isLoading = false;
+  mainTabs = [{ id: 0, label: 'Persons', routerLink: ['./', 'persons'] }, { id: 1, label: 'Relationships', routerLink: ['./', 'relationships'] }]
+  mainTabId = 0;
   // urlPath: any[] = [];
   parentPath: any[] = [];
   // childPath: any[] = [];
@@ -35,7 +38,7 @@ export class GnaProjectComponent {
   }
   ngOnInit() {
     this.activatedRoute.params.subscribe(params => {
-      this.projectId = params['id'];
+      this.projectId = params['projectId'];
       this.rereadProject();
     });
   }
@@ -48,5 +51,8 @@ export class GnaProjectComponent {
   }
   rereadProject() {
       this.project = this.dataService.getProject(this.projectId);
+  }
+  onClickMainTab(tabId: number) {
+    this.mainTabId = tabId;
   }
 }

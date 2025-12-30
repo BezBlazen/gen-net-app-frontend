@@ -3,6 +3,8 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 export interface SelectorUIConfig {
   title?: string;
   toolbar?: boolean;
+  toolbar_top_border?: boolean;
+  entity_view?: boolean;
   // buttons?: {
   //   close?: boolean;
   //   add?: boolean;
@@ -23,6 +25,8 @@ export class EntitySelectorComponent {
   @Input() config: SelectorUIConfig = {
     title: '',
     toolbar: true,
+    toolbar_top_border: true,
+    entity_view: false,
     // buttons: {
     //   close: true,
     //   add: true,
@@ -52,6 +56,7 @@ export class EntitySelectorComponent {
   // };
   @Output() close = new EventEmitter<void>();
   @Output() add = new EventEmitter<void>();
+  @Output() edit = new EventEmitter<void>();
   @Output() delete = new EventEmitter<void>();
   @Output() refresh = new EventEmitter<void>();
   @Output() ok = new EventEmitter<void>();

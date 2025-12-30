@@ -1,5 +1,1 @@
-<app-project-selector class="selector" (projectId)="onSelectProject($event)"></app-project-selector>
-
-@if (projectId) {
-    <app-project-view class="view" [projectId]="projectId" (onDeleted)="onDeleted()"></app-project-view>
-}
+<app-project-selector class="selector" [config]="projectSelectorConfig"></app-project-selector>

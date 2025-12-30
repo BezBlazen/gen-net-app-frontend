@@ -10,6 +10,9 @@
 }
 
 :host ::ng-deep {
+    .toolbar {
+        padding: 1px 0;
+    }
     .table {
         flex: 1;
 
@@ -18,6 +21,7 @@
             border-collapse: collapse;
             text-align: left;
             border-spacing: 0px;
+            border-collapse: collapse;
         }
 
         thead {
@@ -25,22 +29,31 @@
             top: 0;
             background: white;
             z-index: 10;
-            background-color: #ddd;
+            background-color: #eee;
         }
 
         tbody {
+            tr {
+                height: 18px;
+            }
+
             tr:hover {
                 background-color: #e3f2ff;
             }
+
             tr.active {
                 // background-color: #bbb;
                 background-color: #99d1ff;
             }
         }
-
-        td,
         th {
             padding-left: 8px;
+            border-left: 1px solid #ddd;
+            border-right: 1px solid #ddd;
+        }
+        td {
+            padding-left: 8px;
+            border: 1px solid #ddd;
         }
     }
 }

@@ -1,1 +1,17 @@
-<p>person-names-view works!</p>
+<!-- @if (isCreateMode()) { -->
+<app-entity-presentation [config]="getConfig()" [dialogRef]="dialogRef" (close)="onClose()" (ok)="onOk()"
+    (cancel)="onCancel()">
+    <div class="padding-8">
+        <formly-form [form]="form" [fields]="fields" [options]="options"
+            [model]="model"></formly-form>
+    </div>
+</app-entity-presentation>
+<!-- } @else {
+<app-entity-presentation [config]="getConfig()" [dialogRef]="dialogRef" (delete)="onDelete()" (save)="onSave()"
+    (refresh)="onRefresh()">
+    <div class="padding-8">
+        <formly-form [form]="form" [fields]="fields" [options]="options"
+            [model]="model"></formly-form>
+    </div>
+</app-entity-presentation> -->
+<!-- } -->

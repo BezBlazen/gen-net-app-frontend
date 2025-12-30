@@ -1,9 +1,37 @@
 @if (isCreateMode()) {
-<app-entity-presentation [config]="getConfig()" [dialogRef]="dialogRef" (close)="onClose()" (ok)="onOk()" (cancel)="onCancel()">
-    <formly-form [form]="formCreate" [fields]="fieldsCreate" [options]="optionsCreate" [model]="modelCreate"></formly-form>
+<app-entity-presentation [config]="getConfig()" [dialogRef]="dialogRef" (close)="onClose()" (ok)="onOk()"
+    (cancel)="onCancel()">
+    <div class="padding-8">
+        <formly-form [form]="formCreate" [fields]="fieldsCreate" [options]="optionsCreate"
+            [model]="modelCreate"></formly-form>
+    </div>
 </app-entity-presentation>
 } @else {
-<app-entity-presentation [config]="getConfig()" [dialogRef]="dialogRef" (delete)="onDelete()" (save)="onSave()" (refresh)="onRefresh()">
-    <formly-form [form]="form" [fields]="fields" [options]="options" [model]="model"></formly-form>
+<app-entity-presentation [config]="getConfig()" [dialogRef]="dialogRef" (delete)="onDelete()" (save)="onSave()"
+    (refresh)="onRefresh()">
+    <div class="tabbar border-bottom">
+        <ul>
+            @for (tab of mainTabs; track tab.id) {
+            <li [class.active-tab]="mainTabId === tab.id" (click)="onClickMainTab(tab.id)">
+                <div class="name">{{tab.label}}</div>
+                <div class="shadow"></div>
+            </li>
+            }
+        </ul>
+    </div>
+    <div class="body">
+        @if (mainTabId === 0) {
+        <!-- General -->
+        <div class="padding-8">
+            <formly-form [form]="form" [fields]="fields" [options]="options" [model]="model"></formly-form>
+        </div>
+        } @else if (mainTabId === 1) {
+        <!-- Names -->
+        <app-person-names-selector [personNames]="getPersonNames()"></app-person-names-selector>
+        } @else if (mainTabId === 2) {
+        <!-- Events -->
+        Events
+        }
+    </div>
 </app-entity-presentation>
 }

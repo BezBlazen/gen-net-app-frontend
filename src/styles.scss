@@ -19,8 +19,11 @@ div button:not(:first-child) {
 
 .icon-button {
     min-width: 0;
+    width: 28px;
+    height: 24px;
     cursor: pointer;
     margin-left: 1px;
+    padding: 1px 0 0 1px;
     // .icon {
     //     width: 16px;
     // }
@@ -47,4 +50,8 @@ a.active {
 
 a:hover {
     background-color: #e3f2ff;
+}
+
+.padding-8 {
+    padding: 8px;
 }

@@ -24,6 +24,7 @@ import { FieldType, FieldTypeConfig, FormlyModule } from '@ngx-formly/core';
         [title]="getErrorTitle()"
         [class.error]="showError"
         (input)="onChange($event)"
+        [checked]="props.type == 'checkbox' && formControl.value"
       >
     </div>
   `,
@@ -31,6 +32,10 @@ import { FieldType, FieldTypeConfig, FormlyModule } from '@ngx-formly/core';
     .form-group { display: flex; padding-top: 4px; }
     .form-group label { flex: 0 0 100px; font-size: 13px;}
     .form-group input { flex: 1; }
+    .form-group input[type="checkbox"] {
+      flex: 0;
+      margin-left: 0;
+    }
     .error { box-shadow: 0 0 5px red; }
     .required { color: red; }
   `]
@@ -42,9 +47,11 @@ export class FormlyFieldInputComponent extends FieldType<FieldTypeConfig> {
     }
     return this.props['errorTitle'];
   }
+  
   onChange(event: any): void {
-    if (this.formControl.value) {
-      // this.formControl.setValue(this.encodeDateString(datePrecision, date1, date2));
+    if (this.props['type'] == 'checkbox') {
+      this.formControl.setValue(event.currentTarget.checked);
+    } else if (this.formControl.value) {
     } else {
       this.formControl.setValue(undefined);
     }

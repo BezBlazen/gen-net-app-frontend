@@ -21,7 +21,8 @@ export class ProjectViewComponent extends EntityPresentationComponent {
   // [variables]
   isLoading = false;
   @Input() projectId?: string;
-  @Output() onDeleted = new EventEmitter<void>();
+  @Output() onAddEmitted = new EventEmitter<void>();
+  @Output() onDeleteEmitted = new EventEmitter<void>();
   // [variables]
   // --------------------------------
   // [variables] Subscriptions
@@ -86,7 +87,7 @@ export class ProjectViewComponent extends EntityPresentationComponent {
           if (success) {
             this.resetForm();
             this.dialogRef?.close();
-            this.onDeleted.emit();
+            this.onDeleteEmitted.emit();
           }
         });
       }
@@ -120,6 +121,7 @@ export class ProjectViewComponent extends EntityPresentationComponent {
             this.model = { ...this.dataService.getProject(this.model?.id) }
           }
           this.dialogRef?.close();
+          this.onAddEmitted.emit();
         }
       });
     }

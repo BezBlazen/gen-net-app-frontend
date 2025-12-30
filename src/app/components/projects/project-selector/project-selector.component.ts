@@ -18,10 +18,13 @@ import { PresentationUIConfig, PresentationViewMode } from '../../entity-present
 export class ProjectSelectorComponent extends EntitySelectorComponent {
   // --------------------------------
   // [variables]
-  isLoading = false;
   projects: Project[] = [];
-  _projectId = new BehaviorSubject<string | undefined>(undefined);
-  @Output() projectId = this._projectId.asObservable();
+  projectId?: string;
+  projectCreateViewConfig: PresentationUIConfig = {
+    mode: PresentationViewMode.CREATE,
+    title: 'Create Project',
+    toolbar: false
+  };
   @ViewChild('dialogProjectNew') dialogProjectNew!: ElementRef<HTMLDialogElement>;
   // [variables]
   // --------------------------------
@@ -38,30 +41,29 @@ export class ProjectSelectorComponent extends EntitySelectorComponent {
     private dataService: DataService
   ) {
     super();
-    this.dataService.isLoading$.subscribe(isLoading => {
-      this.isLoading = isLoading;
-    });
-    this.dataService.projects$.subscribe(projects => {
-      if (!this.isLoading) {
-        this.rereadProjects();
-      }
-    });
+    this.reloadProjects();
   }
   rereadProjects() {
-    this.projects = this.dataService.getProjects();
-    if (this.projects != null && this.projects.length > 0) {
-      const p = this.projects.find(project => project.id === this._projectId.getValue());
-      if (p) {
-        this.setSelectedProjectId(p.id);
-      } else {
-        this.setSelectedProjectId(this.projects[0].id);
-      }
+    this.projects = this.dataService.getProjectsLocal() ?? [];
+    if (!this.projects || this.projects.length == 0) {
+      this.reloadProjects();
     } else {
-      this.setSelectedProjectId(undefined);
+      this.updateActiveItem();
     }
   }
   reloadProjects() {
-    this.dataService.doGetProjects();
+    this.dataService.getProjects().subscribe((success) => {
+      if (success) {
+        this.projects = this.dataService.getProjectsLocal() ?? [];
+      }
+      this.updateActiveItem();
+    });
+  }
+  updateActiveItem() {
+    const p = this.projects ? this.projects.find(project => project.id === this.projectId) : undefined;
+    if (!p) {
+      this.projectId = (this.projects ?? []).length > 0 ? this.projects[0].id : undefined;
+    }
   }
   getConfig(): SelectorUIConfig {
     const config: SelectorUIConfig = {
@@ -69,24 +71,16 @@ export class ProjectSelectorComponent extends EntitySelectorComponent {
     };
     return config;
   }
-  getNewProjectDialodConfig(): PresentationUIConfig {
-    const config: PresentationUIConfig = {
-      mode: PresentationViewMode.CREATE,
-      title: 'Create Project',
-      toolbar: false
-    };
-    return config;
-  }
-  setSelectedProjectId(projectId: string | undefined) {
-    this._projectId.next(projectId);
-  }
-  isActive(id: string | undefined) {
-    return id && this._projectId.getValue() === id;
+  setSelectedProjectId(id: string | undefined) {
+    this.projectId = id;
   }
   onInit() {
+    this.reloadProjects();
+  }
+  onDeleteEmitted() {
     this.rereadProjects();
-    if (!this.projectId) {
-      this.reloadProjects();
-    }
+  }
+  onAddEmitted() {
+    this.rereadProjects();
   }
 }

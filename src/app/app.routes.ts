@@ -26,7 +26,7 @@ export const routes: Routes = [
                 component: GnaProjectsComponent,
             },
             {
-                path: 'projects/:id',
+                path: 'projects/:projectId',
                 component: GnaProjectComponent,
                 children: [
                     {

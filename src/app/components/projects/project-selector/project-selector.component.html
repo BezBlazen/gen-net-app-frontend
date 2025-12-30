@@ -1,4 +1,4 @@
-<app-entity-selector [config]="getConfig()" (add)="onAdd()" (refresh)="onRefresh()">
+<app-entity-selector class="selector" [config]="getConfig()" (add)="onAdd()" (refresh)="onRefresh()">
     <div class="table">
         <table>
             <thead class="border-bottom">
@@ -8,7 +8,7 @@
             </thead>
             <tbody>
                 @for (project of projects; track project.id) {
-                <tr (click)="setSelectedProjectId(project.id)" [class.active]="isActive(project.id)">
+                <tr (click)="setSelectedProjectId(project.id)" [class.active]="project.id == projectId">
                     <td>{{project.title}} </td>
                 </tr>
                 }
@@ -16,6 +16,13 @@
         </table>
     </div>
 </app-entity-selector>
+@if (config.entity_view && projectId) {
+<app-project-view class="view" [projectId]="projectId" (onDeleteEmitted)="onDeleteEmitted()"></app-project-view>
+}
 <dialog class="dialog-central" #dialogProjectNew>
-    <app-project-view class="view" [config]="getNewProjectDialodConfig()" [dialogRef]="dialogProjectNew"></app-project-view>
+    <app-project-view class="view" 
+        [config]="projectCreateViewConfig"
+        [dialogRef]="dialogProjectNew"
+        (onAddEmitted)="onAddEmitted()"
+        ></app-project-view>
 </dialog>

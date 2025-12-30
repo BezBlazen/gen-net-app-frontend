@@ -2,10 +2,13 @@ import { Component, EventEmitter, Input, Output, SimpleChanges } from '@angular/
 import { DataService } from '../../../services/data.service';
 import { FormGroup, FormsModule } from '@angular/forms';
 import { FormlyFieldConfig, FormlyFormOptions, FormlyModule } from '@ngx-formly/core';
-import { GenderOptions, NameForm, NamePart, NamePartType, Person, PersonCreate } from '../../../models/person.model';
+import { DaoPerson, GenderOptions, Name, NameForm, NamePart, NamePartType, NameTypeOptions, Person, PersonCreate } from '../../../models/person.model';
 import { JsonPipe } from '@angular/common';
 import { EntityPresentationComponent, PresentationUIConfig, PresentationViewMode } from '../../entity-presentation/entity-presentation.component';
 import { Subscription } from 'rxjs';
+import { PersonNamesSelectorComponent } from "../../person-names/person-names-selector/person-names-selector.component";
+import { PersonUtilsComponent } from '../person-utils/person-utils.component';
+import { PersonNamesViewComponent } from '../../person-names/person-names-view/person-names-view.component';
 
 @Component({
   selector: 'app-person-view',
@@ -13,7 +16,7 @@ import { Subscription } from 'rxjs';
     EntityPresentationComponent,
     FormsModule,
     FormlyModule,
-    JsonPipe
+    PersonNamesSelectorComponent,
   ],
   templateUrl: './person-view.component.html',
   styleUrl: './person-view.component.scss'
@@ -24,7 +27,10 @@ export class PersonViewComponent extends EntityPresentationComponent {
   @Input() projectId?: string;
   @Input() personId?: string;
   @Output() onDeleted = new EventEmitter<void>();
+  initPersonAsStr: string = '';
   readonly NamePartType = NamePartType;
+  mainTabs = [{ id: 0, label: 'General' }, { id: 1, label: 'Names' }, { id: 2, label: 'Events' }]
+  mainTabId = 0;
   // [variables]
   // --------------------------------
   // [variables] Subscriptions
@@ -43,7 +49,17 @@ export class PersonViewComponent extends EntityPresentationComponent {
       props: {
         label: 'Gender',
         options: GenderOptions
-      }
+      },
+      defaultValue: GenderOptions[0]?.value
+    },
+    {
+      key: 'names.type',
+      type: 'select',
+      props: {
+        label: 'Name type',
+        options: NameTypeOptions
+      },
+      defaultValue: NameTypeOptions[0]?.value
     },
     {
       key: 'names.first',
@@ -60,14 +76,14 @@ export class PersonViewComponent extends EntityPresentationComponent {
       }
     },
     {
-      key: 'dates.birth',
+      key: 'date.birth',
       type: 'date',
       props: {
         label: 'Birth date',
       }
     },
     {
-      key: 'dates.death',
+      key: 'date.death',
       type: 'date',
       props: {
         label: 'Death date',
@@ -75,32 +91,50 @@ export class PersonViewComponent extends EntityPresentationComponent {
     },
   ];
   // Edit, View
-  model: Person = {};
+  model: DaoPerson = {};
   form = new FormGroup({});
   options: FormlyFormOptions = {};
+  // fields: FormlyFieldConfig[] = [
+  //   {
+  //     key: 'id',
+  //     type: 'input',
+  //     props: {
+  //       label: 'Id',
+  //       disabled: true
+  //     }
+  //   },
+  //   {
+  //     key: 'gender.type',
+  //     type: 'input',
+  //     props: {
+  //       label: 'Gender',
+  //       errorTitle: '6-64 chars',
+  //     }
+  //   },
+  //   {
+  //     key: 'createdAt',
+  //     type: 'input',
+  //     props: {
+  //       label: 'Created at',
+  //       disabled: true
+  //     }
+  //   },
+  // ];
   fields: FormlyFieldConfig[] = [
     {
-      key: 'id',
+      key: 'preferredName',
       type: 'input',
       props: {
-        label: 'Id',
-        disabled: true
-      }
+        label: 'Name',
+        disabled: true,
+      },
     },
     {
       key: 'gender.type',
-      type: 'input',
+      type: 'select',
       props: {
         label: 'Gender',
-        errorTitle: '6-64 chars',
-      }
-    },
-    {
-      key: 'createdAt',
-      type: 'input',
-      props: {
-        label: 'Created at',
-        disabled: true
+        options: GenderOptions
       }
     },
   ];
@@ -167,10 +201,9 @@ export class PersonViewComponent extends EntityPresentationComponent {
         if (firstNamePart || lastNamePart) {
           person.names = [
             {
-              type: '',
+              type: this.modelCreate.names?.type,
               nameForms: [
                 {
-                  preferred: true,
                   parts: [firstNamePart, lastNamePart].filter(x => x != undefined) as NamePart[]
                 }
               ]
@@ -207,7 +240,7 @@ export class PersonViewComponent extends EntityPresentationComponent {
     // Allow subscriptions if PresentationViewMode not CREATE
     if (this.config.mode != PresentationViewMode.CREATE) {
       this.personSubscription = this.dataService.persons$.subscribe(persons => {
-        this.updateModel()
+        this.updateModel();
       });
     }
   }
@@ -215,15 +248,29 @@ export class PersonViewComponent extends EntityPresentationComponent {
     this.personSubscription?.unsubscribe();
   }
   ngOnChanges(changes: SimpleChanges): void {
+    if (changes['projectId'] || changes['personId']) {
+      if (this.initPersonAsStr != '' && this.initPersonAsStr != JSON.stringify(this.model)) {
+        console.warn('this.initPersonAsStr != JSON.stringify(this.model)')
+        console.log(this.initPersonAsStr);
+        console.log(JSON.stringify(this.model));
+        // this.initPersonAsStr = JSON.stringify(this.model);
+        let isConfirmed = confirm("Save changes?");
+        if (isConfirmed) {
+          this.onSave();
+        }
+      }
+    }
     if (changes['projectId']) {
-      this.projectId = changes['projectId'].currentValue;
       this.rereadPerson();
+      this.mainTabId = 0;
     }
     if (changes['personId']) {
-      this.personId = changes['personId'].currentValue;
       this.rereadPerson();
     }
 
+  }
+  onClickMainTab(tabId: number) {
+    this.mainTabId = tabId;
   }
   getConfig(): PresentationUIConfig {
     const config: PresentationUIConfig = {
@@ -245,10 +292,18 @@ export class PersonViewComponent extends EntityPresentationComponent {
     this.updateModel();
   }
   updateModel() {
-    if (this.personId) {
-      this.model = { ...this.dataService.getPersonLocal(this.personId) }
-    } else {
-      this.model = {};
+    this.model = this.personId ? this.dataService.getPersonLocal(this.personId) ?? {} : {};
+    this.model.preferredName = this.getPreferredName(this.model);
+    // Store initial preson state
+    this.initPersonAsStr = JSON.stringify(this.model);
+  }
+  getPreferredName(person: Person | undefined) {
+    return person ? PersonUtilsComponent.getPreferredName(person) : '';
+  }
+  getPersonNames(): Name[] {
+    if (!this.model.names) {
+      this.model.names = [];
     }
+    return this.model.names;
   }
 }

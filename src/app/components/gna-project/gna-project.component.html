@@ -1,20 +1,14 @@
 <div class="toolbar border-bottom">
     <div class="title">{{project?.title}}</div>
-    <!-- <div>{{urlPath}}</div> -->
-    <div class="menu">
-        <ul>
-            <!-- <li><a [routerLink]="['./']" [class.active]="isActive('./')">General</a></li> -->
-            <li><a [routerLink]="['./', 'persons']" [class.active]="isActive('./persons')">Persons</a></li>
-            <li><a [routerLink]="['./', 'relationships']" [class.active]="isActive('./relationships')">Relationships</a></li>
-        </ul>
-        <!-- <button [routerLink]="['./']">General</button>
-        <button [routerLink]="['./', 'persons']">Persons</button>
-        <button [routerLink]="['./', 'relationships']">Relationships</button> -->
-    </div>
+    <ul>
+        @for (tab of mainTabs; track tab.id) {
+        <li [routerLink]="tab.routerLink" [routerLinkActive]="['active-tab']">
+            <div class="name">{{tab.label}}</div>
+            <div class="shadow"></div>
+        </li>
+        }
+    </ul>
 </div>
 <div class="body">
-    <!-- <div>{{parentPath}}</div> -->
-    <!-- <div>{{childPath}}</div>
-    <div>{{urlPath}}</div> -->
     <router-outlet [routerOutletData]="projectId"></router-outlet>
 </div>

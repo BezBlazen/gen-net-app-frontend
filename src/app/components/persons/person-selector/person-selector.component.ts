@@ -1,16 +1,19 @@
-import { Component, ElementRef, EventEmitter, Input, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, ElementRef, Input, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { DataService } from '../../../services/data.service';
-import { Person } from '../../../models/person.model';
+import { Gender, Person } from '../../../models/person.model';
 import { EntitySelectorComponent, SelectorUIConfig } from '../../entity-selector/entity-selector.component';
 import { BehaviorSubject, Subscription } from 'rxjs';
 import { PersonViewComponent } from '../person-view/person-view.component';
 import { PresentationUIConfig, PresentationViewMode } from '../../entity-presentation/entity-presentation.component';
+import { PersonUtilsComponent } from '../person-utils/person-utils.component';
+import { Router, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-person-selector',
   imports: [
     EntitySelectorComponent,
-    PersonViewComponent
+    PersonViewComponent,
+    RouterModule
   ],
   templateUrl: './person-selector.component.html',
   styleUrl: './person-selector.component.scss'
@@ -18,11 +21,12 @@ import { PresentationUIConfig, PresentationViewMode } from '../../entity-present
 export class PersonSelectorComponent extends EntitySelectorComponent {
   // --------------------------------
   // [variables]
-  isLoading = false;
-  persons: Person[] = [];
-  _personId = new BehaviorSubject<string | undefined>(undefined);
-  @Output() personId = this._personId.asObservable();
   @Input() projectId?: string;
+  persons: Person[] = [];
+  personId?: string;
+  isLoading = false;
+  // _personId = new BehaviorSubject<string | undefined>(undefined);
+  // @Output() personId = this._personId.asObservable();
   @ViewChild('dialogPersonNew') dialogPersonNew!: ElementRef<HTMLDialogElement>;
   // [variables]
   // --------------------------------
@@ -35,34 +39,19 @@ export class PersonSelectorComponent extends EntitySelectorComponent {
     this.openDialog(this.dialogPersonNew.nativeElement);
   }
   onRefresh(): void {
-    if (this.projectId) {
-      this.reloadPersons(this.projectId);
-    }
+    this.reloadPersons();
   }
   // [events]
   // --------------------------------
   constructor(
-    private dataService: DataService
+    private dataService: DataService,
+    private router: Router
   ) {
     super();
-    this.dataService.isLoading$.subscribe(isLoading => {
-      this.isLoading = isLoading;
-    });
-    this.dataService.persons$.subscribe(persons => {
-      if (this.projectId) {
-        this.rereadPersons(this.projectId);
-      }
-    });
   }
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['projectId']) {
-      this.projectId = changes['projectId'].currentValue;
-      if (this.projectId) {
-        this.rereadPersons(this.projectId);
-        if (this.persons.length == 0) {
-          this.reloadPersons(this.projectId)
-        }
-      }
+      this.reloadPersons();
     }
   }
   getNewPersonDialodConfig(): PresentationUIConfig {
@@ -73,41 +62,77 @@ export class PersonSelectorComponent extends EntitySelectorComponent {
     };
     return config;
   }
-  rereadPersons(projectId: string) {
-    this.persons = this.dataService.getPersonsLocal(projectId);
-    if (this.persons != null && this.persons.length > 0) {
-      const p = this.persons.find(person => person.id === this._personId.getValue());
-      if (p) {
-        this.setSelectedPerson(p.id);
-      } else {
-        this.setSelectedPerson(this.persons[0].id);
-      }
+  rereadPersons() {
+    this.persons = this.dataService.getPersonsLocal(this.projectId) ?? [];
+    if (!this.persons || this.persons.length == 0) {
+      this.reloadPersons();
     } else {
-      this.setSelectedPerson(undefined);
+      this.updateActiveItem();
     }
   }
-  reloadPersons(projectId: string) {
-    this.dataService.getPersons(projectId).subscribe((success) => {
+  reloadPersons() {
+    if (!this.projectId) {
+      throw new Error('projectId is required');
+    }
+    this.dataService.getPersons(this.projectId).subscribe((success) => {
+      if (success) {
+        this.persons = this.dataService.getPersonsLocal(this.projectId) ?? [];
+      }
+      this.updateActiveItem();
     });
   }
+  updateActiveItem() {
+    const p = this.persons ? this.persons.find(person => person.id === this.personId) : undefined;
+    if (!p) {
+      this.personId = (this.persons ?? []).length > 0 ? this.persons[0].id : undefined;
+    }
+  }
+  /*
+rereadProjects() {
+  this.projects = this.dataService.getProjectsLocal() ?? [];
+  if (!this.projects || this.projects.length == 0) {
+    this.reloadProjects();
+  } else {
+    this.updateActiveItem();
+  }
+}
+reloadProjects() {
+  this.dataService.getProjects().subscribe((success) => {
+    if (success) {
+      this.projects = this.dataService.getProjectsLocal() ?? [];
+    }
+    this.updateActiveItem();
+  });
+}
+updateActiveItem() {
+  const p = this.projects ? this.projects.find(project => project.id === this.projectId)?.id : undefined;
+  if (!p) {
+    this.projectId = (this.projects ?? []).length > 0 ? this.projects[0].id : undefined;
+  }
+}
+*/
   getConfig(): SelectorUIConfig {
     const config: SelectorUIConfig = {
       title: 'Select Person',
     };
     return config;
   }
-  setSelectedPerson(personId: string | undefined) {
-    this._personId.next(personId);
+  getGender(person: Person): string | undefined {
+    return Object.values(Gender).find(gender => gender.value === person.gender?.type)?.label;
   }
-  isActive(id: string | undefined) {
-    return id && this._personId.getValue() === id;
+  setSelectedPerson(personId: string | undefined) {
+    this.personId = personId;
   }
   onInit() {
-    if (this.projectId) {
-      this.rereadPersons(this.projectId);
-      if (this.persons.length == 0) {
-        this.reloadPersons(this.projectId);
-      }
-    }
+    this.reloadPersons();
+  }
+  getPreferredFirstName(person: Person | undefined) {
+    return PersonUtilsComponent.getPreferredFirstName(person);
+  }
+  getPreferredLastName(person: Person | undefined) {
+    return PersonUtilsComponent.getPreferredLastName(person);
+  }
+  onDeleteEmitted() {
+    throw new Error('Method not implemented.');
   }
 }

@@ -1,21 +1,38 @@
-<app-entity-selector [config]="getConfig()" (add)="onAdd()" (refresh)="onRefresh()">
+<app-entity-selector class="selector" [config]="getConfig()" (add)="onAdd()" (refresh)="onRefresh()">
     <div class="table">
         <table>
+            <colgroup>
+                <col style="width: 150px;">
+                <col style="width: 150px;">
+                <col style="width: 100px;">
+                <col style="width: auto;">
+            </colgroup>
             <thead class="border-bottom">
                 <tr>
-                    <th>Title</th>
+                    <!-- <th>Title</th> -->
+                    <th>First name</th>
+                    <th>Last name</th>
+                    <th>Gender</th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
                 @for (person of persons; track person.id) {
-                <tr (click)="setSelectedPerson(person.id)" [class.active]="isActive(person.id)">
-                    <td>{{person.id}} </td>
+                <tr (click)="setSelectedPerson(person.id)" [class.active]="person.id == personId">
+                    <td>{{getPreferredFirstName(person)}}</td>
+                    <td>{{getPreferredLastName(person)}}</td>
+                    <td>{{getGender(person)}}</td>
+                    <td></td>
                 </tr>
                 }
             </tbody>
         </table>
     </div>
 </app-entity-selector>
+@if (config.entity_view && personId) {
+<app-person-view class="view" [personId]="personId" (onDeleteEmitted)="onDeleteEmitted()"></app-person-view>
+}
 <dialog class="dialog-central" #dialogPersonNew>
-    <app-person-view class="view" [config]="getNewPersonDialodConfig()" [projectId]="projectId"  [dialogRef]="dialogPersonNew"></app-person-view>
+    <app-person-view class="view" [config]="getNewPersonDialodConfig()" [projectId]="projectId"
+        [dialogRef]="dialogPersonNew"></app-person-view>
 </dialog>

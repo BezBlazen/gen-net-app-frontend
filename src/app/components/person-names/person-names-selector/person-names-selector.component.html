@@ -1,1 +1,48 @@
-<p>person-names-selector works!</p>
+<app-entity-selector [config]="getConfig()" (add)="onAdd()" (edit)="onEdit()" (delete)="onDelete()">
+    <div class="table">
+        <table>
+            <colgroup>
+                <col style="width: 85px;">
+                <col style="width: 150px;">
+                <col style="width: 150px;">
+                <col style="width: 150px;">
+                <col style="width: auto;">
+            </colgroup>
+            <thead class="border-bottom">
+                <tr>
+                    <th>Preferred</th>
+                    <th>First name</th>
+                    <th>Last name</th>
+                    <th>Name type</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (name of personNames; track $index) {
+                <!-- <tr (click)="setSelectedName(name.id)" [class.active]="isActive($index)"> -->
+                <tr (click)="setSelectedItem($index)" [class.active]="isActive($index)">
+                    <td>
+                        @if ($index == 0) {
+                            <img src="./assets/icons/icons8-checked-checkbox-16.png">
+                        } @else {
+                            <img src="./assets/icons/icons8-unchecked-checkbox-16.png">
+                        }
+                    <td>{{getFirstName(name)}}</td>
+                    <td>{{getLastName(name)}}</td>
+                    <td>{{getNameType(name)}}</td>
+                    <td></td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</app-entity-selector>
+
+<dialog class="dialog-central" #dialogPersonName>
+    <app-person-names-view class="view" [config]="personNameViewConfig"
+        [dialogRef]="dialogPersonName"
+        [personName]="personNameViewDaoName"
+        (onAddEvent)="onAddEvent($event)"
+        (onSaveEvent)="onSaveEvent($event)"
+        ></app-person-names-view>
+</dialog>
