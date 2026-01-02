@@ -133,6 +133,12 @@ updateActiveItem() {
     return PersonUtilsComponent.getPreferredLastName(person);
   }
   onDeleteEmitted() {
-    throw new Error('Method not implemented.');
+    this.rereadPersons();
+  }
+  onSaveEmitted() {
+    this.rereadPersons();
+  }
+  onAddEmitted() {
+    this.rereadPersons();
   }
 }

@@ -26,7 +26,9 @@ export class PersonViewComponent extends EntityPresentationComponent {
   // [variables]
   @Input() projectId?: string;
   @Input() personId?: string;
-  @Output() onDeleted = new EventEmitter<void>();
+  @Output() onAddEmitted = new EventEmitter<void>();
+  @Output() onSaveEmitted = new EventEmitter<void>();
+  @Output() onDeleteEmitted = new EventEmitter<void>();
   initPersonAsStr: string = '';
   readonly NamePartType = NamePartType;
   mainTabs = [{ id: 0, label: 'General' }, { id: 1, label: 'Names' }, { id: 2, label: 'Events' }]
@@ -122,6 +124,14 @@ export class PersonViewComponent extends EntityPresentationComponent {
   // ];
   fields: FormlyFieldConfig[] = [
     {
+      key: 'id',
+      type: 'input',
+      props: {
+        label: 'Id',
+        disabled: true
+      }
+    },
+    {
       key: 'preferredName',
       type: 'input',
       props: {
@@ -148,7 +158,7 @@ export class PersonViewComponent extends EntityPresentationComponent {
         this.dataService.deletePerson(this.model).subscribe((success) => {
           if (success) {
             this.dialogRef?.close();
-            this.onDeleted.emit();
+            this.onDeleteEmitted.emit();
           }
         });
       }
@@ -158,12 +168,19 @@ export class PersonViewComponent extends EntityPresentationComponent {
     if (this.model) {
       this.dataService.updatePerson(this.model).subscribe((success) => {
         if (success) {
+          this.onSaveEmitted.emit();
           this.dialogRef?.close();
         }
       });
     }
   }
   onRefresh(): void {
+    if (this.personId) {
+      this.dataService.getPerson(this.personId).subscribe((success) => {
+      });
+    }
+  }
+  onUndo(): void {
     if (this.personId) {
       this.dataService.getPerson(this.personId).subscribe((success) => {
       });
@@ -216,6 +233,7 @@ export class PersonViewComponent extends EntityPresentationComponent {
           if (success) {
             this.dialogRef?.close();
             this.resetForm();
+            this.onAddEmitted.emit();
           }
         });
       }

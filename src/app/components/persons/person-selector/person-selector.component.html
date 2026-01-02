@@ -30,9 +30,11 @@
     </div>
 </app-entity-selector>
 @if (config.entity_view && personId) {
-<app-person-view class="view" [personId]="personId" (onDeleteEmitted)="onDeleteEmitted()"></app-person-view>
+<app-person-view class="view" [personId]="personId" (onSaveEmitted)="onSaveEmitted()" (onDeleteEmitted)="onDeleteEmitted()"></app-person-view>
 }
 <dialog class="dialog-central" #dialogPersonNew>
     <app-person-view class="view" [config]="getNewPersonDialodConfig()" [projectId]="projectId"
-        [dialogRef]="dialogPersonNew"></app-person-view>
+        [dialogRef]="dialogPersonNew"
+        (onAddEmitted)="onAddEmitted()"
+        ></app-person-view>
 </dialog>

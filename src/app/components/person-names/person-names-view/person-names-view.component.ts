@@ -73,7 +73,6 @@ export class PersonNamesViewComponent extends EntityPresentationComponent {
   onDelete(): void {
   }
   onClose(): void {
-    // this.form.reset();
     if (this.dialogRef) {
       this.dialogRef.close();
     }

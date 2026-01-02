@@ -47,6 +47,7 @@ export class PersonNamesSelectorComponent extends EntitySelectorComponent {
     this.openDialog(this.dialogPersonName.nativeElement);
   }
   onDelete(): void {
+    this.personNames.splice(this._selectedItemIndex, 1);
   }
   onAddEvent(daoName: DaoName): void {
     if (daoName.index == undefined) {

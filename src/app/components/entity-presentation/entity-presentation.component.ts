@@ -28,6 +28,7 @@ export class EntityPresentationComponent {
   @Output() close = new EventEmitter<void>();
   @Output() delete = new EventEmitter<void>();
   @Output() save = new EventEmitter<void>();
+  @Output() undo = new EventEmitter<void>();
   @Output() refresh = new EventEmitter<void>();
   @Output() ok = new EventEmitter<void>();
   @Output() cancel = new EventEmitter<void>();

@@ -125,29 +125,11 @@ export class GnaComponent {
     private router: Router,
     private spinner: NgxSpinnerService
   ) {
-    this.dataService.rereadAccount();    
-    this.dataService.isSignInSuccess$.subscribe(success => {
-      if (success) {
-        // TODO Reset errors not working
-        this.signInModel = { username: "", password: "" };
-        this.closeDialog(this.dialogSignIn.nativeElement);
-      }
-    });
-    this.dataService.isSignUpSuccess$.subscribe(success => {
-      if (success) {
-        // TODO Reset errors not working
-        this.signInModel = { username: "", password: "" };
-        this.signInModel = { username: this.signUpModel.username, password: "" };
-        this.signUpModel = { username: "", password: "", passwordConfirm: "" };
-        this.switchDialog(this.dialogSignUp.nativeElement, this.dialogSignIn.nativeElement);
-      }
-    });
+    this.dataService.reloadAccount();
     this.dataService.account$.subscribe(account => {
-      if (!account || account.username != this.account?.username ) {
-        // this.router.navigate(['/', 'gna', 'projects']);
-      }
       this.account = account;
-      this.dataService.doGetProjects();
+      this.router.navigate(['/', 'gna']);
+      this.reloadProjects();
     });
     this.dataService.isLoading$.subscribe(isLoading => {
       this.isLoading = isLoading;
@@ -179,16 +161,28 @@ export class GnaComponent {
   }
   onSignInFormSubmit() {
     if (this.signInForm.valid) {
-      this.dataService.doPostSignIn(new Account(this.signInModel.username, this.signInModel.password));
+      this.dataService.doSignIn(new Account(this.signInModel.username, this.signInModel.password)).subscribe(success => {
+        if (success) {
+          this.signInModel = { username: "", password: "" };
+          this.closeDialog(this.dialogSignIn.nativeElement);
+        }
+      });
     }
   }
   onSignUpFormSubmit() {
     if (this.signUpForm.valid) {
-      this.dataService.doPostSignUp(new Account(this.signUpModel.username, this.signUpModel.password));
+      this.dataService.doSignUp(new Account(this.signUpModel.username, this.signUpModel.password)).subscribe(success => {
+        if (success) {
+          this.signInModel = { username: "", password: "" };
+          this.signInModel = { username: this.signUpModel.username, password: "" };
+          this.signUpModel = { username: "", password: "", passwordConfirm: "" };
+          this.switchDialog(this.dialogSignUp.nativeElement, this.dialogSignIn.nativeElement);
+        }
+      });
     }
   }
   onSignOut() {
-    this.dataService.doPostSignOut();
+    this.dataService.doSignOut().subscribe();
   }
   onAccountMenuChange(event: Event) {
     const select = event.target as HTMLSelectElement;
@@ -206,6 +200,13 @@ export class GnaComponent {
         this.errorMessage = null;
       }, 3000);
     }
+  }
+  reloadProjects() {
+    this.dataService.getProjects().subscribe((success) => {
+      if (success) {
+        this.projects = this.dataService.getProjectsLocal() ?? [];
+      }
+    });
   }
 }
 

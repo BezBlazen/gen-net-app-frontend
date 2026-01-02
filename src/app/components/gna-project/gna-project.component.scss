@@ -12,6 +12,9 @@
     .title {
         margin: auto 8px;
         font-size: 14px;
+        width: 150px;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     .menu {

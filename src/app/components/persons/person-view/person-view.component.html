@@ -7,7 +7,7 @@
     </div>
 </app-entity-presentation>
 } @else {
-<app-entity-presentation [config]="getConfig()" [dialogRef]="dialogRef" (delete)="onDelete()" (save)="onSave()"
+<app-entity-presentation [config]="getConfig()" [dialogRef]="dialogRef" (delete)="onDelete()" (save)="onSave()" (undo)="onUndo()"
     (refresh)="onRefresh()">
     <div class="tabbar border-bottom">
         <ul>

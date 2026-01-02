@@ -23,6 +23,11 @@
             <img class="icon" src="./assets/icons/icons8-save-16.png" />
         </button>
         }
+        @if (undo.observed) {
+        <button header class="icon-button" (click)="save.emit()">
+            <img class="icon" src="./assets/icons/icons8-undo-16.png" />
+        </button>
+        }
         @if (refresh.observed) {
         <button header class="icon-button" (click)="refresh.emit()">
             <img class="icon" src="./assets/icons/icons8-refresh-16.png" />

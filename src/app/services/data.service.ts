@@ -31,11 +31,6 @@ export class DataService {
   public account$ = this._account.asObservable();
   private _accountLastUserName: string | null = null;
 
-  private _isSignInSuccess = new BehaviorSubject<boolean | null>(null);
-  public isSignInSuccess$ = this._isSignInSuccess.asObservable();
-  private _isSignUpSuccess = new BehaviorSubject<boolean | null>(null);
-  public isSignUpSuccess$ = this._isSignUpSuccess.asObservable();
-
   private _projects = new BehaviorSubject<Project[]>([]);
   public projects$ = this._projects.asObservable();
 
@@ -102,59 +97,71 @@ export class DataService {
   public getAccountLastUserName(): string | null {
     return this._accountLastUserName;
   }
-  public doPostSignIn(account: Account) {
+  public doSignIn(account: Account): Observable<boolean> {
     const rqId = this.guid();
-    this.httpClient
+    this.updateRqIds(rqId, true);
+    return this.httpClient
       .post<Account>(this.baseUrl + '/auth/sign_in', account, { withCredentials: true, })
       .pipe(
-        map((account) => (new ApiDataWrapper(account, false, null))),
-        catchError((err) => of(new ApiDataWrapper(undefined, false, this.getErrorMessage(err)))),
-        startWith(new ApiDataWrapper(undefined, true, null))
-      ).subscribe((pipeData) => {
-        this.updateRqIds(rqId, pipeData.isLoading);
-        // this.updateRqIds(rqId, pipeData.isLoading);
-        this._errorMessage.next(pipeData.errorMessage);
-        if (pipeData.data != undefined) {
-          this._account.next(pipeData.data);
-          this._isSignInSuccess.next(true);
-          this._accountLastUserName = pipeData.data.username;
-        } else {
-          this._account.next(null);
-        }
-      });
+        tap(() => this.updateRqIds(rqId, false)),
+        map((account) => {
+          this._account.next(account);
+          return true;
+        }),
+        catchError((err) => {
+          this._errorMessage.next(this.getErrorMessage(err));
+          return of(false);
+        }),
+      );
+
   }
-  public doPostSignUp(account: Account) {
+  public doSignUp(account: Account): Observable<boolean> {
     const rqId = this.guid();
-    this.httpClient
+    this.updateRqIds(rqId, true);
+    return this.httpClient
       .post<Account>(this.baseUrl + '/auth/sign_up', account, { withCredentials: true, })
+      // .pipe(
+      //   map((account) => (new ApiDataWrapper(account, false, null))),
+      //   catchError((err) => of(new ApiDataWrapper(undefined, false, this.getErrorMessage(err)))),
+      //   startWith(new ApiDataWrapper(undefined, true, null))
+      // ).subscribe((pipeData) => {
+      //   this.updateRqIds(rqId, pipeData.isLoading);
+      //   this._errorMessage.next(pipeData.errorMessage);
+      //   if (pipeData?.data?.username) {
+      //     this._isSignUpSuccess.next(true);
+      //     this._accountLastUserName = pipeData.data.username;
+      //   }
+      // });
       .pipe(
-        map((account) => (new ApiDataWrapper(account, false, null))),
-        catchError((err) => of(new ApiDataWrapper(undefined, false, this.getErrorMessage(err)))),
-        startWith(new ApiDataWrapper(undefined, true, null))
-      ).subscribe((pipeData) => {
-        this.updateRqIds(rqId, pipeData.isLoading);
-        this._errorMessage.next(pipeData.errorMessage);
-        if (pipeData?.data?.username) {
-          this._isSignUpSuccess.next(true);
-          this._accountLastUserName = pipeData.data.username;
-        }
-      });
+        tap(() => this.updateRqIds(rqId, false)),
+        map((account) => {
+          this._accountLastUserName = account.username;
+          return true;
+        }),
+        catchError((err) => {
+          this._errorMessage.next(this.getErrorMessage(err));
+          return of(false);
+        }),
+      );
   }
-  public doPostSignOut() {
+  public doSignOut(): Observable<boolean> {
     const rqId = this.guid();
-    this.httpClient
+    this.updateRqIds(rqId, true);
+    return this.httpClient
       .post<Account>(this.baseUrl + '/auth/sign_out', null, { withCredentials: true, })
       .pipe(
-        map((account) => (new ApiDataWrapper(account, false, null))),
-        catchError((err) => of(new ApiDataWrapper(undefined, false, this.getErrorMessage(err)))),
-        startWith(new ApiDataWrapper(undefined, true, null))
-      ).subscribe((pipeData) => {
-        this.updateRqIds(rqId, pipeData.isLoading);
-        this._errorMessage.next(pipeData.errorMessage);
-        this._account.next(null);
-      });
+        tap(() => this.updateRqIds(rqId, false)),
+        map(() => {
+          this._account.next(null);
+          return true;
+        }),
+        catchError((err) => {
+          this._errorMessage.next(this.getErrorMessage(err));
+          return of(false);
+        }),
+      );
   }
-  public rereadAccount() {
+  public reloadAccount() {
     const rqId = this.guid();
     this.httpClient
       .get<Account>(this.baseUrl + '/auth/account', { withCredentials: true })
@@ -299,7 +306,8 @@ export class DataService {
   // --------------------------
   // Persons
   getPersonLocal(personId: string): Person | undefined {
-    return personId ? JSON.parse(JSON.stringify(this._persons.value.find((person) => person.id === personId))) : undefined;
+    const person = personId ? this._persons.value.find((person) => person.id === personId) : undefined;
+    return person ? JSON.parse(JSON.stringify(person)) : undefined;
   }
   getPerson(personId: string): Observable<boolean> {
     const rqId = this.guid();
@@ -345,7 +353,7 @@ export class DataService {
     const rqId = this.guid();
     this.updateRqIds(rqId, true);
     return this.httpClient
-      .delete<Person>(this.baseUrl + '/persons/' + person.projectId, { withCredentials: true })
+      .delete<Person>(this.baseUrl + '/persons/' + person.id, { withCredentials: true })
       .pipe(
         tap(() => this.updateRqIds(rqId, false)),
         map(() => {
