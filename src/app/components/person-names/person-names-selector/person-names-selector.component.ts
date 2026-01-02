@@ -23,14 +23,14 @@ export class PersonNamesSelectorComponent extends EntitySelectorComponent {
   viewMode: PresentationViewMode = PresentationViewMode.VIEW;
   _selectedItemIndex: number = -1;
   personNameViewConfig: PresentationUIConfig = {};
-  personNameViewDaoName: DaoName = {name: {}};
+  personNameViewDaoName: DaoName = { name: {} };
   // [variables]
   // --------------------------------
   // [events]
   onAdd(): void {
     this.personNameViewConfig.mode = PresentationViewMode.CREATE,
-    this.personNameViewConfig.title = 'Create Name';
-    this.personNameViewDaoName = {name: {}};
+      this.personNameViewConfig.title = 'Create Name';
+    this.personNameViewDaoName = { name: {} };
     this.openDialog(this.dialogPersonName.nativeElement);
   }
   onEdit(): void {
@@ -97,6 +97,9 @@ export class PersonNamesSelectorComponent extends EntitySelectorComponent {
     };
     return config;
   }
+  getFullName(name: Name): string | undefined {
+    return name && name.nameForms && name.nameForms[0] ? name.nameForms[0].fullText : undefined;
+  }
   getFirstName(name: Name): string {
     // Return first name form if exists with NamePart type 'GIVEN'
     if (name && name.nameForms && name.nameForms[0] && name.nameForms[0].parts && name.nameForms[0].parts.length > 0) {
@@ -130,7 +133,7 @@ export class PersonNamesSelectorComponent extends EntitySelectorComponent {
   }
   getPersonName(): DaoName | undefined {
     if (this._selectedItemIndex >= 0) {
-      return {index: this._selectedItemIndex, name: this.personNames[this._selectedItemIndex]}
+      return { index: this._selectedItemIndex, name: this.personNames[this._selectedItemIndex] }
     }
     return undefined
   }

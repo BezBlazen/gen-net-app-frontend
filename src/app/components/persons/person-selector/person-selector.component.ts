@@ -124,6 +124,9 @@ updateActiveItem() {
   onInit() {
     this.reloadPersons();
   }
+  getPreferredFullName(person: Person | undefined) {
+    return PersonUtilsComponent.getPreferredFullName(person);
+  }
   getPreferredFirstName(person: Person | undefined) {
     return PersonUtilsComponent.getPreferredFirstName(person);
   }

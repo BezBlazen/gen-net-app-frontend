@@ -25,6 +25,10 @@ export class PersonUtilsComponent {
     }
     return undefined;
   }
+  static getPreferredFullName(person: Person | undefined): string | undefined {
+    const preferredNameForm = this.getPreferredNameForm(person);
+    return preferredNameForm?.fullText;
+  }
   static getPreferredFirstName(person: Person | undefined): string {
     const preferredNameForm = this.getPreferredNameForm(person);
     return preferredNameForm?.parts?.find((part) => part.type === NamePartType.GIVEN)?.value ?? '';
@@ -34,6 +38,7 @@ export class PersonUtilsComponent {
     return preferredNameForm?.parts?.find((part) => part.type === NamePartType.SURNAME)?.value ?? '';
   }
   static getPreferredName(person: Person | undefined): string {
-    return (this.getPreferredFirstName(person) +" " + this.getPreferredLastName(person)).trim();
+
+    return this.getPreferredFullName(person) ?? (this.getPreferredFirstName(person) +" " + this.getPreferredLastName(person)).trim();
   }
 }

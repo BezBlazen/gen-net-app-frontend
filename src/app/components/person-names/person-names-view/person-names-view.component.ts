@@ -53,6 +53,13 @@ export class PersonNamesViewComponent extends EntityPresentationComponent {
       defaultValue: NameTypeOptions[0]?.value
     },
     {
+      key: 'full',
+      type: 'input',
+      props: {
+        label: 'Full name',
+      }
+    },
+    {
       key: 'first',
       type: 'input',
       props: {
@@ -133,8 +140,9 @@ export class PersonNamesViewComponent extends EntityPresentationComponent {
       newModel.preferred = this.personName?.index == 0;
       newModel.type = this.personName?.name.type;
       const nameForm: NameForm = this.personName?.name?.nameForms && this.personName?.name?.nameForms?.length > 0 ? this.personName?.name?.nameForms[0] : {};
-      newModel.first = nameForm.parts?.find(p => p.type == NamePartType.GIVEN)?.value ?? '';
-      newModel.last = nameForm.parts?.find(p => p.type == NamePartType.SURNAME)?.value ?? '';
+      newModel.full = nameForm.fullText;
+      newModel.first = nameForm.parts?.find(p => p.type == NamePartType.GIVEN)?.value;
+      newModel.last = nameForm.parts?.find(p => p.type == NamePartType.SURNAME)?.value;
       this.model = Object.assign({}, this.model, newModel);
       this.isPreferredReadOnly = this.personName?.index == 0;
     }

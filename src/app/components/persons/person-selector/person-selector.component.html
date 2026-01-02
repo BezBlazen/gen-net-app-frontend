@@ -4,12 +4,14 @@
             <colgroup>
                 <col style="width: 150px;">
                 <col style="width: 150px;">
+                <col style="width: 150px;">
                 <col style="width: 100px;">
                 <col style="width: auto;">
             </colgroup>
             <thead class="border-bottom">
                 <tr>
                     <!-- <th>Title</th> -->
+                    <th>Full name</th>
                     <th>First name</th>
                     <th>Last name</th>
                     <th>Gender</th>
@@ -19,6 +21,7 @@
             <tbody>
                 @for (person of persons; track person.id) {
                 <tr (click)="setSelectedPerson(person.id)" [class.active]="person.id == personId">
+                    <td>{{getPreferredFullName(person)}}</td>
                     <td>{{getPreferredFirstName(person)}}</td>
                     <td>{{getPreferredLastName(person)}}</td>
                     <td>{{getGender(person)}}</td>

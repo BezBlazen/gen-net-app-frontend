@@ -64,6 +64,13 @@ export class PersonViewComponent extends EntityPresentationComponent {
       defaultValue: NameTypeOptions[0]?.value
     },
     {
+      key: 'names.full',
+      type: 'input',
+      props: {
+        label: 'Full name',
+      }
+    },
+    {
       key: 'names.first',
       type: 'input',
       props: {
@@ -189,12 +196,16 @@ export class PersonViewComponent extends EntityPresentationComponent {
             value: this.modelCreate.names?.last
           }
         }
-        if (firstNamePart || lastNamePart) {
+
+        if (firstNamePart || lastNamePart || this.modelCreate.names?.full) {
+
+
           person.names = [
             {
               type: this.modelCreate.names?.type,
               nameForms: [
                 {
+                  fullText: this.modelCreate.names?.full,
                   parts: [firstNamePart, lastNamePart].filter(x => x != undefined) as NamePart[]
                 }
               ]

@@ -6,11 +6,13 @@
                 <col style="width: 150px;">
                 <col style="width: 150px;">
                 <col style="width: 150px;">
+                <col style="width: 150px;">
                 <col style="width: auto;">
             </colgroup>
             <thead class="border-bottom">
                 <tr>
                     <th>Preferred</th>
+                    <th>Full name</th>
                     <th>First name</th>
                     <th>Last name</th>
                     <th>Name type</th>
@@ -27,6 +29,7 @@
                         } @else {
                             <img src="./assets/icons/icons8-unchecked-checkbox-16.png">
                         }
+                    <td>{{getFullName(name)}}</td>
                     <td>{{getFirstName(name)}}</td>
                     <td>{{getLastName(name)}}</td>
                     <td>{{getNameType(name)}}</td>

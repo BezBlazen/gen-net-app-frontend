@@ -29,12 +29,13 @@ export interface NamePart {
 }
 
 export interface NameForm {
-  // fullText?: string;
+  fullText?: string;
   parts?: NamePart[];
 }
 export interface DaoNameForm {
   preferred?: boolean;
   type?: string,
+  full?: string,
   first?: string,
   last?: string
 }
@@ -69,6 +70,7 @@ export interface PersonCreate {
   gender?: Gender;
   names?: {
     type?: string,
+    full?: string,
     first?: string,
     last?: string
   };
