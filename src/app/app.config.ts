@@ -5,7 +5,6 @@ import { routes } from './app.routes';
 import { FormlyModule } from '@ngx-formly/core';
 import { FormlyFieldInputComponent } from './formly/formly-field-input.component';
 import { AbstractControl, ReactiveFormsModule } from '@angular/forms';
-// import { NgxSpinnerModule } from 'ngx-spinner';
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { NgxSpinnerModule } from 'ngx-spinner';
 import { FormlyFieldSelectComponent } from './formly/formly-field-select.component';

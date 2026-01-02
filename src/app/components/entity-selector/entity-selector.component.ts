@@ -5,14 +5,6 @@ export interface SelectorUIConfig {
   toolbar?: boolean;
   toolbar_top_border?: boolean;
   entity_view?: boolean;
-  // buttons?: {
-  //   close?: boolean;
-  //   add?: boolean;
-  //   delete?: boolean;
-  //   refresh?: boolean;
-  //   ok?: boolean;
-  //   cancel?: boolean;
-  // };
 }
 @Component({
   selector: 'app-entity-selector',
@@ -27,33 +19,7 @@ export class EntitySelectorComponent {
     toolbar: true,
     toolbar_top_border: true,
     entity_view: false,
-    // buttons: {
-    //   close: true,
-    //   add: true,
-    //   delete: true,
-    //   refresh: true,
-    //   ok: true,
-    //   cancel: true,
-    // }
   };
-  // onClose(): void {
-  //   if (this.dialogRef) {
-  //     this.dialogRef.close();
-  //   }
-  // };
-  // onAdd(): void {
-  // };
-  // onDelete(): void {
-  // };
-  // onRefresh(): void {
-  // };
-  // onOk(): void {
-  // };
-  // onCancel(): void {
-  //   if (this.dialogRef) {
-  //     this.dialogRef.close();
-  //   }
-  // };
   @Output() close = new EventEmitter<void>();
   @Output() add = new EventEmitter<void>();
   @Output() edit = new EventEmitter<void>();

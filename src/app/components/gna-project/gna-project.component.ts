@@ -17,9 +17,7 @@ export class GnaProjectComponent {
   isLoading = false;
   mainTabs = [{ id: 0, label: 'Persons', routerLink: ['./', 'persons'] }, { id: 1, label: 'Relationships', routerLink: ['./', 'relationships'] }]
   mainTabId = 0;
-  // urlPath: any[] = [];
   parentPath: any[] = [];
-  // childPath: any[] = [];
   // --------------------------------
   // [var] Projects
   projectId: string = '';

@@ -1,24 +1,9 @@
-// export const GenderOptions = [
-//     { label: 'Unknown', value: 'http://gedcomx.org/Unknown' },
-//     { label: 'Male', value: 'http://gedcomx.org/Male' },
-//     { label: 'Female', value: 'http://gedcomx.org/Female' },
-//   ];
 export const Gender = {
   UNKNOWN: { label: 'Unknown', value: 'http://gedcomx.org/Unknown' },
   MALE: { label: 'Male', value: 'http://gedcomx.org/Male' },
   FEMALE: { label: 'Female', value: 'http://gedcomx.org/Female' },
 }
 export const GenderOptions = Object.values(Gender);
-// export enum GenderType {
-//   UNKNOWN = 'http://gedcomx.org/Unknown',
-//   MALE = 'http://gedcomx.org/Male',
-//   FEMALE = 'http://gedcomx.org/Female',
-// }
-// export Record GenderTypeLabels: Record<GenderType, string> = {
-//   [GenderType.UNKNOWN]: "Unknown",
-//   [GenderType.MALE]: "Male",
-//   [GenderType.FEMALE]: "Female",
-// };
 export enum NamePartType {
   GIVEN = 'http://gedcomx.org/GivenName',
   SURNAME = 'http://gedcomx.org/Surname'
@@ -44,7 +29,6 @@ export interface NamePart {
 }
 
 export interface NameForm {
-  // preferred?: boolean;
   // fullText?: string;
   parts?: NamePart[];
 }

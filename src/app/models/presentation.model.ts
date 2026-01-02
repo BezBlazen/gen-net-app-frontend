@@ -10,5 +10,4 @@ export class Presentation {
 export interface IPresentationData<T> {
   data?: T;
   mode: PresentationMode;
-  // modalRef?: NzModalRef;
 };

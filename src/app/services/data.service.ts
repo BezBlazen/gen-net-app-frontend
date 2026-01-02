@@ -120,18 +120,6 @@ export class DataService {
     this.updateRqIds(rqId, true);
     return this.httpClient
       .post<Account>(this.baseUrl + '/auth/sign_up', account, { withCredentials: true, })
-      // .pipe(
-      //   map((account) => (new ApiDataWrapper(account, false, null))),
-      //   catchError((err) => of(new ApiDataWrapper(undefined, false, this.getErrorMessage(err)))),
-      //   startWith(new ApiDataWrapper(undefined, true, null))
-      // ).subscribe((pipeData) => {
-      //   this.updateRqIds(rqId, pipeData.isLoading);
-      //   this._errorMessage.next(pipeData.errorMessage);
-      //   if (pipeData?.data?.username) {
-      //     this._isSignUpSuccess.next(true);
-      //     this._accountLastUserName = pipeData.data.username;
-      //   }
-      // });
       .pipe(
         tap(() => this.updateRqIds(rqId, false)),
         map((account) => {
@@ -186,9 +174,6 @@ export class DataService {
   getProject(projectId: string): Project | undefined {
     return this._projects.value.find((project) => project.id === projectId);
   }
-  // getProjects(): Project[] {
-  //   return this._projects.value;
-  // }
   getProjectsLocal(): Project[] {
     return JSON.parse(JSON.stringify(this._projects.value));
   }
@@ -383,16 +368,6 @@ export class DataService {
         }),
       );
   }
-  // updatePerson(person: Person): void {
-  //   const persons = this._persons.value;
-  //   const newPersons = persons.map(item => item.id === person.id ? { ...item, ...person } : item);
-  //   this._persons.next(newPersons);
-  // }
-  // deletePerson(person: Person): void {
-  //   const persons = this._persons.value;
-  //   const newPersons = persons.filter(item => item.id !== person.id);
-  //   this._persons.next(newPersons);
-  // }
   public getPersons(projectId: string | undefined): Observable<boolean> {
     const rqId = this.guid();
     this.updateRqIds(rqId, true);

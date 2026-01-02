@@ -96,32 +96,6 @@ export class PersonViewComponent extends EntityPresentationComponent {
   model: DaoPerson = {};
   form = new FormGroup({});
   options: FormlyFormOptions = {};
-  // fields: FormlyFieldConfig[] = [
-  //   {
-  //     key: 'id',
-  //     type: 'input',
-  //     props: {
-  //       label: 'Id',
-  //       disabled: true
-  //     }
-  //   },
-  //   {
-  //     key: 'gender.type',
-  //     type: 'input',
-  //     props: {
-  //       label: 'Gender',
-  //       errorTitle: '6-64 chars',
-  //     }
-  //   },
-  //   {
-  //     key: 'createdAt',
-  //     type: 'input',
-  //     props: {
-  //       label: 'Created at',
-  //       disabled: true
-  //     }
-  //   },
-  // ];
   fields: FormlyFieldConfig[] = [
     {
       key: 'id',
@@ -177,14 +151,14 @@ export class PersonViewComponent extends EntityPresentationComponent {
   onRefresh(): void {
     if (this.personId) {
       this.dataService.getPerson(this.personId).subscribe((success) => {
+        if (success) {
+          this.rereadPerson();
+        }
       });
     }
   }
   onUndo(): void {
-    if (this.personId) {
-      this.dataService.getPerson(this.personId).subscribe((success) => {
-      });
-    }
+    this.rereadPerson();
   }
   onClose(): void {
     this.resetForm();
@@ -269,9 +243,6 @@ export class PersonViewComponent extends EntityPresentationComponent {
     if (changes['projectId'] || changes['personId']) {
       if (this.initPersonAsStr != '' && this.initPersonAsStr != JSON.stringify(this.model)) {
         console.warn('this.initPersonAsStr != JSON.stringify(this.model)')
-        console.log(this.initPersonAsStr);
-        console.log(JSON.stringify(this.model));
-        // this.initPersonAsStr = JSON.stringify(this.model);
         let isConfirmed = confirm("Save changes?");
         if (isConfirmed) {
           this.onSave();

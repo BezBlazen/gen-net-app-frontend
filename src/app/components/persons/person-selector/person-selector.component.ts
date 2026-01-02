@@ -25,8 +25,6 @@ export class PersonSelectorComponent extends EntitySelectorComponent {
   persons: Person[] = [];
   personId?: string;
   isLoading = false;
-  // _personId = new BehaviorSubject<string | undefined>(undefined);
-  // @Output() personId = this._personId.asObservable();
   @ViewChild('dialogPersonNew') dialogPersonNew!: ElementRef<HTMLDialogElement>;
   // [variables]
   // --------------------------------

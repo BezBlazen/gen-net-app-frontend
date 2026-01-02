@@ -127,8 +127,10 @@ export class GnaComponent {
   ) {
     this.dataService.reloadAccount();
     this.dataService.account$.subscribe(account => {
+      if (account != this.account) {
+        this.router.navigate(['/', 'gna']);
+      }
       this.account = account;
-      this.router.navigate(['/', 'gna']);
       this.reloadProjects();
     });
     this.dataService.isLoading$.subscribe(isLoading => {
