@@ -7,6 +7,9 @@ import { DataService } from '../../services/data.service';
 import { Account, AccountRole } from '../../models/account.model';
 import { NgxSpinnerComponent, NgxSpinnerService } from 'ngx-spinner';
 import { Project } from '../../models/project.model';
+import { Subscription } from 'rxjs';
+import { PresentationUIConfig, PresentationViewMode } from '../entity-presentation/entity-presentation.component';
+import { ProjectViewComponent } from '../projects/project-view/project-view.component';
 
 @Component({
   selector: 'app-gna',
@@ -15,6 +18,7 @@ import { Project } from '../../models/project.model';
     FormsModule,
     FormlyModule,
     NgxSpinnerComponent,
+    ProjectViewComponent,
     ReactiveFormsModule,
     RouterLink,
     RouterLinkActive,
@@ -30,13 +34,29 @@ export class GnaComponent {
   errorMessage: string | null = null;
   // --------------------------------
   // [var] Account
-  account: Account | null = null;
+  account?: Account;
   accountRoleEnum = AccountRole;
   // [var] Account
   // --------------------------------
   // [var] Projects
+  projectId?: string;
+  projectMenu = [{ id: 0, title: 'Persons', routerLink: ['./', 'persons'] }, { id: 1, title: 'Relationships', routerLink: ['./', 'relationships'] }]
   projects: Project[] = [];
+  projectCreateViewConfig: PresentationUIConfig = {
+    mode: PresentationViewMode.CREATE,
+    title: 'Create Project',
+    toolbar: false
+  };
+  @ViewChild('dialogProjectNew') dialogProjectNew!: ElementRef<HTMLDialogElement>;
   // [var] Projects
+  // --------------------------------
+  // [variables] Subscriptions
+  private activeProjectIdSubscription?: Subscription;
+  private projectsSubscription?: Subscription;
+  private accountSubscription?: Subscription;
+  private isLoadingSubscription?: Subscription;
+  private errorMessageSubscription?: Subscription;
+  // [variables] Subscriptions
   // --------------------------------
   // [var] SignForm
   signInForm = new FormGroup({});
@@ -119,21 +139,25 @@ export class GnaComponent {
     dialogClose.close();
     dialogOpen.showModal();
   }
-
+  onAddProject(): void {
+    this.openDialog(this.dialogProjectNew.nativeElement);
+  }
   constructor(
     private dataService: DataService,
     private router: Router,
     private spinner: NgxSpinnerService
   ) {
-    this.dataService.reloadAccount();
-    this.dataService.account$.subscribe(account => {
-      if (account != this.account) {
-        this.router.navigate(['/', 'gna']);
+
+
+    this.dataService.errorMessage$.subscribe(errorMessage => {
+      if (errorMessage) {
+        this.showAlert(errorMessage);
       }
-      this.account = account;
-      this.reloadProjects();
     });
-    this.dataService.isLoading$.subscribe(isLoading => {
+
+  }
+  ngOnInit() {
+    this.isLoadingSubscription = this.dataService.isLoading$.subscribe(isLoading => {
       this.isLoading = isLoading;
       if (this.isLoading) {
         this.spinner.show();
@@ -143,14 +167,37 @@ export class GnaComponent {
         this.dialogSpinner?.nativeElement.close();
       }
     });
-    this.dataService.errorMessage$.subscribe(errorMessage => {
+    this.errorMessageSubscription = this.dataService.errorMessage$.subscribe(errorMessage => {
       if (errorMessage) {
         this.showAlert(errorMessage);
       }
     });
-    this.dataService.projects$.subscribe(projects => {
-      this.projects = projects;
+    this.accountSubscription = this.dataService.account$.subscribe(account => {
+      console.log(account)
+      this.account = account;
+      this.dataService.resetCache();
+      if (!account) {
+        this.router.navigate(['/', 'gna']);
+      } else {
+        this.dataService.getProjects();
+      }
     });
+    this.projectsSubscription = this.dataService.projects$.subscribe(projects => {
+      this.projects = projects;
+      this.dataService.actualizeActiveProjectId();
+    });
+    this.activeProjectIdSubscription = this.dataService.activeProjectId$.subscribe(projectId => {
+      this.projectId = projectId;
+
+    });
+    this.reloadAccount();
+  }
+  ngOnDestroy() {
+    this.isLoadingSubscription?.unsubscribe();
+    this.errorMessageSubscription?.unsubscribe();
+    this.activeProjectIdSubscription?.unsubscribe();
+    this.projectsSubscription?.unsubscribe();
+    this.accountSubscription?.unsubscribe();
   }
   ngAfterViewInit() {
     const dialogArray = document.querySelectorAll('dialog');
@@ -195,6 +242,11 @@ export class GnaComponent {
     }
     select.value = "default";
   }
+  onSelectProject(event: Event) {
+    const select = event.target as HTMLSelectElement;
+    const selectedValue = select.value;
+    this.dataService.setActiveProjectId(selectedValue);
+  }
   showAlert(message: string) {
     if (message !== null) {
       this.errorMessage = message;
@@ -204,11 +256,10 @@ export class GnaComponent {
     }
   }
   reloadProjects() {
-    this.dataService.getProjects().subscribe((success) => {
-      if (success) {
-        this.projects = this.dataService.getProjectsLocal() ?? [];
-      }
-    });
+    this.dataService.getProjects();
+  }
+  reloadAccount() {
+    this.dataService.getAccount();
   }
 }
 

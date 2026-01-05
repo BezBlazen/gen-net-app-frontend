@@ -7,5 +7,4 @@ import { Component } from '@angular/core';
   styleUrl: './gna-general.component.scss'
 })
 export class GnaGeneralComponent {
-
 }

@@ -98,7 +98,7 @@ export class ProjectViewComponent extends EntityPresentationComponent {
       this.dataService.doPutProject(this.model).subscribe((success) => {
         if (success) {
           if (this.model?.id) {
-            this.model = { ...this.dataService.getProject(this.model?.id) }
+            this.model = { ...this.dataService.getProjectLocal(this.model?.id) }
           }
           this.dialogRef?.close();
         }
@@ -118,7 +118,7 @@ export class ProjectViewComponent extends EntityPresentationComponent {
       this.dataService.doPostProject(this.modelCreate).subscribe((success) => {
         if (success) {
           if (this.model?.id) {
-            this.model = { ...this.dataService.getProject(this.model?.id) }
+            this.model = { ...this.dataService.getProjectLocal(this.model?.id) }
           }
           this.dialogRef?.close();
           this.onAddEmitted.emit();
@@ -138,8 +138,6 @@ export class ProjectViewComponent extends EntityPresentationComponent {
     private dataService: DataService
   ) {
     super();
-
-
   }
   ngOnInit() {
     // Allow subscriptions if PresentationViewMode not CREATE
@@ -177,7 +175,7 @@ export class ProjectViewComponent extends EntityPresentationComponent {
   }
   updateModel() {
     if (this.projectId) {
-      this.model = { ...this.dataService.getProject(this.projectId) }
+      this.model = { ...this.dataService.getProjectLocal(this.projectId) }
     } else {
       this.model = {};
     }

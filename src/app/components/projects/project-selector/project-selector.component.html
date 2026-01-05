@@ -17,12 +17,11 @@
     </div>
 </app-entity-selector>
 @if (config.entity_view && projectId) {
-<app-project-view class="view" [projectId]="projectId" (onDeleteEmitted)="onDeleteEmitted()"></app-project-view>
+<app-project-view class="view" [projectId]="projectId"></app-project-view>
 }
 <dialog class="dialog-central" #dialogProjectNew>
     <app-project-view class="view" 
         [config]="projectCreateViewConfig"
         [dialogRef]="dialogProjectNew"
-        (onAddEmitted)="onAddEmitted()"
         ></app-project-view>
 </dialog>

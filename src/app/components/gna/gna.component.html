@@ -5,7 +5,7 @@
         </div>
         <div class="app-header-account-menu">
             @if (account?.role == accountRoleEnum.User) {
-            <select (change)="onAccountMenuChange($event)">
+            <select name="selectAccountMenu" (change)="onAccountMenuChange($event)">
                 <option value="default" disabled selected>{{account?.username}}</option>
                 <option value="signOut">Logout</option>
             </select>
@@ -16,18 +16,32 @@
     </div>
     <div class="app-wrapper">
         <div class="app-wrapper-menu">
-            <menu>
-                <li><a [routerLink]="['/', 'gna', 'projects']" [routerLinkActive]="['active']" [routerLinkActiveOptions]="{exact:true}">Projects</a>
-                    <ul>
-                        @for (project of projects; track project.id) {
-                        <li><a [routerLink]="['/', 'gna', 'projects', project.id]" routerLinkActive="active">{{
-                                project.title }}</a></li>
-                        } @empty {
-                        <!-- TODO: add new project -->
-                        }
-                    </ul>
+            <ul>
+                @if (projects.length > 0) {
+                <li>
+                    <a [routerLink]="['/', 'gna', 'projects']" routerLinkActive="active">Projects</a>
                 </li>
-            </menu>
+                <li>
+                    <select name="selectCurrentProject" (change)="onSelectProject($event)">
+                        @for (item of projects; track item.id) {
+                            <option [value]="item.id" [selected]="item.id == projectId">{{item.title}}</option>
+                        }
+                    </select>
+                </li>
+                } @else {
+                <li>
+                    <a>Projects</a>
+                    <button class="icon-button" (click)="onAddProject()">
+                        <img class="icon" src="./assets/icons/icons8-plus-math-16.png" />
+                    </button>
+                </li>
+                }
+                @if (projectId) {
+                    @for (item of projectMenu; track item.id) {
+                    <li><a [routerLink]="item.routerLink" routerLinkActive="active">{{item.title }}</a></li>
+                    }
+                }
+            </ul>
         </div>
         <div class="app-wrapper-container">
             <router-outlet></router-outlet>
@@ -74,6 +88,12 @@
             </div>
         </div>
     </form>
+</dialog>
+<dialog class="dialog-central" #dialogProjectNew>
+    <app-project-view class="view" 
+        [config]="projectCreateViewConfig"
+        [dialogRef]="dialogProjectNew"
+        ></app-project-view>
 </dialog>
 <div class="app-alert" [style.visibility]="!errorMessage? 'hidden': 'visible'">
     <p>{{errorMessage}}</p>

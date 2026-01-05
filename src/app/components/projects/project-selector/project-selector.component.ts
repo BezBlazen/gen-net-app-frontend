@@ -1,4 +1,4 @@
-import { Component, ElementRef, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, Input, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { Project } from '../../../models/project.model';
 import { DataService } from '../../../services/data.service';
 import { EntitySelectorComponent, SelectorUIConfig } from '../../entity-selector/entity-selector.component';
@@ -18,7 +18,8 @@ import { PresentationUIConfig, PresentationViewMode } from '../../entity-present
 export class ProjectSelectorComponent extends EntitySelectorComponent {
   // --------------------------------
   // [variables]
-  projects: Project[] = [];
+  @Input() projects: Project[] = [];
+  // projects: Project[] = [];
   projectId?: string;
   projectCreateViewConfig: PresentationUIConfig = {
     mode: PresentationViewMode.CREATE,
@@ -33,7 +34,7 @@ export class ProjectSelectorComponent extends EntitySelectorComponent {
     this.openDialog(this.dialogProjectNew.nativeElement);
   }
   onRefresh(): void {
-    this.reloadProjects();
+    this.dataService.getProjects();
   }
   // [events]
   // --------------------------------
@@ -41,23 +42,11 @@ export class ProjectSelectorComponent extends EntitySelectorComponent {
     private dataService: DataService
   ) {
     super();
-    this.reloadProjects();
   }
-  rereadProjects() {
-    this.projects = this.dataService.getProjectsLocal() ?? [];
-    if (!this.projects || this.projects.length == 0) {
-      this.reloadProjects();
-    } else {
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['projects']) {
       this.updateActiveItem();
     }
-  }
-  reloadProjects() {
-    this.dataService.getProjects().subscribe((success) => {
-      if (success) {
-        this.projects = this.dataService.getProjectsLocal() ?? [];
-      }
-      this.updateActiveItem();
-    });
   }
   updateActiveItem() {
     const p = this.projects ? this.projects.find(project => project.id === this.projectId) : undefined;
@@ -73,14 +62,5 @@ export class ProjectSelectorComponent extends EntitySelectorComponent {
   }
   setSelectedProjectId(id: string | undefined) {
     this.projectId = id;
-  }
-  onInit() {
-    this.reloadProjects();
-  }
-  onDeleteEmitted() {
-    this.rereadProjects();
-  }
-  onAddEmitted() {
-    this.rereadProjects();
   }
 }

@@ -1,6 +1,6 @@
 import { Injectable, numberAttribute } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { BehaviorSubject, catchError, map, Observable, of, startWith, delay, Subject, skip, tap } from 'rxjs';
+import { BehaviorSubject, catchError, map, Observable, of, startWith, delay, Subject, skip, tap, Subscription } from 'rxjs';
 import { ApiDataWrapper } from './api-data-wrapper';
 import { Account, AccountRole } from '../models/account.model';
 import { Project } from '../models/project.model';
@@ -27,14 +27,20 @@ export class DataService {
   private _errorMessage = new BehaviorSubject<string | null>(null);
   public errorMessage$ = this._errorMessage.asObservable();
 
-  private _account = new BehaviorSubject<Account | null>(null);
+  private _account = new BehaviorSubject<Account | undefined>(undefined);
   public account$ = this._account.asObservable();
   private _accountLastUserName: string | null = null;
 
+  private _activeProjectId = new BehaviorSubject<string | undefined>(undefined);
+  public activeProjectId$ = this._activeProjectId.asObservable();
+
   private _projects = new BehaviorSubject<Project[]>([]);
+  private _projectsSubscription?: Subscription;
   public projects$ = this._projects.asObservable();
 
   private _persons = new BehaviorSubject<Person[]>([]);
+  private _accountSubscription?: Subscription;
+  private _personsSubscription?: Subscription;
   public persons$ = this._persons.asObservable();
 
   errorMessageUnexpected: string = "Unexpected server error";
@@ -140,7 +146,7 @@ export class DataService {
       .pipe(
         tap(() => this.updateRqIds(rqId, false)),
         map(() => {
-          this._account.next(null);
+          this._account.next(undefined);
           return true;
         }),
         catchError((err) => {
@@ -149,50 +155,98 @@ export class DataService {
         }),
       );
   }
-  public reloadAccount() {
+  // public reloadAccount() {
+  //   const rqId = this.guid();
+  //   this.httpClient
+  //     .get<Account>(this.baseUrl + '/auth/account', { withCredentials: true })
+  //     .pipe(
+  //       map((account) => (new ApiDataWrapper(account, false, null))),
+  //       catchError((err) => of(new ApiDataWrapper(undefined, false, this.getErrorMessage(err)))),
+  //       startWith(new ApiDataWrapper(undefined, true, null))
+  //     ).subscribe((pipeData) => {
+  //       this.updateRqIds(rqId, pipeData.isLoading);
+  //       // Hide reread errors
+  //       // this._errorMessage.next(pipeData.errorMessage);
+  //       if (pipeData.data != undefined) {
+  //         this._account.next(pipeData.data);
+  //       } else {
+  //         this._account.next(null);
+  //       }
+  //     });
+  // }
+  public getAccount(): Observable<boolean> {
+    const _success = new Subject<boolean>();
+    if (this._accountSubscription) {
+      this._accountSubscription.unsubscribe();
+    }
     const rqId = this.guid();
-    this.httpClient
+    this._accountSubscription = this.httpClient
       .get<Account>(this.baseUrl + '/auth/account', { withCredentials: true })
-      .pipe(
-        map((account) => (new ApiDataWrapper(account, false, null))),
-        catchError((err) => of(new ApiDataWrapper(undefined, false, this.getErrorMessage(err)))),
-        startWith(new ApiDataWrapper(undefined, true, null))
-      ).subscribe((pipeData) => {
-        this.updateRqIds(rqId, pipeData.isLoading);
-        // Hide reread errors
-        // this._errorMessage.next(pipeData.errorMessage);
-        if (pipeData.data != undefined) {
-          this._account.next(pipeData.data);
-        } else {
-          this._account.next(null);
+      .subscribe({
+        next: (account) => {
+          this._account.next(account.username ? account : undefined);
+          _success.next(true);
+        },
+        error: (err) => {
+          this._errorMessage.next(this.getErrorMessage(err));
+          this._account.next(undefined);
+          _success.next(false);
+        },
+        complete: () => {
+          this.updateRqIds(rqId, false);
+          this._accountSubscription = undefined;
         }
       });
+    return _success.asObservable();
   }
   // Account
   // --------------------------
+  // Cache
+  resetCache() {
+    this._projects.next([]);
+    this._persons.next([]);
+    this._activeProjectId.next(undefined);
+  }
+  // Cache
+  // --------------------------
   // Projects
-  getProject(projectId: string): Project | undefined {
-    return this._projects.value.find((project) => project.id === projectId);
+  setActiveProjectId(projectId: string) {
+    this._activeProjectId.next(this.getProjectLocal(projectId)?.id);
+  }
+  actualizeActiveProjectId() {
+    this._activeProjectId.next(this.getProjectLocal(this._activeProjectId.value)?.id);
+  }
+  getProjectLocal(projectId: string | undefined): Project | undefined {
+    return projectId ? this._projects.value.find((project) => project.id === projectId) ?? this._projects.value[0] : this._projects.value[0];
   }
   getProjectsLocal(): Project[] {
     return JSON.parse(JSON.stringify(this._projects.value));
   }
   getProjects(): Observable<boolean> {
+    const _result = new Subject<boolean>();
+    if (this._projectsSubscription) {
+      this._projectsSubscription.unsubscribe();
+    }
     const rqId = this.guid();
     this.updateRqIds(rqId, true);
-    return this.httpClient
+    this._projectsSubscription = this.httpClient
       .get<Project[]>(this.baseUrl + '/projects', { withCredentials: true })
-      .pipe(
-        tap(() => this.updateRqIds(rqId, false)),
-        map((projects) => {
+      .subscribe({
+        next: (projects) => {
           this._projects.next(projects);
-          return true;
-        }),
-        catchError((err) => {
+          _result.next(true);
+        },
+        error: (err) => {
           this._errorMessage.next(this.getErrorMessage(err));
-          return of(false);
-        }),
-      );
+          this._projects.next([]);
+          _result.next(false);
+        },
+        complete: () => {
+          this.updateRqIds(rqId, false);
+          this._projectsSubscription = undefined;
+        }
+      });
+    return _result.asObservable();
   }
   addProject(project: Project): void {
     const projects = this._projects.value;
@@ -207,6 +261,7 @@ export class DataService {
     const projects = this._projects.value;
     const newProjects = projects.filter(item => item.id !== project.id);
     this._projects.next(newProjects);
+    this.actualizeActiveProjectId();
   }
   public doGetProjects() {
     const rqId = this.guid();
@@ -368,6 +423,7 @@ export class DataService {
         }),
       );
   }
+  /*
   public getPersons(projectId: string | undefined): Observable<boolean> {
     const rqId = this.guid();
     this.updateRqIds(rqId, true);
@@ -392,6 +448,43 @@ export class DataService {
           return of(false);
         }),
       )
+  }*/
+  getActiveProjectPersons(): Observable<boolean> {
+    return this._activeProjectId.value ? this.getPersons(this._activeProjectId.value) : of(false);
+  }
+  getPersons(projectId: string): Observable<boolean> {
+    const _result = new Subject<boolean>();
+    if (this._personsSubscription) {
+      this._personsSubscription.unsubscribe();
+    }
+    const rqId = this.guid();
+    this.updateRqIds(rqId, true);
+    let params = new HttpParams();
+    if (projectId) {
+      params = params.append('project_id', projectId);
+    }
+    this._projectsSubscription = this.httpClient
+      .get<Person[]>(this.baseUrl + '/persons', { withCredentials: true, params: params })
+      .subscribe({
+        next: (persons) => {
+          if (projectId) {
+            this._persons.next(this._persons.value.filter((person) => person.projectId !== projectId).concat(persons));
+          } else {
+            this._persons.next(persons);
+          }
+          _result.next(true);
+        },
+        error: (err) => {
+          this._errorMessage.next(this.getErrorMessage(err));
+          this._persons.next([]);
+          _result.next(false);
+        },
+        complete: () => {
+          this.updateRqIds(rqId, false);
+          this._personsSubscription = undefined;
+        }
+      });
+    return _result.asObservable();
   }
   private doPostPerson(person: Person): Observable<boolean> {
     const rqId = this.guid();

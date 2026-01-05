@@ -4,6 +4,8 @@ import { ProjectViewComponent } from '../projects/project-view/project-view.comp
 import { ProjectSelectorComponent } from '../projects/project-selector/project-selector.component';
 import { Router } from '@angular/router';
 import { SelectorUIConfig } from '../entity-selector/entity-selector.component';
+import { Subscription } from 'rxjs';
+import { DataService } from '../../services/data.service';
 
 @Component({
   selector: 'app-gna-projects',
@@ -25,6 +27,18 @@ export class GnaProjectsComponent {
   }
   // [vars]
   // --------------------------------
-  constructor(private router: Router) {
+  // [variables] Subscriptions
+  private projectsSubscription?: Subscription;
+  // [variables] Subscriptions
+  // --------------------------------
+  constructor(private dataService: DataService) {
+  }
+  ngOnInit() {
+    this.projectsSubscription = this.dataService.projects$.subscribe(projects => {
+      this.projects = projects;
+    });
+  }
+  ngOnDestroy() {
+    this.projectsSubscription?.unsubscribe();
   }
 }

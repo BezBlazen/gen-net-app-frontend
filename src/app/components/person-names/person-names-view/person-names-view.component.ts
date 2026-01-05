@@ -89,6 +89,9 @@ export class PersonNamesViewComponent extends EntityPresentationComponent {
     if (true) {
       if (this.model && this.form.valid) {
         const nameForm: NameForm = {}
+        if (this.model.full) {
+          nameForm.fullText = this.model.full;
+        }
         if (this.model.first || this.model.last) {
           nameForm.parts = [];
           if (this.model.first) {

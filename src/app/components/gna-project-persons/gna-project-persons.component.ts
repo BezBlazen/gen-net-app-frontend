@@ -3,6 +3,10 @@ import { PersonSelectorComponent } from '../persons/person-selector/person-selec
 import { PersonViewComponent } from '../persons/person-view/person-view.component';
 import { ActivatedRoute, Router, ROUTER_OUTLET_DATA } from '@angular/router';
 import { SelectorUIConfig } from '../entity-selector/entity-selector.component';
+import { Project } from '../../models/project.model';
+import { DataService } from '../../services/data.service';
+import { Subscription } from 'rxjs';
+import { Person } from '../../models/person.model';
 
 @Component({
   selector: 'app-gna-project-persons',
@@ -13,31 +17,38 @@ import { SelectorUIConfig } from '../entity-selector/entity-selector.component';
   styleUrl: './gna-project-persons.component.scss'
 })
 export class GnaProjectPersonsComponent {
-  routerData = inject(ROUTER_OUTLET_DATA) as Signal<string | undefined>;
+  // routerData = inject(ROUTER_OUTLET_DATA) as Signal<string | undefined>;
+  // --------------------------------
+  // [var] Projects
   projectId?: string;
+  persons: Person[] = [];
+  // [var] Projects
+  // --------------------------------
+  // [variables] Subscriptions
+  private activeProjectIdSubscription?: Subscription;
+  private personsSubscription?: Subscription;
+  // [variables] Subscriptions
   personId?: string;
   personSelectorConfig: SelectorUIConfig = {
     toolbar: true,
     entity_view: true,
   }
-  constructor(private activatedRoute: ActivatedRoute, private router: Router) {
-    effect(() => {
-      this.projectId = this.routerData();
-    });
+  constructor(private activatedRoute: ActivatedRoute, private router: Router, private dataService: DataService) {
   }
   ngOnInit() {
-    // Initial fetch
-    this.projectId = this.activatedRoute.snapshot.paramMap.get('projectId') ?? undefined;
-    // this.personId = this.activatedRoute.snapshot.paramMap.get('personId') ?? undefined;
-
-    // If the component can be reused
-    this.activatedRoute.paramMap.subscribe(params => {
-      this.projectId = params.get('projectId') ?? undefined;
-    //   this.personId = params.get('personId') ?? undefined;
+    this.activeProjectIdSubscription = this.dataService.activeProjectId$.subscribe(projectId => {
+      this.projectId = projectId;
+      this.dataService.getActiveProjectPersons();
     });
+    this.personsSubscription = this.dataService.persons$.subscribe(persons => {
+      this.persons = persons.filter(person => person.projectId == this.projectId);
+    });
+  }
+  ngOnDestroy() {
+    this.activeProjectIdSubscription?.unsubscribe();
+    this.personsSubscription?.unsubscribe();
   }
   onSelectItem(personId: string | undefined) {
     this.personId = personId;
-    console.log('onSelectItem', personId)
   }
 }

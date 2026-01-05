@@ -184,6 +184,7 @@ export class PersonViewComponent extends EntityPresentationComponent {
         }
         let firstNamePart: NamePart | undefined = undefined;
         let lastNamePart: NamePart | undefined = undefined;
+        let fullName = this.modelCreate.names?.full;
         if (this.modelCreate.names?.first) {
           firstNamePart = {
             type: NamePartType.GIVEN,
@@ -197,15 +198,13 @@ export class PersonViewComponent extends EntityPresentationComponent {
           }
         }
 
-        if (firstNamePart || lastNamePart || this.modelCreate.names?.full) {
-
-
+        if (firstNamePart || lastNamePart || fullName) {
           person.names = [
             {
               type: this.modelCreate.names?.type,
               nameForms: [
                 {
-                  fullText: this.modelCreate.names?.full,
+                  fullText: fullName,
                   parts: [firstNamePart, lastNamePart].filter(x => x != undefined) as NamePart[]
                 }
               ]

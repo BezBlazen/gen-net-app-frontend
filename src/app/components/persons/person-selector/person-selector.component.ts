@@ -22,34 +22,28 @@ export class PersonSelectorComponent extends EntitySelectorComponent {
   // --------------------------------
   // [variables]
   @Input() projectId?: string;
-  persons: Person[] = [];
+  @Input() persons: Person[] = [];
   personId?: string;
-  isLoading = false;
   @ViewChild('dialogPersonNew') dialogPersonNew!: ElementRef<HTMLDialogElement>;
   // [variables]
-  // --------------------------------
-  // [variables] Subscriptions
-  private personsSubscription?: Subscription;
-  // [variables] Subscriptions
   // --------------------------------
   // [events]
   onAdd(): void {
     this.openDialog(this.dialogPersonNew.nativeElement);
   }
   onRefresh(): void {
-    this.reloadPersons();
+    // this.dataService.getPersons(this.projectId);
   }
   // [events]
   // --------------------------------
   constructor(
-    private dataService: DataService,
-    private router: Router
+    private dataService: DataService
   ) {
     super();
   }
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['projectId']) {
-      this.reloadPersons();
+    if (changes['persons']) {
+      this.updateActiveItem();
     }
   }
   getNewPersonDialodConfig(): PresentationUIConfig {
@@ -60,55 +54,12 @@ export class PersonSelectorComponent extends EntitySelectorComponent {
     };
     return config;
   }
-  rereadPersons() {
-    this.persons = this.dataService.getPersonsLocal(this.projectId) ?? [];
-    if (!this.persons || this.persons.length == 0) {
-      this.reloadPersons();
-    } else {
-      this.updateActiveItem();
-    }
-  }
-  reloadPersons() {
-    if (!this.projectId) {
-      throw new Error('projectId is required');
-    }
-    this.dataService.getPersons(this.projectId).subscribe((success) => {
-      if (success) {
-        this.persons = this.dataService.getPersonsLocal(this.projectId) ?? [];
-      }
-      this.updateActiveItem();
-    });
-  }
   updateActiveItem() {
     const p = this.persons ? this.persons.find(person => person.id === this.personId) : undefined;
     if (!p) {
       this.personId = (this.persons ?? []).length > 0 ? this.persons[0].id : undefined;
     }
   }
-  /*
-rereadProjects() {
-  this.projects = this.dataService.getProjectsLocal() ?? [];
-  if (!this.projects || this.projects.length == 0) {
-    this.reloadProjects();
-  } else {
-    this.updateActiveItem();
-  }
-}
-reloadProjects() {
-  this.dataService.getProjects().subscribe((success) => {
-    if (success) {
-      this.projects = this.dataService.getProjectsLocal() ?? [];
-    }
-    this.updateActiveItem();
-  });
-}
-updateActiveItem() {
-  const p = this.projects ? this.projects.find(project => project.id === this.projectId)?.id : undefined;
-  if (!p) {
-    this.projectId = (this.projects ?? []).length > 0 ? this.projects[0].id : undefined;
-  }
-}
-*/
   getConfig(): SelectorUIConfig {
     const config: SelectorUIConfig = {
       title: 'Select Person',
@@ -122,7 +73,7 @@ updateActiveItem() {
     this.personId = personId;
   }
   onInit() {
-    this.reloadPersons();
+    // this.reloadPersons();
   }
   getPreferredFullName(person: Person | undefined) {
     return PersonUtilsComponent.getPreferredFullName(person);
@@ -134,12 +85,12 @@ updateActiveItem() {
     return PersonUtilsComponent.getPreferredLastName(person);
   }
   onDeleteEmitted() {
-    this.rereadPersons();
+    // this.rereadPersons();
   }
   onSaveEmitted() {
-    this.rereadPersons();
+    // this.rereadPersons();
   }
   onAddEmitted() {
-    this.rereadPersons();
+    // this.rereadPersons();
   }
 }
