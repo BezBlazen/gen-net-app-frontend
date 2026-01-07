@@ -1,22 +1,20 @@
 import { Component, effect, inject, Signal } from '@angular/core';
 import { PersonSelectorComponent } from '../persons/person-selector/person-selector.component';
-import { PersonViewComponent } from '../persons/person-view/person-view.component';
 import { ActivatedRoute, Router, ROUTER_OUTLET_DATA } from '@angular/router';
 import { SelectorUIConfig } from '../entity-selector/entity-selector.component';
-import { Project } from '../../models/project.model';
 import { DataService } from '../../services/data.service';
 import { Subscription } from 'rxjs';
 import { Person } from '../../models/person.model';
 
 @Component({
-  selector: 'app-gna-project-persons',
+  selector: 'app-gna-persons',
   imports: [
     PersonSelectorComponent,
   ],
-  templateUrl: './gna-project-persons.component.html',
-  styleUrl: './gna-project-persons.component.scss'
+  templateUrl: './gna-persons.component.html',
+  styleUrl: './gna-persons.component.scss'
 })
-export class GnaProjectPersonsComponent {
+export class GnaPersonsComponent {
   // routerData = inject(ROUTER_OUTLET_DATA) as Signal<string | undefined>;
   // --------------------------------
   // [var] Projects

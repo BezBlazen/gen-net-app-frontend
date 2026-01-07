@@ -40,7 +40,7 @@ export class GnaComponent {
   // --------------------------------
   // [var] Projects
   projectId?: string;
-  projectMenu = [{ id: 0, title: 'Persons', routerLink: ['./', 'persons'] }, { id: 1, title: 'Relationships', routerLink: ['./', 'relationships'] }]
+  projectMenu = [{ id: 0, title: 'Tree', routerLink: ['./', 'tree'] }, { id: 1, title: 'Persons', routerLink: ['./', 'persons'] }, { id: 2, title: 'Relationships', routerLink: ['./', 'relationships'] }]
   projects: Project[] = [];
   projectCreateViewConfig: PresentationUIConfig = {
     mode: PresentationViewMode.CREATE,

@@ -1,9 +1,10 @@
 import { Routes } from '@angular/router';
 import { GnaComponent } from './components/gna/gna.component';
-import { GnaProjectsComponent } from './components/gna-projects/gna-projects.component';
-import { GnaProjectPersonsComponent } from './components/gna-project-persons/gna-project-persons.component';
-import { GnaProjectRelationshipsComponent } from './components/gna-project-relationships/gna-project-relationships.component';
 import { GnaGeneralComponent } from './components/gna-general/gna-general.component';
+import { GnaPersonsComponent } from './components/gna-persons/gna-persons.component';
+import { GnaProjectsComponent } from './components/gna-projects/gna-projects.component';
+import { GnaRelationshipsComponent } from './components/gna-relationships/gna-relationships.component';
+import { GnaTreeComponent } from './components/gna-tree/gna-tree.component';
 
 export const routes: Routes = [
     {
@@ -20,16 +21,20 @@ export const routes: Routes = [
                 component: GnaGeneralComponent,
             },
             {
+                path: 'tree',
+                component: GnaTreeComponent,
+            },
+            {
                 path: 'projects',
                 component: GnaProjectsComponent,
             },
             {
                 path: 'persons',
-                component: GnaProjectPersonsComponent,
+                component: GnaPersonsComponent,
             },
             {
                 path: 'relationships',
-                component: GnaProjectRelationshipsComponent,
+                component: GnaRelationshipsComponent,
             },
             // {
             //     path: 'projects/:projectId',
