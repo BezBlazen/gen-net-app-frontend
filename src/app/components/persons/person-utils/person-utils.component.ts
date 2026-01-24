@@ -1,8 +1,6 @@
 import { Component } from '@angular/core';
-// import { NamePartType } from '../../../models/person.model';
-import { P } from '@angular/cdk/keycodes';
 import { NameForm, Person } from '../../../models/api.model';
-import { NamePartTypeApi } from '../../../../api/model/namePartType';
+import { CommonApiUri } from '../../../models/common.model';
 
 @Component({
   selector: 'app-person-utils',
@@ -33,11 +31,11 @@ export class PersonUtilsComponent {
   }
   static getPreferredFirstName(person: Person | undefined): string {
     const preferredNameForm = this.getPreferredNameForm(person);
-    return preferredNameForm?.parts?.find((part) => part.type === NamePartTypeApi.HttpGnaBzblzGiven)?.value ?? '';
+    return preferredNameForm?.parts?.find((part) => part.type === CommonApiUri.NamePartTypeGiven)?.value ?? '';
   }
   static getPreferredLastName(person: Person | undefined): string {
     const preferredNameForm = this.getPreferredNameForm(person);
-    return preferredNameForm?.parts?.find((part) => part.type === NamePartTypeApi.HttpGnaBzblzSurname)?.value ?? '';
+    return preferredNameForm?.parts?.find((part) => part.type === CommonApiUri.NamePartTypeSurname)?.value ?? '';
   }
   static getPreferredName(person: Person | undefined): string {
 

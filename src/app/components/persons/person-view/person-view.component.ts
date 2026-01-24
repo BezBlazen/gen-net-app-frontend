@@ -2,18 +2,14 @@ import { Component, EventEmitter, Input, Output, SimpleChanges } from '@angular/
 import { DataService } from '../../../services/data.service';
 import { FormGroup, FormsModule } from '@angular/forms';
 import { FormlyFieldConfig, FormlyFormOptions, FormlyModule } from '@ngx-formly/core';
-// import { DaoPerson, GenderOptions, NamePartType, NameTypeOptions, PersonCreate } from '../../../models/person.model';
-import { JsonPipe } from '@angular/common';
 import { EntityPresentationComponent, PresentationUIConfig, PresentationViewMode } from '../../entity-presentation/entity-presentation.component';
 import { Subscription } from 'rxjs';
 import { PersonNamesSelectorComponent } from "../../person-names/person-names-selector/person-names-selector.component";
 import { PersonUtilsComponent } from '../person-utils/person-utils.component';
-import { PersonNamesViewComponent } from '../../person-names/person-names-view/person-names-view.component';
-import { FieldOptions, Name, NamePart, Person } from '../../../models/api.model';
-import { NamePartTypeApi } from '../../../../api/model/namePartType';
+import { Name, NamePart, Person } from '../../../models/api.model';
 import { PersonCreateLocal, PersonLocal } from '../../../models/person.model';
-import { PersonApi } from '../../../../api/model/person';
-import { SchemasApi } from '../../../../api/model/schemas';
+import { UriDtoApi } from '../../../../api/model/uriDto';
+import { CommonApiUri } from '../../../models/common.model';
 
 @Component({
   selector: 'app-person-view',
@@ -29,14 +25,13 @@ import { SchemasApi } from '../../../../api/model/schemas';
 export class PersonViewComponent extends EntityPresentationComponent {
   // --------------------------------
   // [variables]
-  schemas?: SchemasApi;
+  uriDict?: UriDtoApi[];
   @Input() projectId?: string;
   @Input() personId?: string;
   @Output() onAddEmitted = new EventEmitter<void>();
   @Output() onSaveEmitted = new EventEmitter<void>();
   @Output() onDeleteEmitted = new EventEmitter<void>();
   initPersonAsStr: string = '';
-  readonly NamePartTypeApi = NamePartTypeApi;
   mainTabs = [{ id: 0, label: 'General' }, { id: 1, label: 'Names' }, { id: 2, label: 'Events' }]
   mainTabId = 0;
   // [variables]
@@ -59,7 +54,7 @@ export class PersonViewComponent extends EntityPresentationComponent {
       },
       hooks: {
         onInit: (field) => {
-          const nameTypes = this.dataService.getSchemasGenderTypesOption();
+          const nameTypes = this.dataService.getDictUriGenderTypesOption();
           field.props!.options = nameTypes;
           if (nameTypes && nameTypes?.length > 0 && !field.defaultValue) {
             field.defaultValue = nameTypes[0].value;
@@ -76,7 +71,7 @@ export class PersonViewComponent extends EntityPresentationComponent {
       },
       hooks: {
         onInit: (field) => {
-          const nameTypes = this.dataService.getSchemasNameTypesOption();
+          const nameTypes = this.dataService.getDictUriNameTypesOption();
           field.props!.options = nameTypes;
           if (nameTypes && nameTypes?.length > 0 && !field.defaultValue) {
             field.defaultValue = nameTypes[0].value;
@@ -151,7 +146,7 @@ export class PersonViewComponent extends EntityPresentationComponent {
       },
       hooks: {
         onInit: (field) => {
-          const nameTypes = this.dataService.getSchemasGenderTypesOption();
+          const nameTypes = this.dataService.getDictUriGenderTypesOption();
           field.props!.options = nameTypes;
           if (nameTypes && nameTypes?.length > 0 && !field.defaultValue) {
             field.defaultValue = nameTypes[0].value;
@@ -219,13 +214,13 @@ export class PersonViewComponent extends EntityPresentationComponent {
         let fullName = this.modelCreate.names?.full;
         if (this.modelCreate.names?.first) {
           firstNamePart = {
-            type: NamePartTypeApi.HttpGnaBzblzGiven,
+            type: CommonApiUri.NamePartTypeGiven,
             value: this.modelCreate.names?.first
           }
         }
         if (this.modelCreate.names?.last) {
           lastNamePart = {
-            type: NamePartTypeApi.HttpGnaBzblzSurname,
+            type: CommonApiUri.NamePartTypeSurname,
             value: this.modelCreate.names?.last
           }
         }
@@ -271,7 +266,7 @@ export class PersonViewComponent extends EntityPresentationComponent {
     super();
   }
   ngOnInit() {
-    this.schemas = this.dataService.getSchemasLocal();
+    this.uriDict = this.dataService.getDictUriLocal();
     // Allow subscriptions if PresentationViewMode not CREATE
     if (this.config.mode != PresentationViewMode.CREATE) {
       this.personSubscription = this.dataService.persons$.subscribe(persons => {

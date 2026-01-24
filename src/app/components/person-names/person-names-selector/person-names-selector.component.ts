@@ -3,11 +3,9 @@ import { EntitySelectorComponent, SelectorUIConfig } from '../../entity-selector
 import { PersonNamesViewComponent } from '../person-names-view/person-names-view.component';
 import { DataService } from '../../../services/data.service';
 import { PresentationUIConfig, PresentationViewMode } from '../../entity-presentation/entity-presentation.component';
-// import { DaoName, NamePartType, NameType, NameTypeOptions } from '../../../models/person.model';
-import { JsonPipe } from '@angular/common';
 import { Name } from '../../../models/api.model';
 import { NameLocal } from '../../../models/person.model';
-import { NamePartTypeApi } from '../../../../api/model/namePartType';
+import { CommonApiUri } from '../../../models/common.model';
 
 @Component({
   selector: 'app-person-names-selector',
@@ -106,7 +104,7 @@ export class PersonNamesSelectorComponent extends EntitySelectorComponent {
     // Return first name form if exists with NamePart type 'GIVEN'
     if (name && name.nameForms && name.nameForms[0] && name.nameForms[0].parts && name.nameForms[0].parts.length > 0) {
       for (const part of name.nameForms[0].parts) {
-        if (part.type === NamePartTypeApi.HttpGnaBzblzGiven) {
+        if (part.type === CommonApiUri.NamePartTypeGiven) {
           return part.value ?? '';
         }
       }
@@ -117,7 +115,7 @@ export class PersonNamesSelectorComponent extends EntitySelectorComponent {
     // Return first name form if exists with NamePart type 'SURNAME'
     if (name && name.nameForms && name.nameForms[0] && name.nameForms[0].parts && name.nameForms[0].parts.length > 0) {
       for (const part of name.nameForms[0].parts) {
-        if (part.type === NamePartTypeApi.HttpGnaBzblzSurname) {
+        if (part.type === CommonApiUri.NamePartTypeSurname) {
           return part.value ?? '';
         }
       }
@@ -125,7 +123,7 @@ export class PersonNamesSelectorComponent extends EntitySelectorComponent {
     return '';
   }
   getNameType(name: Name): string {
-    return this.dataService.schemas?.baseNameTypeUri?.find(option => option.uri === name.type)?.title ?? '';
+    return this.dataService.dictUri?.find(option => option.uri === name.type)?.title ?? '';
   }
   isActive(index: number) {
     return this._selectedItemIndex == index;

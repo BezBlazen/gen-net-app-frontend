@@ -4,9 +4,9 @@ import { EntityPresentationComponent, PresentationUIConfig, PresentationViewMode
 import { FormlyFieldConfig, FormlyFormOptions, FormlyModule } from '@ngx-formly/core';
 import { FormGroup, FormsModule } from '@angular/forms';
 import { Name, NameForm } from '../../../models/api.model';
-import { NamePartTypeApi } from '../../../../api/model/namePartType';
 import { NameFormLocal, NameLocal } from '../../../models/person.model';
 import { DataService } from '../../../services/data.service';
+import { CommonApiUri } from '../../../models/common.model';
 
 @Component({
   selector: 'app-person-names-view',
@@ -55,7 +55,7 @@ export class PersonNamesViewComponent extends EntityPresentationComponent {
       },
       hooks: {
         onInit: (field) => {
-          const nameTypes = this.dataService.getSchemasNameTypesOption();
+          const nameTypes = this.dataService.getDictUriNameTypesOption();
           field.props!.options = nameTypes;
           if (nameTypes && nameTypes?.length > 0 && !field.defaultValue) {
             field.defaultValue = nameTypes[0].value;
@@ -108,13 +108,13 @@ export class PersonNamesViewComponent extends EntityPresentationComponent {
           nameForm.parts = [];
           if (this.model.first) {
             nameForm.parts.push({
-              type: NamePartTypeApi.HttpGnaBzblzGiven,
+              type: CommonApiUri.NamePartTypeGiven,
               value: this.model.first
             });
           }
           if (this.model.last) {
             nameForm.parts.push({
-              type: NamePartTypeApi.HttpGnaBzblzSurname,
+              type: CommonApiUri.NamePartTypeSurname,
               value: this.model.last
             });
           }
@@ -158,8 +158,8 @@ export class PersonNamesViewComponent extends EntityPresentationComponent {
       newModel.type = this.personName?.name.type;
       const nameForm: NameForm = this.personName?.name?.nameForms && this.personName?.name?.nameForms?.length > 0 ? this.personName?.name?.nameForms[0] : {};
       newModel.full = nameForm.fullText;
-      newModel.first = nameForm.parts?.find(p => p.type == NamePartTypeApi.HttpGnaBzblzGiven)?.value;
-      newModel.last = nameForm.parts?.find(p => p.type == NamePartTypeApi.HttpGnaBzblzSurname)?.value;
+      newModel.first = nameForm.parts?.find(p => p.type == CommonApiUri.NamePartTypeGiven)?.value;
+      newModel.last = nameForm.parts?.find(p => p.type == CommonApiUri.NamePartTypeSurname)?.value;
       this.model = Object.assign({}, this.model, newModel);
       this.isPreferredReadOnly = this.personName?.index == 0;
     }

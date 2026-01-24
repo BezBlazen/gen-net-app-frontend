@@ -68,7 +68,7 @@ export class PersonSelectorComponent extends EntitySelectorComponent {
     return config;
   }
   getGender(person: Person): string | undefined {
-    return this.dataService.schemas?.baseGenderTypeUri?.find(gender => gender.uri === person.gender?.type)?.title;
+    return this.dataService.dictUri?.find(gender => gender.uri === person.gender?.type)?.title;
   }
   setSelectedPerson(personId: string | undefined) {
     this.personId = personId;

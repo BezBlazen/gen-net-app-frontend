@@ -179,7 +179,7 @@ export class GnaComponent {
         this.router.navigate(['/', 'gna']);
       } else {
         this.dataService.getProjects();
-        this.dataService.getSchemas();
+        this.dataService.getDictUri();
       }
     });
     this.projectsSubscription = this.dataService.projects$.subscribe(projects => {
@@ -191,7 +191,7 @@ export class GnaComponent {
 
     });
     this.reloadAccount();
-    this.dataService.getSchemas();
+    this.dataService.getDictUri();
   }
   ngOnDestroy() {
     this.isLoadingSubscription?.unsubscribe();

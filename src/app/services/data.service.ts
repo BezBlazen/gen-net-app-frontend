@@ -10,7 +10,9 @@ import { AccountDtoApi } from '../../api/model/accountDto';
 import { AccountSignInDtoApi } from '../../api/model/accountSignInDto';
 import { AccountSignUpDtoApi } from '../../api/model/accountSignUpDto';
 import { FieldOptions, Person, Project } from '../models/api.model';
-import { SchemasApi } from '../../api/model/schemas';
+// import { SchemasApi } from '../../api/model/dictUri';
+import { UriDtoApi } from '../../api/model/uriDto';
+import { CommonApiUri } from '../models/common.model';
 // import { AccountDto, AccountSignInDto, AccountSignUpDto, Project } from '../../api';
 
 export class DataServiceState {
@@ -37,10 +39,10 @@ export class DataService {
   public account$ = this._account.asObservable();
   private _accountLastUserName?: string;
 
-  public schemas?: SchemasApi;
-  private _schemas = new BehaviorSubject<SchemasApi>({});
-  private _schemasSubscription?: Subscription;
-  public schemas$ = this._schemas.asObservable();
+  public dictUri?: UriDtoApi[];
+  private _dictUri = new BehaviorSubject<UriDtoApi[]>([]);
+  private _uriSubscription?: Subscription;
+  public dictUri$ = this._dictUri.asObservable();
 
   private _activeProjectId = new BehaviorSubject<string | undefined>(undefined);
   public activeProjectId$ = this._activeProjectId.asObservable();
@@ -217,52 +219,52 @@ export class DataService {
   }
   // Account
   // --------------------------
-  // Schemas
-  public getSchemas(): Observable<boolean> {
+  // Uri
+  public getDictUri(): Observable<boolean> {
     const _success = new Subject<boolean>();
     if (this.isAccountValid()) {
       const rqId = this.guid();
-      this._schemasSubscription = this.httpClient
-        .get<SchemasApi>(this.baseUrl + '/schemas', { withCredentials: true })
+      this._uriSubscription = this.httpClient
+        .get<UriDtoApi[]>(this.baseUrl + '/dict_uri', { withCredentials: true })
         .subscribe({
-          next: (schemas) => {
-            this._schemas.next(schemas);
-            this.schemas = schemas;
+          next: (dictUri) => {
+            this._dictUri.next(dictUri);
+            this.dictUri = dictUri;
             _success.next(true);
           },
           error: (err) => {
             this._errorMessage.next(this.getErrorMessage(err));
-            this._schemas.next({});
-            this.schemas = undefined;
+            this._dictUri.next([]);
+            this.dictUri = undefined;
             _success.next(false);
           },
           complete: () => {
             this.updateRqIds(rqId, false);
-            this._schemasSubscription = undefined;
+            this._uriSubscription = undefined;
           }
         });
     } else {
-      this._schemas.next({});
-      this.schemas = undefined;
+      this._dictUri.next([]);
+      this.dictUri = undefined;
       _success.next(false);
     }
     return _success.asObservable();
   }
-  getSchemasLocal(): SchemasApi {
-    return JSON.parse(JSON.stringify(this._schemas.value));
+  getDictUriLocal(): UriDtoApi[] {
+    return JSON.parse(JSON.stringify(this._dictUri.value));
   }
-  getSchemasGenderTypesOption(): FieldOptions[] | undefined {
-    return this.schemas?.baseGenderTypeUri?.map(nameType => ({
-      label: nameType.title,
-      value: nameType.uri,
-      description: nameType.description
+  getDictUriGenderTypesOption(): FieldOptions[] | undefined {
+    return this.dictUri?.filter(dictUri => dictUri.uri?.startsWith(CommonApiUri.PrefixGenderType)).map(type => ({
+      label: type.title,
+      value: type.uri,
+      description: type.description
     }));
   }
-  getSchemasNameTypesOption(): FieldOptions[] | undefined {
-    return this.schemas?.baseNameTypeUri?.map(nameType => ({
-      label: nameType.title,
-      value: nameType.uri,
-      description: nameType.description
+  getDictUriNameTypesOption(): FieldOptions[] | undefined {
+    return this.dictUri?.filter(dictUri => dictUri.uri?.startsWith(CommonApiUri.PrefixNameType)).map(type => ({
+      label: type.title,
+      value: type.uri,
+      description: type.description
     }));
   }
   // Schemas
