@@ -1,15 +1,15 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, ViewChild, inject } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from "@angular/router";
 import { FormlyFieldConfig, FormlyFormOptions, FormlyModule } from '@ngx-formly/core';
 import { DataService } from '../../services/data.service';
-import { Account, AccountRole } from '../../models/account.model';
 import { NgxSpinnerComponent, NgxSpinnerService } from 'ngx-spinner';
-import { Project } from '../../models/project.model';
 import { Subscription } from 'rxjs';
 import { PresentationUIConfig, PresentationViewMode } from '../entity-presentation/entity-presentation.component';
 import { ProjectViewComponent } from '../projects/project-view/project-view.component';
+import { Account, Project } from '../../models/api.model';
+import { AccountRoleTypeApi } from '../../../api/model/accountRoleType';
 
 @Component({
   selector: 'app-gna',
@@ -35,7 +35,7 @@ export class GnaComponent {
   // --------------------------------
   // [var] Account
   account?: Account;
-  accountRoleEnum = AccountRole;
+  accountRoleType = AccountRoleTypeApi;
   // [var] Account
   // --------------------------------
   // [var] Projects
@@ -173,13 +173,13 @@ export class GnaComponent {
       }
     });
     this.accountSubscription = this.dataService.account$.subscribe(account => {
-      console.log(account)
       this.account = account;
       this.dataService.resetCache();
       if (!account) {
         this.router.navigate(['/', 'gna']);
       } else {
         this.dataService.getProjects();
+        this.dataService.getSchemas();
       }
     });
     this.projectsSubscription = this.dataService.projects$.subscribe(projects => {
@@ -191,6 +191,7 @@ export class GnaComponent {
 
     });
     this.reloadAccount();
+    this.dataService.getSchemas();
   }
   ngOnDestroy() {
     this.isLoadingSubscription?.unsubscribe();
@@ -210,7 +211,7 @@ export class GnaComponent {
   }
   onSignInFormSubmit() {
     if (this.signInForm.valid) {
-      this.dataService.doSignIn(new Account(this.signInModel.username, this.signInModel.password)).subscribe(success => {
+      this.dataService.doSignIn({username: this.signInModel.username, password: this.signInModel.password}).subscribe(success => {
         if (success) {
           this.signInModel = { username: "", password: "" };
           this.closeDialog(this.dialogSignIn.nativeElement);
@@ -220,7 +221,7 @@ export class GnaComponent {
   }
   onSignUpFormSubmit() {
     if (this.signUpForm.valid) {
-      this.dataService.doSignUp(new Account(this.signUpModel.username, this.signUpModel.password)).subscribe(success => {
+      this.dataService.doSignUp({username: this.signUpModel.username, password: this.signUpModel.password}).subscribe(success => {
         if (success) {
           this.signInModel = { username: "", password: "" };
           this.signInModel = { username: this.signUpModel.username, password: "" };
@@ -260,6 +261,9 @@ export class GnaComponent {
   }
   reloadAccount() {
     this.dataService.getAccount();
+  }
+  onAddEmitted() {
+    this.reloadAccount();
   }
 }
 

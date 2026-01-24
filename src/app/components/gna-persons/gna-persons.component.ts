@@ -1,10 +1,11 @@
-import { Component, effect, inject, Signal } from '@angular/core';
+import { Component } from '@angular/core';
 import { PersonSelectorComponent } from '../persons/person-selector/person-selector.component';
-import { ActivatedRoute, Router, ROUTER_OUTLET_DATA } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { SelectorUIConfig } from '../entity-selector/entity-selector.component';
 import { DataService } from '../../services/data.service';
 import { Subscription } from 'rxjs';
-import { Person } from '../../models/person.model';
+import { Person } from '../../models/api.model';
+// import { Person } from '../../models/person.model';
 
 @Component({
   selector: 'app-gna-persons',

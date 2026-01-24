@@ -2,10 +2,16 @@ import { Injectable, numberAttribute } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { BehaviorSubject, catchError, map, Observable, of, startWith, delay, Subject, skip, tap, Subscription } from 'rxjs';
 import { ApiDataWrapper } from './api-data-wrapper';
-import { Account, AccountRole } from '../models/account.model';
-import { Project } from '../models/project.model';
-import { Person } from '../models/person.model';
+// import { Account, AccountRole } from '../models/account.model';
+// import { Project } from '../models/project.model';
+// import { Person } from '../models/person.model';
 import { I } from '@angular/cdk/keycodes';
+import { AccountDtoApi } from '../../api/model/accountDto';
+import { AccountSignInDtoApi } from '../../api/model/accountSignInDto';
+import { AccountSignUpDtoApi } from '../../api/model/accountSignUpDto';
+import { FieldOptions, Person, Project } from '../models/api.model';
+import { SchemasApi } from '../../api/model/schemas';
+// import { AccountDto, AccountSignInDto, AccountSignUpDto, Project } from '../../api';
 
 export class DataServiceState {
   errorMessage?: string;
@@ -27,9 +33,14 @@ export class DataService {
   private _errorMessage = new BehaviorSubject<string | null>(null);
   public errorMessage$ = this._errorMessage.asObservable();
 
-  private _account = new BehaviorSubject<Account | undefined>(undefined);
+  private _account = new BehaviorSubject<AccountDtoApi | undefined>(undefined);
   public account$ = this._account.asObservable();
-  private _accountLastUserName: string | null = null;
+  private _accountLastUserName?: string;
+
+  public schemas?: SchemasApi;
+  private _schemas = new BehaviorSubject<SchemasApi>({});
+  private _schemasSubscription?: Subscription;
+  public schemas$ = this._schemas.asObservable();
 
   private _activeProjectId = new BehaviorSubject<string | undefined>(undefined);
   public activeProjectId$ = this._activeProjectId.asObservable();
@@ -42,6 +53,8 @@ export class DataService {
   private _accountSubscription?: Subscription;
   private _personsSubscription?: Subscription;
   public persons$ = this._persons.asObservable();
+
+
 
   errorMessageUnexpected: string = "Unexpected server error";
 
@@ -100,14 +113,14 @@ export class DataService {
   // IsLoading
   // --------------------------
   // Account
-  public getAccountLastUserName(): string | null {
+  public getAccountLastUserName(): string | undefined {
     return this._accountLastUserName;
   }
-  public doSignIn(account: Account): Observable<boolean> {
+  public doSignIn(account: AccountSignInDtoApi): Observable<boolean> {
     const rqId = this.guid();
     this.updateRqIds(rqId, true);
     return this.httpClient
-      .post<Account>(this.baseUrl + '/auth/sign_in', account, { withCredentials: true, })
+      .post<AccountDtoApi>(this.baseUrl + '/auth/sign_in', account, { withCredentials: true, })
       .pipe(
         tap(() => this.updateRqIds(rqId, false)),
         map((account) => {
@@ -121,11 +134,11 @@ export class DataService {
       );
 
   }
-  public doSignUp(account: Account): Observable<boolean> {
+  public doSignUp(account: AccountSignUpDtoApi): Observable<boolean> {
     const rqId = this.guid();
     this.updateRqIds(rqId, true);
     return this.httpClient
-      .post<Account>(this.baseUrl + '/auth/sign_up', account, { withCredentials: true, })
+      .post<AccountDtoApi>(this.baseUrl + '/auth/sign_up', account, { withCredentials: true, })
       .pipe(
         tap(() => this.updateRqIds(rqId, false)),
         map((account) => {
@@ -142,7 +155,7 @@ export class DataService {
     const rqId = this.guid();
     this.updateRqIds(rqId, true);
     return this.httpClient
-      .post<Account>(this.baseUrl + '/auth/sign_out', null, { withCredentials: true, })
+      .post<AccountDtoApi>(this.baseUrl + '/auth/sign_out', null, { withCredentials: true, })
       .pipe(
         tap(() => this.updateRqIds(rqId, false)),
         map(() => {
@@ -154,6 +167,9 @@ export class DataService {
           return of(false);
         }),
       );
+  }
+  private isAccountValid(): boolean {
+    return this._account.value != null && this._account.value.username != null && this._account.value.roleType != null;
   }
   // public reloadAccount() {
   //   const rqId = this.guid();
@@ -181,7 +197,7 @@ export class DataService {
     }
     const rqId = this.guid();
     this._accountSubscription = this.httpClient
-      .get<Account>(this.baseUrl + '/auth/account', { withCredentials: true })
+      .get<AccountDtoApi>(this.baseUrl + '/auth/account', { withCredentials: true })
       .subscribe({
         next: (account) => {
           this._account.next(account.username ? account : undefined);
@@ -200,6 +216,56 @@ export class DataService {
     return _success.asObservable();
   }
   // Account
+  // --------------------------
+  // Schemas
+  public getSchemas(): Observable<boolean> {
+    const _success = new Subject<boolean>();
+    if (this.isAccountValid()) {
+      const rqId = this.guid();
+      this._schemasSubscription = this.httpClient
+        .get<SchemasApi>(this.baseUrl + '/schemas', { withCredentials: true })
+        .subscribe({
+          next: (schemas) => {
+            this._schemas.next(schemas);
+            this.schemas = schemas;
+            _success.next(true);
+          },
+          error: (err) => {
+            this._errorMessage.next(this.getErrorMessage(err));
+            this._schemas.next({});
+            this.schemas = undefined;
+            _success.next(false);
+          },
+          complete: () => {
+            this.updateRqIds(rqId, false);
+            this._schemasSubscription = undefined;
+          }
+        });
+    } else {
+      this._schemas.next({});
+      this.schemas = undefined;
+      _success.next(false);
+    }
+    return _success.asObservable();
+  }
+  getSchemasLocal(): SchemasApi {
+    return JSON.parse(JSON.stringify(this._schemas.value));
+  }
+  getSchemasGenderTypesOption(): FieldOptions[] | undefined {
+    return this.schemas?.baseGenderTypeUri?.map(nameType => ({
+      label: nameType.title,
+      value: nameType.uri,
+      description: nameType.description
+    }));
+  }
+  getSchemasNameTypesOption(): FieldOptions[] | undefined {
+    return this.schemas?.baseNameTypeUri?.map(nameType => ({
+      label: nameType.title,
+      value: nameType.uri,
+      description: nameType.description
+    }));
+  }
+  // Schemas
   // --------------------------
   // Cache
   resetCache() {

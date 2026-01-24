@@ -3,8 +3,11 @@ import { EntitySelectorComponent, SelectorUIConfig } from '../../entity-selector
 import { PersonNamesViewComponent } from '../person-names-view/person-names-view.component';
 import { DataService } from '../../../services/data.service';
 import { PresentationUIConfig, PresentationViewMode } from '../../entity-presentation/entity-presentation.component';
-import { DaoName, Name, NamePartType, NameType, NameTypeOptions } from '../../../models/person.model';
+// import { DaoName, NamePartType, NameType, NameTypeOptions } from '../../../models/person.model';
 import { JsonPipe } from '@angular/common';
+import { Name } from '../../../models/api.model';
+import { NameLocal } from '../../../models/person.model';
+import { NamePartTypeApi } from '../../../../api/model/namePartType';
 
 @Component({
   selector: 'app-person-names-selector',
@@ -23,7 +26,7 @@ export class PersonNamesSelectorComponent extends EntitySelectorComponent {
   viewMode: PresentationViewMode = PresentationViewMode.VIEW;
   _selectedItemIndex: number = -1;
   personNameViewConfig: PresentationUIConfig = {};
-  personNameViewDaoName: DaoName = { name: {} };
+  personNameViewDaoName: NameLocal = { name: {} };
   // [variables]
   // --------------------------------
   // [events]
@@ -35,7 +38,6 @@ export class PersonNamesSelectorComponent extends EntitySelectorComponent {
   }
   onEdit(): void {
     if (this._selectedItemIndex < 0) {
-      console.log('No items selected');
       return;
     }
     this.personNameViewConfig.mode = PresentationViewMode.EDIT;
@@ -49,7 +51,7 @@ export class PersonNamesSelectorComponent extends EntitySelectorComponent {
   onDelete(): void {
     this.personNames.splice(this._selectedItemIndex, 1);
   }
-  onAddEvent(daoName: DaoName): void {
+  onAddEvent(daoName: NameLocal): void {
     if (daoName.index == undefined) {
       this.personNames.push(daoName.name);
       this._selectedItemIndex = this.personNames.length - 1;
@@ -60,7 +62,7 @@ export class PersonNamesSelectorComponent extends EntitySelectorComponent {
       throw new Error("Unexpected action");
     }
   }
-  onSaveEvent(daoName: DaoName): void {
+  onSaveEvent(daoName: NameLocal): void {
     if (daoName.index != this._selectedItemIndex) {
       if (daoName.index != 0) {
         throw new Error("Unexpected action");
@@ -104,7 +106,7 @@ export class PersonNamesSelectorComponent extends EntitySelectorComponent {
     // Return first name form if exists with NamePart type 'GIVEN'
     if (name && name.nameForms && name.nameForms[0] && name.nameForms[0].parts && name.nameForms[0].parts.length > 0) {
       for (const part of name.nameForms[0].parts) {
-        if (part.type === NamePartType.GIVEN) {
+        if (part.type === NamePartTypeApi.HttpGnaBzblzGiven) {
           return part.value ?? '';
         }
       }
@@ -115,7 +117,7 @@ export class PersonNamesSelectorComponent extends EntitySelectorComponent {
     // Return first name form if exists with NamePart type 'SURNAME'
     if (name && name.nameForms && name.nameForms[0] && name.nameForms[0].parts && name.nameForms[0].parts.length > 0) {
       for (const part of name.nameForms[0].parts) {
-        if (part.type === NamePartType.SURNAME) {
+        if (part.type === NamePartTypeApi.HttpGnaBzblzSurname) {
           return part.value ?? '';
         }
       }
@@ -123,7 +125,7 @@ export class PersonNamesSelectorComponent extends EntitySelectorComponent {
     return '';
   }
   getNameType(name: Name): string {
-    return NameTypeOptions.find(option => option.value === name.type)?.label ?? '';
+    return this.dataService.schemas?.baseNameTypeUri?.find(option => option.uri === name.type)?.title ?? '';
   }
   isActive(index: number) {
     return this._selectedItemIndex == index;
@@ -131,7 +133,7 @@ export class PersonNamesSelectorComponent extends EntitySelectorComponent {
   setSelectedItem(index: number) {
     this._selectedItemIndex = index;
   }
-  getPersonName(): DaoName | undefined {
+  getPersonName(): NameLocal | undefined {
     if (this._selectedItemIndex >= 0) {
       return { index: this._selectedItemIndex, name: this.personNames[this._selectedItemIndex] }
     }

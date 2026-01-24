@@ -1,10 +1,11 @@
 import { Component, ElementRef, Input, Output, SimpleChanges, ViewChild } from '@angular/core';
-import { Project } from '../../../models/project.model';
+// import { Project } from '../../../models/project.model';
 import { DataService } from '../../../services/data.service';
 import { EntitySelectorComponent, SelectorUIConfig } from '../../entity-selector/entity-selector.component';
 import { BehaviorSubject } from 'rxjs';
 import { ProjectViewComponent } from '../project-view/project-view.component';
 import { PresentationUIConfig, PresentationViewMode } from '../../entity-presentation/entity-presentation.component';
+import { Project } from '../../../models/api.model';
 
 @Component({
   selector: 'app-project-selector',

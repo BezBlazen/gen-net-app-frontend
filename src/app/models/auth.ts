@@ -1,11 +1,11 @@
-export enum AuthState {
-    Unknown,
-    SignInInProgress,
-    SignUpInProgress,
-    SignOutInProgress
-}
+// export enum AuthState {
+//     Unknown,
+//     SignInInProgress,
+//     SignUpInProgress,
+//     SignOutInProgress
+// }
 
-export interface Auth {
-    state: AuthState;
-    username: string;
-}
+// export interface Auth {
+//     state: AuthState;
+//     username: string;
+// }

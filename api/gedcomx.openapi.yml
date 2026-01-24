@@ -1,0 +1,292 @@
+openapi: 3.1.0
+info:
+  title: GNA
+  version: 1.0.0
+components:
+  schemas:
+    GnaProject:
+          type: object
+          description: Main container for GnaProject data
+          properties:
+            persons:
+              type: array
+              items:
+                $ref: '#/components/schemas/Person'
+            # relationships:
+            #   type: array
+            #   items:
+            #     $ref: '#/components/schemas/Relationship'
+            # sourceDescriptions:
+            #   type: array
+            #   items:
+            #     $ref: '#/components/schemas/SourceDescription'
+            # agents:
+            #   type: array
+            #   items:
+            #     $ref: '#/components/schemas/Agent'
+            # events:
+            #   type: array
+            #   items:
+            #     $ref: '#/components/schemas/Event'
+            # documents:
+            #   type: array
+            #   items:
+            #     $ref: '#/components/schemas/Document'
+            # places:
+            #   type: array
+            #   items:
+            #     $ref: '#/components/schemas/PlaceDescription'
+            attributions:
+              type: array
+              items:
+                $ref: '#/components/schemas/Attribution'
+
+    Attribution:
+      type: object
+      x-identifier: 'http://gedcomx.org/v1/Attribution'
+      properties:
+        contributor:
+          type: string
+          format: uri
+          description: Reference to the agent to whom the attributed data is attributed.
+        modified:
+          type: integer
+          description: Timestamp of when the attributed data was contributed.
+        changeMessage:
+          type: string
+          description: A statement of why the attributed data is being provided by the contributor.
+        creator:
+          type: string
+          format: uri
+          description: Reference to the agent that created the attributed data. The creator MAY be different from the contributor if changes were made to the attributed data.
+        created:
+          type: integer
+          description: Timestamp of when the attributed data was contributed.
+
+    Qualifier:
+      type: object
+      x-identifier: 'http://gedcomx.org/v1/Qualifier'
+      properties:
+        name:
+          type: string
+          description: The name of the qualifier.
+        value:
+          type: string
+          description: The value of the qualifier.
+      required:
+          - name
+
+    SourceReference:
+      type: object
+      x-identifier: 'http://gedcomx.org/v1/Qualifier'
+      properties:
+        description:
+          type: string
+          format: uri
+          description: Reference to a description of the target source.
+        descriptionId:
+          type: string
+          description: The id of the target source.
+        attribution:
+          $ref: '#/components/schemas/Attribution'
+          description: The attribution of this source reference.
+        qualifiers:
+          type: array
+          description: Qualifiers for the reference, used to identify specific fragments of the source that are being referenced.
+          items:
+            $ref: '#/components/schemas/Qualifier'
+      required:
+          - description
+
+    Note:
+      type: object
+      x-identifier: 'http://gedcomx.org/v1/Note'
+      properties:
+        lang:
+          type: string
+          description: The locale identifier for the note.
+        subject:
+          type: string
+          description: A subject or title for the note.
+        text:
+          type: string
+          description: The text of the note.
+        attribution:
+          $ref: '#/components/schemas/Attribution'
+          description: The attribution of this note.
+
+    Conclusion:
+      type: object
+      x-identifier: 'http://gedcomx.org/v1/Conclusion'
+      description: The Conclusion data type defines the abstract concept for a basic genealogical data item.
+      properties:
+        id:
+          type: string
+          description: An identifier for the conclusion data.
+        lang:
+          type: string
+          description: The locale identifier for the conclusion.
+        sources:
+          type: array
+          description: The list of references to the sources of related to this conclusion.
+          items:
+            $ref: '#/components/schemas/SourceReference'
+        analysis:
+          type: string
+          format: uri
+          description: Reference to a document containing analysis supporting this conclusion.
+        notes:
+          type: array
+          description: A list of notes about this conclusion.
+          items:
+            $ref: '#/components/schemas/Note'
+        confidence:
+          type: string
+          description: Reference to a confidence level for this conclusion.
+        attribution:
+          $ref: '#/components/schemas/Attribution'
+          description: The attribution of this conclusion.
+
+    EvidenceReference:
+      type: object
+      x-identifier: 'http://gedcomx.org/v1/EvidenceReference'
+      description: The EvidenceReference data type defines a reference to data being used to derive the given instance of Subject.
+      properties:
+        resource:
+          type: string
+          format: uri
+          description: Reference to the supporting data.
+        attribution:
+          $ref: '#/components/schemas/Attribution'
+          description: The attribution of this evidence reference.
+      required:
+          - resource
+
+    Identifier:
+      type: object
+      x-identifier: 'http://gedcomx.org/v1/Identifier'
+      description: The Identifier data type defines the data structure used to supply an identifier of a genealogical resource
+      properties:
+        value:
+          type: string
+          format: uri
+          description: The value of the identifier.
+        type:
+          type: string
+          format: uri
+          description: Enumerated value that identifies how the identifier is to be used and the nature of the resource to which the identifier resolves.
+      required:
+          - value
+
+    IdentifierType:
+      type: string
+      format: url
+      enum:
+        - 'http://gedcomx.org/Primary'
+        - 'http://gedcomx.org/Authority'
+        - 'http://gedcomx.org/Deprecated'
+      x-enum-varnames:
+        - PRIMARY
+        - AUTHORITY
+        - DEPRECATED
+      x-enumDescriptions:
+        - The primary identifier for the resource. The value of the identifier MUST resolve to the instance of Subject to which the identifier applies.
+        - An identifier for the resource in an external authority or other expert system. The value of the identifier MUST resolve to a public, authoritative, source for information about the Subject to which the identifier applies.
+        - An identifier that has been relegated, deprecated, or otherwise downgraded. This identifier is commonly used as the result of a merge when what was once a primary identifier for a resource is no longer the primary identifier. The value of the identifier MUST resolve to the instance of Subject to which the identifier applies.
+
+    Subject:
+      x-identifier: "http://gedcomx.org/v1/Subject"
+      description: The Subject data type defines the abstract concept of a genealogical subject.
+      allOf:
+        - $ref: '#/components/schemas/Conclusion'
+        - type: object
+          properties:
+            extracted:
+              type: boolean
+              description: Whether this subject is to be constrained as an extracted conclusion.
+            evidence:
+              type: array
+              description: References to other subjects that support this subject.
+              items:
+                $ref: '#/components/schemas/EvidenceReference'
+            media:
+              type: array
+              description: References to multimedia resources for this subject, such as photos or videos, intended to provide additional context or illustration for the subject and not considered evidence supporting the identity of the subject or its supporting conclusions.
+              items:
+                $ref: '#/components/schemas/SourceReference'
+            identifiers:
+              type: array
+              description: A list of identifiers for the subject.
+              items: 
+                $ref: '#/components/schemas/Identifier'
+    
+    Gender:
+      type: object
+      x-identifier: 'http://gedcomx.org/v1/Gender'
+      description: The Gender data type defines a gender of a person.
+      allOf:
+        - $ref: '#/components/schemas/Conclusion'
+        - type: object
+          properties:
+            type:
+              type: string
+              format: url
+              description: Enumerated value identifying the gender.
+
+    GenderType:
+      type: string
+      format: url
+      enum:
+        - 'http://gedcomx.org/Male'
+        - 'http://gedcomx.org/Female'
+        - 'http://gedcomx.org/Unknown'
+        - 'http://gedcomx.org/Intersex'
+      x-enum-varnames:
+        - MALE
+        - FEMALE
+        - UNKNOWN
+        - INTERSEX
+      x-enumDescriptions:
+        - Male gender.
+        - Female gender.
+        - Unknown gender.
+        - Intersex (assignment at birth).
+
+    Name:
+      type: object
+      x-identifier: 'http://gedcomx.org/v1/Name'
+      description: The Name data type defines a name of a person.
+      allOf:
+        - $ref: '#/components/schemas/Conclusion'
+        - type: object
+          properties:
+            type:
+              type: string
+              format: url
+              description: Enumerated value identifying the name type.
+
+    Person:
+      x-identifier: "http://gedcomx.org/v1/Person"
+      description: The Person data type defines a description of a person.
+      allOf:
+        - $ref: '#/components/schemas/Subject'
+        - type: object
+          properties:
+            private:
+              type: boolean
+              description: Whether this instance of Person has been designated for limited distribution or display.
+            gender:
+              $ref: '#/components/schemas/Gender'
+              description: The sex of the person as assigned at birth
+            # names:
+            #   type: array
+            #   description: The names of the person.
+            #   items:
+            #     $ref: '#/components/schemas/Name'
+            # facts:
+            #   type: array
+            #   description: The facts of the person.
+            #   items: 
+            #     $ref: '#/components/schemas/Fact'          
+
+

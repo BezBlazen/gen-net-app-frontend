@@ -2,13 +2,18 @@ import { Component, EventEmitter, Input, Output, SimpleChanges } from '@angular/
 import { DataService } from '../../../services/data.service';
 import { FormGroup, FormsModule } from '@angular/forms';
 import { FormlyFieldConfig, FormlyFormOptions, FormlyModule } from '@ngx-formly/core';
-import { DaoPerson, GenderOptions, Name, NameForm, NamePart, NamePartType, NameTypeOptions, Person, PersonCreate } from '../../../models/person.model';
+// import { DaoPerson, GenderOptions, NamePartType, NameTypeOptions, PersonCreate } from '../../../models/person.model';
 import { JsonPipe } from '@angular/common';
 import { EntityPresentationComponent, PresentationUIConfig, PresentationViewMode } from '../../entity-presentation/entity-presentation.component';
 import { Subscription } from 'rxjs';
 import { PersonNamesSelectorComponent } from "../../person-names/person-names-selector/person-names-selector.component";
 import { PersonUtilsComponent } from '../person-utils/person-utils.component';
 import { PersonNamesViewComponent } from '../../person-names/person-names-view/person-names-view.component';
+import { FieldOptions, Name, NamePart, Person } from '../../../models/api.model';
+import { NamePartTypeApi } from '../../../../api/model/namePartType';
+import { PersonCreateLocal, PersonLocal } from '../../../models/person.model';
+import { PersonApi } from '../../../../api/model/person';
+import { SchemasApi } from '../../../../api/model/schemas';
 
 @Component({
   selector: 'app-person-view',
@@ -24,13 +29,14 @@ import { PersonNamesViewComponent } from '../../person-names/person-names-view/p
 export class PersonViewComponent extends EntityPresentationComponent {
   // --------------------------------
   // [variables]
+  schemas?: SchemasApi;
   @Input() projectId?: string;
   @Input() personId?: string;
   @Output() onAddEmitted = new EventEmitter<void>();
   @Output() onSaveEmitted = new EventEmitter<void>();
   @Output() onDeleteEmitted = new EventEmitter<void>();
   initPersonAsStr: string = '';
-  readonly NamePartType = NamePartType;
+  readonly NamePartTypeApi = NamePartTypeApi;
   mainTabs = [{ id: 0, label: 'General' }, { id: 1, label: 'Names' }, { id: 2, label: 'Events' }]
   mainTabId = 0;
   // [variables]
@@ -41,7 +47,7 @@ export class PersonViewComponent extends EntityPresentationComponent {
   // --------------------------------
   // [variables] Formly
   // Create
-  modelCreate: PersonCreate = {};
+  modelCreate: PersonCreateLocal = {};
   formCreate = new FormGroup({});
   optionsCreate: FormlyFormOptions = {};
   fieldsCreate: FormlyFieldConfig[] = [
@@ -50,18 +56,34 @@ export class PersonViewComponent extends EntityPresentationComponent {
       type: 'select',
       props: {
         label: 'Gender',
-        options: GenderOptions
       },
-      defaultValue: GenderOptions[0]?.value
+      hooks: {
+        onInit: (field) => {
+          const nameTypes = this.dataService.getSchemasGenderTypesOption();
+          field.props!.options = nameTypes;
+          if (nameTypes && nameTypes?.length > 0 && !field.defaultValue) {
+            field.defaultValue = nameTypes[0].value;
+            field.formControl?.setValue(field.defaultValue);
+          }
+        }
+      },
     },
     {
       key: 'names.type',
       type: 'select',
       props: {
         label: 'Name type',
-        options: NameTypeOptions
       },
-      defaultValue: NameTypeOptions[0]?.value
+      hooks: {
+        onInit: (field) => {
+          const nameTypes = this.dataService.getSchemasNameTypesOption();
+          field.props!.options = nameTypes;
+          if (nameTypes && nameTypes?.length > 0 && !field.defaultValue) {
+            field.defaultValue = nameTypes[0].value;
+            field.formControl?.setValue(field.defaultValue);
+          }
+        }
+      },
     },
     {
       key: 'names.full',
@@ -100,12 +122,12 @@ export class PersonViewComponent extends EntityPresentationComponent {
     },
   ];
   // Edit, View
-  model: DaoPerson = {};
+  model: PersonLocal = {};
   form = new FormGroup({});
   options: FormlyFormOptions = {};
   fields: FormlyFieldConfig[] = [
     {
-      key: 'id',
+      key: 'personApi.id',
       type: 'input',
       props: {
         label: 'Id',
@@ -121,22 +143,32 @@ export class PersonViewComponent extends EntityPresentationComponent {
       },
     },
     {
-      key: 'gender.type',
+      key: 'personApi.gender.type',
       type: 'select',
       props: {
         label: 'Gender',
-        options: GenderOptions
-      }
+
+      },
+      hooks: {
+        onInit: (field) => {
+          const nameTypes = this.dataService.getSchemasGenderTypesOption();
+          field.props!.options = nameTypes;
+          if (nameTypes && nameTypes?.length > 0 && !field.defaultValue) {
+            field.defaultValue = nameTypes[0].value;
+            field.formControl?.setValue(field.defaultValue);
+          }
+        }
+      },    
     },
   ];
   // [variables] Formly
   // --------------------------------
   // [events] EntityPresentation
   onDelete(): void {
-    if (this.model) {
-      let isConfirmed = confirm("Delete person: '" + this.model?.id + "' ?");
+    if (this.model.personApi) {
+      let isConfirmed = confirm("Delete person: '" + this.model?.personApi?.id + "' ?");
       if (isConfirmed) {
-        this.dataService.deletePerson(this.model).subscribe((success) => {
+        this.dataService.deletePerson(this.model.personApi).subscribe((success) => {
           if (success) {
             this.dialogRef?.close();
             this.onDeleteEmitted.emit();
@@ -146,8 +178,8 @@ export class PersonViewComponent extends EntityPresentationComponent {
     }
   }
   onSave(): void {
-    if (this.model) {
-      this.dataService.updatePerson(this.model).subscribe((success) => {
+    if (this.model.personApi) {
+      this.dataService.updatePerson(this.model.personApi).subscribe((success) => {
         if (success) {
           this.onSaveEmitted.emit();
           this.dialogRef?.close();
@@ -187,13 +219,13 @@ export class PersonViewComponent extends EntityPresentationComponent {
         let fullName = this.modelCreate.names?.full;
         if (this.modelCreate.names?.first) {
           firstNamePart = {
-            type: NamePartType.GIVEN,
+            type: NamePartTypeApi.HttpGnaBzblzGiven,
             value: this.modelCreate.names?.first
           }
         }
         if (this.modelCreate.names?.last) {
           lastNamePart = {
-            type: NamePartType.SURNAME,
+            type: NamePartTypeApi.HttpGnaBzblzSurname,
             value: this.modelCreate.names?.last
           }
         }
@@ -239,6 +271,7 @@ export class PersonViewComponent extends EntityPresentationComponent {
     super();
   }
   ngOnInit() {
+    this.schemas = this.dataService.getSchemasLocal();
     // Allow subscriptions if PresentationViewMode not CREATE
     if (this.config.mode != PresentationViewMode.CREATE) {
       this.personSubscription = this.dataService.persons$.subscribe(persons => {
@@ -251,7 +284,7 @@ export class PersonViewComponent extends EntityPresentationComponent {
   }
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['projectId'] || changes['personId']) {
-      if (this.initPersonAsStr != '' && this.initPersonAsStr != JSON.stringify(this.model)) {
+      if (this.initPersonAsStr != '' && this.initPersonAsStr != JSON.stringify(this.model.personApi)) {
         console.warn('this.initPersonAsStr != JSON.stringify(this.model)')
         let isConfirmed = confirm("Save changes?");
         if (isConfirmed) {
@@ -277,6 +310,7 @@ export class PersonViewComponent extends EntityPresentationComponent {
     };
     return config;
   }
+
   resetForm() {
     this.form.reset();
     this.formCreate.reset();
@@ -291,18 +325,19 @@ export class PersonViewComponent extends EntityPresentationComponent {
     this.updateModel();
   }
   updateModel() {
-    this.model = this.personId ? this.dataService.getPersonLocal(this.personId) ?? {} : {};
-    this.model.preferredName = this.getPreferredName(this.model);
+    this.model = {};
+    this.model.personApi = this.personId ? this.dataService.getPersonLocal(this.personId) ?? {} : {};
+    this.model.preferredName = this.getPreferredName(this.model.personApi);
     // Store initial preson state
-    this.initPersonAsStr = JSON.stringify(this.model);
+    this.initPersonAsStr = JSON.stringify(this.model.personApi);
   }
   getPreferredName(person: Person | undefined) {
     return person ? PersonUtilsComponent.getPreferredName(person) : '';
   }
   getPersonNames(): Name[] {
-    if (!this.model.names) {
-      this.model.names = [];
-    }
-    return this.model.names;
+    // if (!this.model.person?.names) {
+    //   this.model.person.names = [];
+    // }
+    return this.model.personApi?.names ?? [];
   }
 }

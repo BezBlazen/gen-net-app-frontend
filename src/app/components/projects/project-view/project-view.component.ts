@@ -1,10 +1,12 @@
 import { Component, EventEmitter, Input, Output, SimpleChanges } from '@angular/core';
-import { Project } from '../../../models/project.model';
+// import { Project } from '../../../models/project.model';
 import { FormGroup, FormsModule } from '@angular/forms';
 import { FormlyFieldConfig, FormlyFormOptions, FormlyModule } from '@ngx-formly/core';
 import { DataService } from '../../../services/data.service';
 import { EntityPresentationComponent, PresentationUIConfig, PresentationViewMode } from '../../entity-presentation/entity-presentation.component';
 import { Subscription } from 'rxjs';
+import { Project } from '../../../models/api.model';
+// import { Project } from '../../../../api';
 
 @Component({
   selector: 'app-project-view',
@@ -31,6 +33,7 @@ export class ProjectViewComponent extends EntityPresentationComponent {
   // --------------------------------
   // [variables] Formly
   // Create
+  // type ProjectApiModel = Partial<ProjectApi>;
   modelCreate: Project = {};
   formCreate = new FormGroup({});
   optionsCreate: FormlyFormOptions = {};
@@ -177,7 +180,7 @@ export class ProjectViewComponent extends EntityPresentationComponent {
     if (this.projectId) {
       this.model = { ...this.dataService.getProjectLocal(this.projectId) }
     } else {
-      this.model = {};
+      this.model = undefined;
     }
   }
   reloadProjects() {

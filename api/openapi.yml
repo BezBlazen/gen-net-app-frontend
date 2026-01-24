@@ -1,0 +1,231 @@
+openapi: 3.1.0
+info:
+  title: GNA
+  version: 1.0.0
+components:
+  schemas:
+    Project:
+      description: Main container for Project data
+      allOf:
+        - $ref: '#/components/schemas/Conclusion'
+        - type: object
+          properties:
+            identifiers:
+              type: array
+              description: A list of identifiers for the subject.
+              items: 
+                $ref: '#/components/schemas/Identifier'
+    Qualifier:
+      type: object
+      x-identifier: 'http://gna.bzblz/v1/Qualifier'
+      properties:
+        name:
+          type: string
+          description: The name of the qualifier.
+        value:
+          type: string
+          description: The value of the qualifier.
+      required:
+          - name
+
+    Conclusion:
+      type: object
+      x-identifier: 'http://gna.bzblz/v1/Conclusion'
+      description: The Conclusion data type defines the abstract concept for a basic genealogical data item.
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: An identifier for the conclusion data.
+
+    Identifier:
+      type: object
+      x-identifier: 'http://gna.bzblz/v1/Identifier'
+      description: The Identifier data type defines the data structure used to supply an identifier of a genealogical resource
+      properties:
+        value:
+          type: string
+          format: uri
+          description: The value of the identifier.
+        type:
+          type: string
+          format: uri
+          description: Enumerated value that identifies how the identifier is to be used and the nature of the resource to which the identifier resolves.
+      required:
+          - value
+
+    IdentifierType:
+      type: string
+      format: url
+      enum:
+        - 'http://gna.bzblz/Primary'
+        - 'http://gna.bzblz/Authority'
+        - 'http://gna.bzblz/Deprecated'
+      x-enum-varnames:
+        - PRIMARY
+        - AUTHORITY
+        - DEPRECATED
+      x-enumDescriptions:
+        - The primary identifier for the resource. The value of the identifier MUST resolve to the instance of Subject to which the identifier applies.
+        - An identifier for the resource in an external authority or other expert system. The value of the identifier MUST resolve to a public, authoritative, source for information about the Subject to which the identifier applies.
+        - An identifier that has been relegated, deprecated, or otherwise downgraded. This identifier is commonly used as the result of a merge when what was once a primary identifier for a resource is no longer the primary identifier. The value of the identifier MUST resolve to the instance of Subject to which the identifier applies.
+
+    Subject:
+      x-identifier: "http://gna.bzblz/v1/Subject"
+      description: The Subject data type defines the abstract concept of a genealogical subject.
+      allOf:
+        - $ref: '#/components/schemas/Conclusion'
+        - type: object
+          properties:
+            identifiers:
+              type: array
+              description: A list of identifiers for the subject.
+              items: 
+                $ref: '#/components/schemas/Identifier'
+    
+    Gender:
+      type: object
+      x-identifier: 'http://gna.bzblz/v1/Gender'
+      description: The Gender data type defines a gender of a person.
+      allOf:
+        - $ref: '#/components/schemas/Conclusion'
+        - type: object
+          properties:
+            type:
+              type: string
+              format: url
+              description: Enumerated value identifying the gender.
+
+    GenderType:
+      type: string
+      format: url
+      enum:
+        - 'http://gna.bzblz/Male'
+        - 'http://gna.bzblz/Female'
+        - 'http://gna.bzblz/Unknown'
+      x-enum-varnames:
+        - MALE
+        - FEMALE
+        - UNKNOWN
+      x-enumDescriptions:
+        - Male gender.
+        - Female gender.
+        - Unknown gender.
+
+    Name:
+      type: object
+      x-identifier: 'http://gna.bzblz/v1/Name'
+      description: The Name data type defines a name of a person.
+      allOf:
+        - $ref: '#/components/schemas/Conclusion'
+        - type: object
+          properties:
+            type:
+              type: string
+              format: url
+              description: Enumerated value identifying the name type.
+            nameForms:
+              type: array
+              description: The name form(s) that best express this name.
+              items: 
+                $ref: '#/components/schemas/NameForm'
+    NameType:
+      type: string
+      format: url
+      enum:
+        - 'http://gna.bzblz/BirthName'
+        - 'http://gna.bzblz/MarriedName'
+        - 'http://gna.bzblz/AlsoKnownAs'
+        - 'http://gna.bzblz/Nickname'
+        - 'http://gna.bzblz/AdoptiveName'
+        - 'http://gna.bzblz/FormalName'
+        - 'http://gna.bzblz/ReligiousName'
+      x-enum-varnames:
+        - BIRTHNAME
+        - MARRIEDNAME
+        - ALSOKNOWNAS
+        - NICKNAME
+        - ADOPTIVENAME
+        - FORMALNAME
+        - RELIGIOUSNAME
+      x-enumDescriptions:
+        - Name given at birth.
+        - Name accepted at marriage.
+        - Also known as name.
+        - Nickname.
+        - Name given at adoption.
+        - A formal name, usually given to distinguish it from a name more commonly used.
+        - A name given at a religious rite or ceremony.
+
+    NameForm:
+      type: object
+      x-identifier: 'http://gna.bzblz/v1/NameForm'
+      description: The NameForm data type defines a representation of a name.
+      properties:
+        fullText:
+          type: string
+          description: A full rendering of the name (or as much of the name as is known).
+        parts:
+          type: array
+          description: Any identified name parts from the name.
+          items: 
+            $ref: '#/components/schemas/NamePart'
+
+    NamePart:
+      type: object
+      x-identifier: 'http://gna.bzblz/v1/NamePart'
+      description: The NameForm data type defines a representation of a name.
+      properties:
+        type:
+          type: string
+          format: url
+          description: Enumerated value identifying the type of the name part.
+        value:
+          type: string
+          description: The term(s) from the name that make up this name part.
+      required:
+          - value
+    NamePartType:
+      type: string
+      format: url
+      enum:
+        - 'http://gna.bzblz/Prefix'
+        - 'http://gna.bzblz/Suffix'
+        - 'http://gna.bzblz/Given'
+        - 'http://gna.bzblz/Surname'
+      x-enum-varnames:
+        - PREFIX
+        - SUFFIX
+        - GIVEN
+        - SURNAME
+      x-enumDescriptions:
+        - A name prefix.
+        - A name suffix.
+        - A given name.
+        - A surname.
+
+    Person:
+      x-identifier: "http://gna.bzblz/v1/Person"
+      description: The Person data type defines a description of a person.
+      allOf:
+        - $ref: '#/components/schemas/Subject'
+        - type: object
+          properties:
+            private:
+              type: boolean
+              description: Whether this instance of Person has been designated for limited distribution or display.
+            gender:
+              $ref: '#/components/schemas/Gender'
+              description: The sex of the person as assigned at birth
+            names:
+              type: array
+              description: The names of the person.
+              items:
+                $ref: '#/components/schemas/Name'
+            # facts:
+            #   type: array
+            #   description: The facts of the person.
+            #   items: 
+            #     $ref: '#/components/schemas/Fact'          
+
+

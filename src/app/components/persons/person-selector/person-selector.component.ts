@@ -1,12 +1,13 @@
 import { Component, ElementRef, Input, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { DataService } from '../../../services/data.service';
-import { Gender, Person } from '../../../models/person.model';
+import { Gender } from '../../../models/person.model';
 import { EntitySelectorComponent, SelectorUIConfig } from '../../entity-selector/entity-selector.component';
 import { BehaviorSubject, Subscription } from 'rxjs';
 import { PersonViewComponent } from '../person-view/person-view.component';
 import { PresentationUIConfig, PresentationViewMode } from '../../entity-presentation/entity-presentation.component';
 import { PersonUtilsComponent } from '../person-utils/person-utils.component';
 import { Router, RouterModule } from '@angular/router';
+import { Person } from '../../../models/api.model';
 
 @Component({
   selector: 'app-person-selector',
@@ -67,7 +68,7 @@ export class PersonSelectorComponent extends EntitySelectorComponent {
     return config;
   }
   getGender(person: Person): string | undefined {
-    return Object.values(Gender).find(gender => gender.value === person.gender?.type)?.label;
+    return this.dataService.schemas?.baseGenderTypeUri?.find(gender => gender.uri === person.gender?.type)?.title;
   }
   setSelectedPerson(personId: string | undefined) {
     this.personId = personId;

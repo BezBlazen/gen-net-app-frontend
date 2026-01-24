@@ -1,11 +1,9 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
-import { Project } from '../../models/project.model';
-import { ProjectViewComponent } from '../projects/project-view/project-view.component';
+import { Component } from '@angular/core';
 import { ProjectSelectorComponent } from '../projects/project-selector/project-selector.component';
-import { Router } from '@angular/router';
 import { SelectorUIConfig } from '../entity-selector/entity-selector.component';
 import { Subscription } from 'rxjs';
 import { DataService } from '../../services/data.service';
+import { Project } from '../../models/api.model';
 
 @Component({
   selector: 'app-gna-projects',

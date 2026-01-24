@@ -1,3 +1,3 @@
-interface IPresentation {
-  presentation_create: () => void;
-}
+// interface IPresentation {
+//   presentation_create: () => void;
+// }

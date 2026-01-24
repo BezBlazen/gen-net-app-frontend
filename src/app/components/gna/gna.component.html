@@ -4,7 +4,7 @@
             <a [routerLink]="['/', 'gna']">gen-net-app</a>
         </div>
         <div class="app-header-account-menu">
-            @if (account?.role == accountRoleEnum.User) {
+            @if (account?.roleType == accountRoleType.RoleUser) {
             <select name="selectAccountMenu" (change)="onAccountMenuChange($event)">
                 <option value="default" disabled selected>{{account?.username}}</option>
                 <option value="signOut">Logout</option>
@@ -93,6 +93,7 @@
     <app-project-view class="view" 
         [config]="projectCreateViewConfig"
         [dialogRef]="dialogProjectNew"
+        (onAddEmitted)="onAddEmitted()"
         ></app-project-view>
 </dialog>
 <div class="app-alert" [style.visibility]="!errorMessage? 'hidden': 'visible'">
