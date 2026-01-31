@@ -10,6 +10,8 @@ import { Name, NamePart, Person } from '../../../models/api.model';
 import { PersonCreateLocal, PersonLocal } from '../../../models/person.model';
 import { UriDtoApi } from '../../../../api/model/uriDto';
 import { CommonApiUri } from '../../../models/common.model';
+import { JsonPipe } from '@angular/common';
+import { FactApi } from '../../../../api/model/fact';
 
 @Component({
   selector: 'app-person-view',
@@ -17,6 +19,7 @@ import { CommonApiUri } from '../../../models/common.model';
     EntityPresentationComponent,
     FormsModule,
     FormlyModule,
+    JsonPipe,
     PersonNamesSelectorComponent,
   ],
   templateUrl: './person-view.component.html',
@@ -153,7 +156,7 @@ export class PersonViewComponent extends EntityPresentationComponent {
             field.formControl?.setValue(field.defaultValue);
           }
         }
-      },    
+      },
     },
   ];
   // [variables] Formly
@@ -237,6 +240,26 @@ export class PersonViewComponent extends EntityPresentationComponent {
               ]
             }
           ]
+        }
+        let facts: FactApi[] = [];
+        if (this.modelCreate.date?.birth && this.modelCreate.date?.birth != '') {
+          facts.push({
+            type: CommonApiUri.PersonFactTypeBirth,
+            date: {
+              formal: this.modelCreate.date?.birth
+            }
+          })
+        }
+        if (this.modelCreate.date?.death && this.modelCreate.date?.death != '') {
+          facts.push({
+            type: CommonApiUri.PersonFactTypeDeath,
+            date: {
+              formal: this.modelCreate.date?.death
+            }
+          })
+        }
+        if (facts.length > 0) {
+          person.facts = facts;
         }
         person.projectId = this.projectId;
 

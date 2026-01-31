@@ -8,6 +8,7 @@
  * Do not edit the class manually.
  */
 import { NameApi } from './name';
+import { FactApi } from './fact';
 import { GenderApi } from './gender';
 
 
@@ -43,5 +44,9 @@ export interface PersonApi {
      * The names of the person.
      */
     names?: Array<NameApi>;
+    /**
+     * The facts of the person.
+     */
+    facts?: Array<FactApi>;
 }
 

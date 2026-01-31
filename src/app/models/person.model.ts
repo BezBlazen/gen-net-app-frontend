@@ -66,7 +66,11 @@ export interface PersonCreateLocal {
     full?: string,
     first?: string,
     last?: string
-  };
+  },
+  date?: {
+    birth?: string,
+    death?: string,
+  }
 }
 export interface PersonLocal {
   personApi?: PersonApi

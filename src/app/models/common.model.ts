@@ -10,5 +10,7 @@ export enum CommonApiUri {
   PrefixGenderType = 'http://gna.bzblz/GenderType/',
   PrefixNameType = 'http://gna.bzblz/NameType/',
   PrefixNamePartType = 'http://gna.bzblz/NamePartType/',
-  PrefixPersonFactType = 'http://gna.bzblz/PersonFactType/'
+  PrefixPersonFactType = 'http://gna.bzblz/PersonFactType/',
+  PersonFactTypeBirth = 'http://gna.bzblz/PersonFactType/Birth',
+  PersonFactTypeDeath = 'http://gna.bzblz/PersonFactType/Death',
 }

@@ -8,8 +8,8 @@ import { AbstractControl, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { NgxSpinnerModule } from 'ngx-spinner';
 import { FormlyFieldSelectComponent } from './formly/formly-field-select.component';
-import { FormlyFieldDateComponent } from './formly/formly-field-date.component';
 import { provideEnvironmentNgxMask } from 'ngx-mask';
+import { FormlyFieldDateComponent } from './formly/formly-field-date.component';
 
 export function passwordConfirmMatchValidator(control: AbstractControl) {
   const { password, passwordConfirm } = control.value;
