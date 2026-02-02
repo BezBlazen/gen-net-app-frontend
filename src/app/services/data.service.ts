@@ -267,6 +267,13 @@ export class DataService {
       description: type.description
     }));
   }
+  getDictUriPersonFactTypesOption(): FieldOptions[] | undefined {
+    return this.dictUri?.filter(dictUri => dictUri.uri?.startsWith(CommonApiUri.PrefixPersonFactType)).map(type => ({
+      label: type.title,
+      value: type.uri,
+      description: type.description
+    }));
+  }
   // Schemas
   // --------------------------
   // Cache

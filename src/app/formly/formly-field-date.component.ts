@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
-import { FieldType, FieldTypeConfig, FormlyModule } from '@ngx-formly/core';
-import { FormControl, Validators, ValidatorFn, AbstractControl, ValidationErrors, ReactiveFormsModule, FormsModule, FormGroup } from '@angular/forms';
+import { Component, ElementRef, SimpleChanges, ViewChild } from '@angular/core';
+import { FieldType, FieldTypeConfig, FormlyFieldConfig, FormlyModule } from '@ngx-formly/core';
+import { FormControl, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
 
@@ -39,8 +39,9 @@ export enum DatePrecision {
         <input 
           [id]="getId(0)"
           type="text"
+          [formControl]="formControl"
           style="display: none;"
-          [formControl]="formControl">
+          >
         @if (showFirstDate) {
         <input 
           [id]="getId(1)"
@@ -78,7 +79,7 @@ export enum DatePrecision {
 export class FormlyFieldDateComponent extends FieldType<FieldTypeConfig> {
   private readonly DATE_REGEX = /^\d{4}(-\d{2}){0,2}$/;
   private valueSubscription?: Subscription;
-
+  private isInternalSetValue: boolean = false;
   precisionOptions = [
     { value: DatePrecision.Exactly, label: 'Exactly' },
     { value: DatePrecision.Approximate, label: 'Approximate' },
@@ -102,12 +103,16 @@ export class FormlyFieldDateComponent extends FieldType<FieldTypeConfig> {
   }
   constructor() {
     super();
-    this.setupValueChanges();
     this.initializeFromModel();
+    this.setupValueChanges();
   }
   ngOnInit() {
     this.valueSubscription = this.formControl.valueChanges.subscribe(value => {
-      // console.log('Value changed:', value);
+      if (this.isInternalSetValue) {
+        this.initializeFromModel();
+      } else {
+        this.isInternalSetValue = false;
+      }
     });
   }
 
@@ -134,11 +139,28 @@ export class FormlyFieldDateComponent extends FieldType<FieldTypeConfig> {
   private initializeFromModel(): void {
     const dateStrValue: string | undefined = this.formControl?.value;
     if (dateStrValue && dateStrValue != "") {
-      const regexSingleDate = "/^((A?\d{4}(-\d{2}){0,2})|(\d{4}(-\d{2}){0,2}/\d{4}(-\d{2}){0,2}))$/";
-      if (!dateStrValue.match(regexSingleDate)) {
-        throw new Error("Can't parse date");
+      let slashIndex = dateStrValue.indexOf('/');
+      if (dateStrValue.length > 0 && slashIndex == 0) {
+        this.precisionControl.setValue(DatePrecision.Before);
+        this.date1Control.setValue('');
+        this.date2Control.setValue(dateStrValue.split('/')[1]);
+      } else if (dateStrValue.length > 0 && slashIndex == (dateStrValue.length - 1)) {
+        this.precisionControl.setValue(DatePrecision.After);
+        this.date1Control.setValue(dateStrValue.split('/')[0]);
+        this.date2Control.setValue('');
+      } else if (dateStrValue.length > 0 && slashIndex > 0) {
+        this.precisionControl.setValue(DatePrecision.Between);
+        this.date1Control.setValue(dateStrValue.split('/')[0]);
+        this.date2Control.setValue(dateStrValue.split('/')[1]);
+      } else if (dateStrValue.startsWith('A')) {
+        this.precisionControl.setValue(DatePrecision.Approximate);
+        this.date1Control.setValue(dateStrValue.substring(1));
+        this.date2Control.setValue('');
+      } else {
+        this.precisionControl.setValue(DatePrecision.Exactly);
+        this.date1Control.setValue(dateStrValue);
+        this.date2Control.setValue('');
       }
-      throw new Error("Perser not defined yet");
     } else {
       this.precisionControl.setValue(DatePrecision.Exactly);
       this.date1Control.setValue('');
@@ -183,6 +205,7 @@ export class FormlyFieldDateComponent extends FieldType<FieldTypeConfig> {
       default:
     }
     if (this.formControl) {
+      this.isInternalSetValue = true;
       this.formControl.setValue(dateStrValue ?? '');
     }
   }

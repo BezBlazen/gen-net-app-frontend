@@ -12,11 +12,13 @@ import { UriDtoApi } from '../../../../api/model/uriDto';
 import { CommonApiUri } from '../../../models/common.model';
 import { JsonPipe } from '@angular/common';
 import { FactApi } from '../../../../api/model/fact';
+import { PersonFactSelectorComponent } from '../../person-facts/person-fact-selector/person-fact-selector.component';
 
 @Component({
   selector: 'app-person-view',
   imports: [
     EntityPresentationComponent,
+    PersonFactSelectorComponent,
     FormsModule,
     FormlyModule,
     JsonPipe,
@@ -35,7 +37,7 @@ export class PersonViewComponent extends EntityPresentationComponent {
   @Output() onSaveEmitted = new EventEmitter<void>();
   @Output() onDeleteEmitted = new EventEmitter<void>();
   initPersonAsStr: string = '';
-  mainTabs = [{ id: 0, label: 'General' }, { id: 1, label: 'Names' }, { id: 2, label: 'Events' }]
+  mainTabs = [{ id: 0, label: 'General' }, { id: 1, label: 'Names' }, { id: 2, label: 'Facts' }]
   mainTabId = 0;
   // [variables]
   // --------------------------------
@@ -357,5 +359,8 @@ export class PersonViewComponent extends EntityPresentationComponent {
     //   this.model.person.names = [];
     // }
     return this.model.personApi?.names ?? [];
+  }
+  getPersonFacts(): FactApi[] {
+    return this.model.personApi?.facts ?? [];
   }
 }

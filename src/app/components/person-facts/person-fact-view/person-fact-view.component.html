@@ -1,0 +1,8 @@
+<app-entity-presentation [config]="getConfig()" [dialogRef]="dialogRef" (close)="onClose()" (ok)="onOk()"
+    (cancel)="onCancel()">
+    <div class="padding-8">
+        <formly-form [form]="form" [fields]="fields" [options]="options"
+            [model]="model"></formly-form>
+    </div>
+</app-entity-presentation>
+{{model | json}}

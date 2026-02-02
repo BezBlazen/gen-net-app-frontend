@@ -1,4 +1,5 @@
 // import { NamePartTypeApi } from "../../api/model/namePartType";
+import { FactApi } from "../../api/model/fact";
 import { NameApi } from "../../api/model/name";
 import { PersonApi } from "../../api/model/person";
 // import { Name } from "./api.model";
@@ -88,4 +89,8 @@ export interface NameFormLocal {
 export interface NameLocal {
   index?: number,
   name: NameApi
+}
+export interface FactLocal {
+  index?: number,
+  fact: FactApi
 }

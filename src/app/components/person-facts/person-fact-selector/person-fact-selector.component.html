@@ -1,0 +1,36 @@
+<app-entity-selector [config]="getConfig()" (add)="onAdd()" (edit)="onEdit()" (delete)="onDelete()">
+    <div class="table">
+        <table>
+            <colgroup>
+                <col style="width: 150px;">
+                <col style="width: 150px;">
+                <col style="width: auto;">
+            </colgroup>
+            <thead class="border-bottom">
+                <tr>
+                    <th>Type</th>
+                    <th>Date</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (fact of facts; track $index) {
+                <tr (click)="setSelectedItem($index)" [class.active]="isActive($index)">
+                    <td>{{getTypeTitle(fact)}}</td>
+                    <td>{{getDateAsStr(fact)}}</td>
+                    <td></td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</app-entity-selector>
+
+<dialog class="dialog-central" #dialogFact>
+    <app-person-fact-view class="view" [config]="factViewConfig"
+        [dialogRef]="dialogFact"
+        [factLocal]="factLocal"
+        (onAddEvent)="onAddEvent($event)"
+        (onSaveEvent)="onSaveEvent($event)"
+        ></app-person-fact-view>
+</dialog>

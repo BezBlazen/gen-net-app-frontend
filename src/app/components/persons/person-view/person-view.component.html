@@ -29,8 +29,8 @@
         <!-- Names -->
         <app-person-names-selector [personNames]="getPersonNames()"></app-person-names-selector>
         } @else if (mainTabId === 2) {
-        <!-- Events -->
-        Events
+        <!-- Facts -->
+        <app-person-fact-selector [facts]="getPersonFacts()"></app-person-fact-selector>
         }
     </div>
 </app-entity-presentation>
